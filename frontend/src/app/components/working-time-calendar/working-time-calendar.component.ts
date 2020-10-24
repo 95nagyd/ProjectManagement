@@ -72,7 +72,7 @@ export class WorkingTimeCalendarComponent implements OnInit {
       });
     }
     this.updateCalendarData();
-    
+    //TODO: scrolltop app componentből hónap váltáskor
     setTimeout(() => {
       this.spinner.hide();
     }, 700);
