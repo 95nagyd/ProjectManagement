@@ -1,0 +1,14 @@
+
+.login-container {
+    width: 325px;
+    margin-top: 70px;
+}
+
+.card-header {
+    align-self: center;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  pointer-events: all !important;
+}

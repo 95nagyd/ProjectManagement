@@ -1,0 +1,22 @@
+<ngx-spinner 
+    bdColor = "rgba(0, 0, 0, 0.8)" 
+    size = "large" color = "#fff" 
+    type = "ball-climbing-dot" 
+    [fullScreen] = "true">
+</ngx-spinner>
+<app-navbar *ngIf="isLoggedIn()" (clickOutside)="navbar.collapseIfPossible()"></app-navbar>
+<div class="route-component">
+    <router-outlet *ngIf="!isLoggedIn()"></router-outlet>
+
+    <div *ngIf="isLoggedIn()" class="container-fluid h-max" #page>
+        <div class="h-100 row justify-content-center">
+            <div class="col-12 p-0 pt-1">
+                <div class="component-content-container card mx-2 mb-2">
+                    <div class="card-body h-100">
+                        <router-outlet></router-outlet>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

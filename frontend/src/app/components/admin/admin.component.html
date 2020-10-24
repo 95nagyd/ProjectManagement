@@ -1,0 +1,8 @@
+<ul *ngIf="users">
+    <span>Összes felhasználó:</span>
+    <li *ngFor="let user of users">
+        <span>Vezetéknév: {{user.lastName}}</span>
+        <br>
+        <span>Keresztnév: {{user.firstName}}</span>
+    </li>
+</ul>

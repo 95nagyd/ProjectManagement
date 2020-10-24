@@ -1,0 +1,15 @@
+
+
+<input  *ngIf="!isDisabled"
+        type="text" 
+        maxlength="5"
+        class="pretty-time" 
+        [ngClass]="{ 'invalid': !isValid }"
+        [(ngModel)]="value"
+        (blur)="onFocusOut();"
+        (keypress)="onKeyPress($event);"/>
+
+<div    *ngIf="isDisabled"
+        class="pretty-time pretty-time-fake-input" >
+        {{value}}
+</div>

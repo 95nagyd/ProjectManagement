@@ -1,0 +1,168 @@
+<button [disabled]="!isInitComplete" 
+        class="btn btn-secondary"
+        (click)="saveCalendar();">
+                                Mentés
+</button>
+
+
+<div class="calendar-container">
+    <div class="calendar-slider p-2">
+         <span>
+            <i  class="fa fa-arrow-left pr-2 calendar-slider-arrow" 
+                (click)="changeMonth('previous')"
+                aria-hidden="true"></i>
+         </span>
+         <span>
+                {{yearMonth}}
+         </span>
+         <span>
+            <i  class="fa fa-arrow-right pl-2 calendar-slider-arrow" 
+                (click)="changeMonth('next')"
+                aria-hidden="true"></i>
+         </span>
+    </div>
+    <div class="header">
+        <div class="date-header-cell-w">
+            Dátum
+        </div>
+        <div class="working-time-header-cell-w">
+            Munkaidő
+        </div>
+        <div class="project-header-cell-w">
+            Projekt
+        </div>
+        <div class="design-phase-header-cell-w">
+            Tervfázis
+        </div>
+        <div class="structural-element-header-cell-w">
+            Szerkezeti&nbsp;elem
+        </div>
+        <div class="subtask-header-cell-w">
+            Részfeladat
+        </div>
+        <div class="comment-header-cell-w">
+            Megjegyzés
+        </div>
+        <div class="modify-header-cell-w">
+            <i class="fa fa-pencil" aria-hidden="true"></i>
+        </div>
+    </div>
+    <div class="calendar-content" #cal>
+        <table cellspacing="0" cellpadding="0">
+            <tbody>
+                <tr *ngFor="let dayData of daysOfMonth; last as isLast;" 
+                    [ngStyle]="{'background-color': dayData.backgroundColor}">
+                    <!-- Dátum cella -->
+                    <td class="date-cell date-cell-w"
+                        [ngClass]="isLast ? 'last-tr-left' : ''">
+                        <div class="day" 
+                             [ngStyle]="dayData.name === 'szombat' || dayData.name === 'vasárnap' ? {'background-color': 'rgb(130, 130, 130)', color: 'rgb(235, 235, 235)' } : {}"
+                             [ngClass]="isLast ? 'last-tr-left' : ''">
+                            <div class="day-number">{{dayData.number}}.</div>
+                            <div class="day-name">{{dayData.name}}</div>
+                        </div>
+                    </td>
+                    <!-- Munkaidő cella -->
+                    <td class="working-time-cell-w">
+                        <table>
+                            <tr *ngFor="let cellData of fakeData[dayData.number];">
+                                <td>
+                                    <div>
+                                        <formatted-time value="{{cellData ? cellData.workingTime : '00:00'}}"
+                                                        [isDisabled]="!isEditable">
+                                        </formatted-time>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <!-- Projekt cella -->
+                    <td [ngStyle]="{width: calcWidth*0.4+'px'}">
+                        <table>
+                            <tr *ngFor="let cellData of fakeData[dayData.number];">
+                                <td>
+                                    <div>
+                                        <span>{{cellData.project}}</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <!-- Tervfázis cella -->
+                    <td [ngStyle]="{width: calcWidth*0.195+'px'}">
+                        <table>
+                            <tr *ngFor="let cellData of fakeData[dayData.number];">
+                                <td>
+                                    <div>
+                                        <span>{{cellData.designPhase}}</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <!-- Szerkezeti elem cella -->
+                    <td [ngStyle]="{width: calcWidth*0.21+'px'}">
+                        <table>
+                            <tr *ngFor="let cellData of fakeData[dayData.number];">
+                                <td>
+                                    <div>
+                                        <span>{{cellData.structuralElement}}</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <!-- Részfeladat cella -->
+                    <td [ngStyle]="{width: calcWidth*0.195+'px'}">
+                        <table>
+                            <tr *ngFor="let cellData of fakeData[dayData.number];">
+                                <td>
+                                    <div>
+                                        <span>{{cellData.subtask}}</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <!-- Megjegyzés cella -->
+                    <td class="comment-cell-w">
+                        <table>
+                            <tr *ngFor="let cellData of fakeData[dayData.number];">
+                                <td>
+                                    <div [ngSwitch]="cellData.comment && cellData.length != 0">
+                                        <i *ngSwitchCase="true" class="fa fa-comment" style="cursor: pointer;" aria-hidden="true"></i>
+                                        <i *ngSwitchCase="false" class="fa fa-comment-o" aria-hidden="true"></i>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <!-- Szerkesztés cella -->
+                    <td class="modify-cell modify-cell-w"
+                        [ngClass]="isLast ? 'last-tr-right' : ''">
+                        <table>
+                            <tr *ngFor="let cellData of fakeData[dayData.number]; index as rowIndex; last as isLastRow; count as rowCount;">
+                                <td>
+                                    <div class="modify">
+                                        <div class="m-auto modify-add" 
+                                                [ngClass]="!isEditable || !isLastRow ? 'modify-disabled' : ''"
+                                                (click)="isEditable && isLastRow ? addRow(dayData.number) : null;">
+                                            <i class="fa fa-plus-square-o" aria-hidden="true"></i>
+                                        </div>
+                                        <div class="m-auto modify-delete"
+                                                [ngClass]="!isEditable || rowCount === 1 ? 'modify-disabled' : ''"
+                                                (click)="isEditable && rowCount != 1 ? deleteRow(dayData.number, rowIndex) : null;">
+                                            <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+

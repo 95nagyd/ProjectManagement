@@ -1,0 +1,14 @@
+
+html, body {
+    background-color: rgb(231, 231, 231);
+}
+
+.h-max {
+    height: calc( 100vh - 70px );
+    overflow-y: auto;
+}
+
+
+.component-content-container {
+    height: calc(100% - 0.5rem);
+}

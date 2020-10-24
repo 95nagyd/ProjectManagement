@@ -1,0 +1,60 @@
+<div class="container login-container">
+    <div class="card">
+        <h4 class="card-header">
+            <img src="../assets/img/companyLogo.png" height="130px">
+        </h4>
+        <div class="card-body">
+            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+                <div class="form-group">
+                    <label for="username">Felhasználónév</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <i class="fa fa-user-o" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                        <input  type="text" 
+                                formControlName="username" 
+                                class="form-control rounded-right"
+                                maxlength="20"
+                                [ngClass]="{ 'is-invalid': submitted && formControls.username.errors }"
+                                placeholder="Felhasználónév"/>
+                        <div *ngIf="formControls.username.errors" class="invalid-feedback">
+                            <div *ngIf="submitted && formControls.username.hasError('required')">A felhasználónév kitöltése kötelező.</div>
+                            <div *ngIf="formControls.username.hasError('minlength') || formControls.username.hasError('maxlength')">A felhasználónév 6-20 karakter hosszú lehet!</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="password">Jelszó</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <i class="fa fa-lock" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                        <input  type="password" 
+                                formControlName="password" 
+                                class="form-control rounded-right" 
+                                maxlength="20"
+                                [ngClass]="{ 'is-invalid': submitted && formControls.password.errors }"
+                                placeholder="Jelszó" />
+                        <div *ngIf="formControls.password.errors" class="invalid-feedback">
+                            <div *ngIf="submitted && formControls.password.hasError('required')">A jelszó kitöltése kötelező.</div>
+                            <div *ngIf="formControls.password.hasError('minlength') || formControls.password.hasError('maxlength')">A jelszó 6-20 karakter hosszú lehet!</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <button type="submit" 
+                            [disabled]="loading || formControls.username.hasError('required') || formControls.username.hasError('minlength') || formControls.password.hasError('required') || formControls.password.hasError('minlength')" 
+                            class="btn btn-secondary">
+                            <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
+                                Bejelentkezés
+                    </button>
+                </div>
+                <div *ngIf="error" class="alert alert-danger mt-3 mb-0">{{error}}</div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,72 @@
+<nav class="navbar sticky-top navbar-expand-xl navbar-dark bg-dark">
+    <div class="navbar-header">
+        <div class="navbar-brand">
+            <img src="../assets/img/companyLogo.png" height="50px">
+        </div>
+    </div>
+    <div *ngIf="isExpandable()" class="ml-auto p-0 col-4">
+        <app-navbar-user-details></app-navbar-user-details>
+    </div>
+    <button class="navbar-toggler" type="button" (click)="toggleNavbar()">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse show" 
+    [@expandCollapse] = "isNavbarCollapsed ? 'collapsed' : 'expanded'"
+    [@.disabled]="isAnimationDisabled">
+        <hr class="nav-dropdown-start">
+        <ul class="navbar-nav w-100">
+            <li class="nav-item align-self-center">
+                <a class="nav-link" 
+                    *ngIf="isAdmin()"
+                    routerLink="administration" 
+                    routerLinkActive="active active-nav-link" 
+                    (click)="collapseIfPossible()">
+                        <i class="fa fa-cogs" aria-hidden="true"></i>
+                        ADMINISZTRÁCIÓ
+                </a>
+            </li>
+            <li class="nav-item align-self-center">
+                <a class="nav-link" 
+                    routerLink="workingTime" 
+                    routerLinkActive="active active-nav-link"
+                    (click)="collapseIfPossible()">
+                        <i class="fa fa-calendar" aria-hidden="true"></i>
+                        MUNKAIDŐ<span class="sr-only">(current)</span>
+                </a>
+            </li>
+            <li class="nav-item align-self-center">
+                <a class="nav-link" 
+                    routerLink="team" 
+                    routerLinkActive="active active-nav-link" 
+                    (click)="collapseIfPossible()">
+                        <i class="fa fa-users" aria-hidden="true"></i>
+                        MUNKATÁRSAK
+                </a>
+            </li>
+            <li class="nav-item align-self-center">
+                <a class="nav-link" 
+                    routerLink="stats" 
+                    routerLinkActive="active active-nav-link" 
+                    (click)="collapseIfPossible()">
+                        <i class="fa fa-bar-chart" aria-hidden="true"></i>
+                        STATISZTIKÁK
+                </a>
+            </li>
+            <li class="nav-item">
+                <hr class="nav-dropdown-end">
+            </li>
+            <div class="navbar-nav ml-auto align-items-center col-sm-4 p-0">
+                <div *ngIf="!isExpandable()" class="ml-auto col">
+                    <app-navbar-user-details></app-navbar-user-details>
+                </div>
+                <li class="nav-item ml-auto">
+                    <a class="nav-link text-right p-0 col" (click)="logout()">
+                        <i class="fa fa-sign-out" aria-hidden="true"></i>
+                        Kijelentkezés
+                    </a>
+                </li>
+            </div>
+        </ul>
+    </div>
+</nav>

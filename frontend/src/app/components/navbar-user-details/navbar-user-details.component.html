@@ -1,0 +1,9 @@
+<div class="user-details pr-2">
+    <div class="user-name text-right pr-1">
+        {{currentUserFullName}}
+    </div>
+    <div class="time-left text-right">
+        <div *ngIf="!isTimeLeftIndicatorReady()" class="spinner-border spinner-border-sm"></div>
+        <div *ngIf="isTimeLeftIndicatorReady()" [ngStyle]="{'color': timeLeft < 60 ? 'rgb(212, 27, 23)' : null}">{{ timeLeft | minuteSeconds }}</div>
+    </div>
+</div>
