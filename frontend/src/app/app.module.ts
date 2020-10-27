@@ -25,6 +25,8 @@ import { TeamComponent } from './components/team/team.component';
 import { StatsComponent } from './components/stats/stats.component';
 import { WorkingTimeCalendarComponent } from './components/working-time-calendar/working-time-calendar.component';
 import { FormattedTimeComponent } from './components/formatted-time/formatted-time.component';
+import { CommentBoxComponent } from './components/working-time-calendar/comment-box/comment-box.component';
+
 
 @NgModule({
   declarations: [
@@ -40,7 +42,8 @@ import { FormattedTimeComponent } from './components/formatted-time/formatted-ti
     TeamComponent,
     StatsComponent,
     WorkingTimeCalendarComponent,
-    FormattedTimeComponent
+    FormattedTimeComponent,
+    CommentBoxComponent
   ],
   imports: [
     BrowserModule,

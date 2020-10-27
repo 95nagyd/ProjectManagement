@@ -8,11 +8,11 @@
 <div class="route-component">
     <router-outlet *ngIf="!isLoggedIn()"></router-outlet>
 
-    <div *ngIf="isLoggedIn()" class="container-fluid h-max" #page>
+    <div *ngIf="isLoggedIn()" class="container-fluid h-max" (scroll)="onScroll();" #page>
         <div class="h-100 row justify-content-center">
             <div class="col-12 p-0 pt-1">
                 <div class="component-content-container card mx-2 mb-2">
-                    <div class="card-body h-100">
+                    <div class="card-body h-100" >
                         <router-outlet></router-outlet>
                     </div>
                 </div>

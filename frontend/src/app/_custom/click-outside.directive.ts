@@ -12,6 +12,6 @@ export class ClickOutsideDirective {
 
   @HostListener('document:click', ['$event.target'])
   public onClick(target: any) {
-    if(!this.spinner.isSpinnerVisible() && !this.elementRef.nativeElement.contains(target)) this.clickOutside.emit();
+    if(!this.spinner.isSpinnerVisible() && !this.elementRef.nativeElement.contains(target)) {this.clickOutside.emit();}
   }
 }

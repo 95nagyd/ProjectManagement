@@ -1,5 +1,6 @@
 import { Component, NgZone, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { AuthenticationService } from '@app/_services/authentication.service';
+import { PageContentScrollOffsetService } from '@app/_services/page-content-scroll-offset.service';
 import { Router } from '@angular/router';
 import { SpinnerService } from './_services/spinner.service';
 import { NavbarComponent } from './components/navbar/navbar.component';
@@ -17,18 +18,29 @@ export class AppComponent {
   private isLoggedInPastState: any;
 
   @ViewChild(NavbarComponent) navbar: NavbarComponent;
-  @ViewChild('page')
-  page: ElementRef;
+  @ViewChild('page') page: ElementRef;
 
   constructor(private authenticationService: AuthenticationService, private router: Router, 
-                private ngZone: NgZone, private spinner: SpinnerService) { 
-    this.isLoggedInPastState = this.isLoggedIn();
+                private _ngZone: NgZone, private spinner: SpinnerService, private scrollOffsetService: PageContentScrollOffsetService) { 
+                  
+    this.spinner.show();
 
+    scrollOffsetService.register(this);
+
+    this.isLoggedInPastState = this.isLoggedIn();
+                  
     if (this.isLoggedInPastState) this.router.navigate(['']);
 
     this.initInterval();
   }
 
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      this.scrollOffsetService.setOffsetY(0);
+      this.spinner.hide();
+    }, 0);
+  }
 
   initInterval() {
     interval(500).pipe(
@@ -37,8 +49,8 @@ export class AppComponent {
       }))
       .subscribe((isLoggedInActualState) => { 
         if(isLoggedInActualState !== this.isLoggedInPastState){
-          if(isLoggedInActualState) this.ngZone.run(() => this.router.navigate(['']) );
-          if(!isLoggedInActualState) this.ngZone.run(() => this.router.navigate(['/login']) );
+          if(isLoggedInActualState) this._ngZone.run(() => this.router.navigate(['']) );
+          if(!isLoggedInActualState) this._ngZone.run(() => this.router.navigate(['/login']) );
           this.isLoggedInPastState = isLoggedInActualState;
         }
       })
@@ -48,9 +60,8 @@ export class AppComponent {
     return this.authenticationService.isLoggedIn();
   }
 
-  
-  scrollTop(){
-    this.page.nativeElement.scrollTop = 0;
+  setScrollTop(offset: number){
+    if(this.page) { this.page.nativeElement.scrollTop = offset; }
   }
 
   @HostListener('document:keydown', ['$event'])   
@@ -59,4 +70,8 @@ export class AppComponent {
       event.preventDefault();
     }
   }
+
+  onScroll() {
+    this.scrollOffsetService.setOffsetY(this.page.nativeElement.scrollTop);
+  };
 }

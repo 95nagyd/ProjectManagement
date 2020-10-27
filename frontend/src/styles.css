@@ -11,4 +11,5 @@ html, body {
 
 .component-content-container {
     height: calc(100% - 0.5rem);
+    display: relative;
 }

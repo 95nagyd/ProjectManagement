@@ -1,25 +1,27 @@
-<button [disabled]="!isInitComplete" 
-        class="btn btn-secondary"
-        (click)="saveCalendar();">
-                                Mentés
-</button>
-
-
+<comment-box #commentbox></comment-box>
 <div class="calendar-container">
     <div class="calendar-slider p-2">
-         <span>
-            <i  class="fa fa-arrow-left pr-2 calendar-slider-arrow" 
-                (click)="changeMonth('previous')"
-                aria-hidden="true"></i>
-         </span>
-         <span>
-                {{yearMonth}}
-         </span>
-         <span>
-            <i  class="fa fa-arrow-right pl-2 calendar-slider-arrow" 
-                (click)="changeMonth('next')"
-                aria-hidden="true"></i>
-         </span>
+        <div class="calendar-slider-left">
+           <i  class="fa fa-arrow-left pr-2 cursor-pointer" 
+               (click)="changeMonth('previous')"
+               aria-hidden="true"></i>
+        </div>
+        <div class="calendar-slider-period">
+               {{period}}
+        </div>
+        <div class="calendar-slider-right">
+            <div class="w-50">
+                <i  class="fa fa-arrow-right pl-2 cursor-pointer" 
+                    (click)="changeMonth('next')"
+                    aria-hidden="true"></i>
+            </div>
+           <div class="w-50 text-right pr-2">
+                <i class="fa fa-floppy-o cursor-pointer calendar-slider-right-save" 
+                    (click)="saveCalendar();"
+                    [ngClass]="!isInitComplete || isCalDataValid() ? 'save-valid' : 'save-error'" 
+                    aria-hidden="true"></i>
+           </div>
+        </div>
     </div>
     <div class="header">
         <div class="date-header-cell-w">
@@ -56,10 +58,10 @@
                     <td class="date-cell date-cell-w"
                         [ngClass]="isLast ? 'last-tr-left' : ''">
                         <div class="day" 
-                             [ngStyle]="dayData.name === 'szombat' || dayData.name === 'vasárnap' ? {'background-color': 'rgb(130, 130, 130)', color: 'rgb(235, 235, 235)' } : {}"
+                             [ngStyle]="dayData.name === 'szombat' ? { 'background-color': 'rgb(130, 130, 130)', color: 'rgb(235, 235, 235)' } : dayData.name === 'vasárnap' ? { 'background-color': 'rgb(130, 130, 130)', color: 'rgb(186, 4, 4)' } : {}"
                              [ngClass]="isLast ? 'last-tr-left' : ''">
                             <div class="day-number">{{dayData.number}}.</div>
-                            <div class="day-name">{{dayData.name}}</div>
+                            <div class="day-name" [ngStyle]="dayData.name === 'vasárnap' ? { 'font-weight': 'bold' } : {}">{{dayData.name}}</div>
                         </div>
                     </td>
                     <!-- Munkaidő cella -->
@@ -77,7 +79,7 @@
                         </table>
                     </td>
                     <!-- Projekt cella -->
-                    <td [ngStyle]="{width: calcWidth*0.4+'px'}">
+                    <td>
                         <table>
                             <tr *ngFor="let cellData of fakeData[dayData.number];">
                                 <td>
@@ -89,7 +91,7 @@
                         </table>
                     </td>
                     <!-- Tervfázis cella -->
-                    <td [ngStyle]="{width: calcWidth*0.195+'px'}">
+                    <td>
                         <table>
                             <tr *ngFor="let cellData of fakeData[dayData.number];">
                                 <td>
@@ -101,7 +103,7 @@
                         </table>
                     </td>
                     <!-- Szerkezeti elem cella -->
-                    <td [ngStyle]="{width: calcWidth*0.21+'px'}">
+                    <td >
                         <table>
                             <tr *ngFor="let cellData of fakeData[dayData.number];">
                                 <td>
@@ -113,7 +115,7 @@
                         </table>
                     </td>
                     <!-- Részfeladat cella -->
-                    <td [ngStyle]="{width: calcWidth*0.195+'px'}">
+                    <td >
                         <table>
                             <tr *ngFor="let cellData of fakeData[dayData.number];">
                                 <td>
@@ -130,8 +132,22 @@
                             <tr *ngFor="let cellData of fakeData[dayData.number];">
                                 <td>
                                     <div [ngSwitch]="cellData.comment && cellData.length != 0">
-                                        <i *ngSwitchCase="true" class="fa fa-comment" style="cursor: pointer;" aria-hidden="true"></i>
-                                        <i *ngSwitchCase="false" class="fa fa-comment-o" aria-hidden="true"></i>
+                                        <div>
+                                            <i *ngSwitchCase="true" 
+                                                class="fa fa-comment cursor-pointer" 
+                                                aria-hidden="true"
+                                                (mouseenter)="previewComment(cellData.comment, $event);" 
+                                                (mouseleave)="hideComment();"
+                                                (click)="editComment(cellData.comment, $event);"></i>
+                                        </div>
+                                        <div>
+                                            <i *ngSwitchCase="false" 
+                                                [ngClass]="isEditable ? 'cursor-pointer' : ''"
+                                                class="fa fa-comment-o" 
+                                                aria-hidden="true"
+                                                (mouseenter)="previewComment(cellData.comment, $event);" 
+                                                (mouseleave)="hideComment();"></i>
+                                        </div>
                                     </div>
                                 </td>
                             </tr>
@@ -144,12 +160,12 @@
                             <tr *ngFor="let cellData of fakeData[dayData.number]; index as rowIndex; last as isLastRow; count as rowCount;">
                                 <td>
                                     <div class="modify">
-                                        <div class="m-auto modify-add" 
+                                        <div class="m-auto modify-add cursor-pointer" 
                                                 [ngClass]="!isEditable || !isLastRow ? 'modify-disabled' : ''"
                                                 (click)="isEditable && isLastRow ? addRow(dayData.number) : null;">
                                             <i class="fa fa-plus-square-o" aria-hidden="true"></i>
                                         </div>
-                                        <div class="m-auto modify-delete"
+                                        <div class="m-auto modify-delete cursor-pointer"
                                                 [ngClass]="!isEditable || rowCount === 1 ? 'modify-disabled' : ''"
                                                 (click)="isEditable && rowCount != 1 ? deleteRow(dayData.number, rowIndex) : null;">
                                             <i class="fa fa-trash-o" aria-hidden="true"></i>
