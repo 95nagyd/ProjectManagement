@@ -17,15 +17,16 @@ import { AdminComponent } from './components/admin/admin.component';
 
 import { JwtInterceptor } from './_helpers/jwt.interceptor';
 import { ErrorInterceptor } from './_helpers/error.interceptor';
-import { NavbarUserDetailsComponent } from './components/navbar-user-details/navbar-user-details.component';
+import { NavbarUserDetailsComponent } from './components/navbar/navbar-user-details/navbar-user-details.component';
 import { MinuteSecondsPipe } from '@app/_custom/minute-seconds.pipe'
 import { NgxSpinnerModule } from "ngx-spinner";
 import { ClickOutsideDirective } from './_custom/click-outside.directive';
 import { TeamComponent } from './components/team/team.component';
 import { StatsComponent } from './components/stats/stats.component';
-import { WorkingTimeCalendarComponent } from './components/working-time-calendar/working-time-calendar.component';
-import { FormattedTimeComponent } from './components/formatted-time/formatted-time.component';
-import { CommentBoxComponent } from './components/working-time-calendar/comment-box/comment-box.component';
+import { WorkingTimeCalendarComponent } from './components/_core/working-time-calendar/working-time-calendar.component';
+import { FormattedTimeComponent } from './components/_core/working-time-calendar/formatted-time/formatted-time.component';
+import { CommentBoxComponent } from './components/_core/working-time-calendar/comment-box/comment-box.component';
+import { ComboBoxComponent } from './components/_core/combo-box/combo-box.component';
 
 
 @NgModule({
@@ -43,7 +44,8 @@ import { CommentBoxComponent } from './components/working-time-calendar/comment-
     StatsComponent,
     WorkingTimeCalendarComponent,
     FormattedTimeComponent,
-    CommentBoxComponent
+    CommentBoxComponent,
+    ComboBoxComponent
   ],
   imports: [
     BrowserModule,

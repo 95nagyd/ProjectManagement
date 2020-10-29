@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { WorkingTimeCalendarService } from '@app/_services/working-time-calendar.service';
 
 @Component({
   selector: 'formatted-time',
@@ -8,16 +9,28 @@ import { Component, Input, OnInit } from '@angular/core';
 export class FormattedTimeComponent implements OnInit {
 
   private hasError: Boolean;
-  private pattern;
+  private pattern: any;
 
-  constructor() { 
+  constructor(private calendarService: WorkingTimeCalendarService) { 
     this.hasError = false;
     this.pattern = /^[0-9]{0,2}[\:]?[0-9]{0,2}$/;
   }
 
-  ngOnInit(): void { }
+  ngOnInit(): void { 
+    this.value = !this.value || this.value.length === 0 ? '00:00' : this.value;
+  }
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      this.updateValue();
+    }, 0);
+  }
+  
+
   @Input() value: string;
   @Input() isDisabled: Boolean;
+  @Input() dataPosition: any;
+
 
   public get isValid() : Boolean { return !this.hasError; }
 
@@ -30,6 +43,7 @@ export class FormattedTimeComponent implements OnInit {
     if(!input || input.length === 0) {
       this.hasError = false;
       this.value = '00:00';
+      this.updateValue();
       return;
     }
 
@@ -72,7 +86,13 @@ export class FormattedTimeComponent implements OnInit {
     }
 
     this.hasError = false;
-    this.value = (hours < 10 ? ('0' + hours) : hours.toString()) + ':' + (minutes < 10 ? ('0' + minutes) : minutes.toString())
+    this.value = (hours < 10 ? ('0' + hours) : hours.toString()) + ':' + (minutes < 10 ? ('0' + minutes) : minutes.toString());
+    this.updateValue();
+  }
+
+  updateValue(){
+    //TODO: split : , parseintelső *60 + parseint második
+    this.calendarService.getCalendarActualData()[this.dataPosition.dayNumber][this.dataPosition.dataIndex].workingTime = this.value;
   }
 
   onKeyPress(event: any){

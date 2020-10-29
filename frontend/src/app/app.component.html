@@ -4,7 +4,7 @@
     type = "ball-climbing-dot" 
     [fullScreen] = "true">
 </ngx-spinner>
-<app-navbar *ngIf="isLoggedIn()" (clickOutside)="navbar.collapseIfPossible()"></app-navbar>
+<navbar *ngIf="isLoggedIn()" (clickOutside)="navbar.collapseIfPossible()"></navbar>
 <div class="route-component">
     <router-outlet *ngIf="!isLoggedIn()"></router-outlet>
 

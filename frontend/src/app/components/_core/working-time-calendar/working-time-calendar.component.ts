@@ -1,14 +1,11 @@
 import { Component, OnInit, Input, ViewChild, ViewChildren, QueryList, ElementRef, HostListener, EventEmitter, Output } from '@angular/core';
-import { FormattedTimeComponent } from '@app/components/formatted-time/formatted-time.component'
+import { FormattedTimeComponent } from '@app/components/_core/working-time-calendar/formatted-time/formatted-time.component'
 import { SpinnerService } from '@app/_services/spinner.service';
-import { CommentBoxComponent } from '@app/components/working-time-calendar/comment-box/comment-box.component';
+import { CommentBoxComponent } from '@app/components/_core/working-time-calendar/comment-box/comment-box.component';
 import { PageContentScrollOffsetService } from '@app/_services/page-content-scroll-offset.service';
-
-interface DayRow {
-  number: string;
-  name: string;
-  backgroundColor: string;
-}
+import { WorkingTimeCalendarService } from '@app/_services/working-time-calendar.service';
+import { CalendarDayDetails } from '@app/_models/calendarDayDetails';
+import { CalendarDayData } from '@app/_models/calendarDayData';
 
 @Component({
   selector: 'working-time-calendar',
@@ -25,13 +22,12 @@ export class WorkingTimeCalendarComponent implements OnInit {
   period: string;
   monthNames: string[];
   dayNames: string[];
-  daysOfMonth: DayRow[] = [];
+  daysOfMonth: CalendarDayDetails[] = [];
+  calendarData: CalendarDayData[] = [];
 
-
-
-  fakeData = {  }
-
-  constructor(private spinner: SpinnerService, private scrollOffsetService: PageContentScrollOffsetService) { }
+  constructor(private spinner: SpinnerService, private scrollOffsetService: PageContentScrollOffsetService, 
+    private calendarService: WorkingTimeCalendarService) { 
+    }
 
   ngOnInit(): void { 
     this.spinner.show();
@@ -56,9 +52,8 @@ export class WorkingTimeCalendarComponent implements OnInit {
 
   @Input() isEditable: Boolean;
   @ViewChild('commentbox') commentbox: CommentBoxComponent;
-  
-  setPeriod() { this.period = this.choosenPeriod.getFullYear().toString() + ' ' + this.monthNames[this.choosenPeriod.getMonth()] }
 
+  setPeriod() { this.period = this.choosenPeriod.getFullYear().toString() + ' ' + this.monthNames[this.choosenPeriod.getMonth()] }
 
   refreshCalendar() {
     this.spinner.show();
@@ -74,7 +69,7 @@ export class WorkingTimeCalendarComponent implements OnInit {
     }
     this.updateCalendarData();
     this.scrollOffsetService.setOffsetY(0);
-    this.hideComment();
+    if(this.commentbox) { this.commentbox.hide(); }
     setTimeout(() => {
       this.spinner.hide();
     }, 700);
@@ -85,7 +80,6 @@ export class WorkingTimeCalendarComponent implements OnInit {
     this.choosenPeriod.setMonth(this.choosenPeriod.getMonth() + (direction === 'previous' ? -1 : 1)); 
     
     this.setPeriod();
-    this.fakeData = {}
     this.refreshCalendar();
 
   }
@@ -94,17 +88,18 @@ export class WorkingTimeCalendarComponent implements OnInit {
 
   private updateCalendarData() {
     //ide majd api hívással lekérni a beállított hónaphoz tartozó adatokat, ami most a fakeData
+    this.calendarData = this.calendarService.getCalendarDataDataAccessOperation(this.choosenPeriod);
     this.daysOfMonth.forEach(dayData => {
-      if(!this.fakeData[dayData.number]) { 
-        this.fakeData[dayData.number] = [];
-        this.addRow(dayData.number); 
+      if(!this.calendarData[dayData.number]) { 
+        this.calendarData[dayData.number] = [];
+        this.addEmptyRow(dayData.number); 
       }
     });
   }
 
-  addRow(dayNumber: string) { 
-    const newRow = {
-      workingTime : '00:00',
+  addEmptyRow(dayNumber: string) {
+    const newRow: CalendarDayData = {
+      workingTime : '',
       project: 'Ürömhegyi lejtő...',
       designPhase: 'Munkatársakkal...',
       structuralElement: 'aaaaaaaaaaaaaaaaaaaa',
@@ -112,21 +107,16 @@ export class WorkingTimeCalendarComponent implements OnInit {
       comment: 'csp egységárhoz tonna becslés tisztázás, axis modell átnézés, Zsolt VT-nek ajánlatkérés, belső egyeztetés'
     }
 
-    this.fakeData[dayNumber].push(newRow);
+    this.calendarData[dayNumber].push(newRow);
   }
 
   deleteRow(dayNumber: string, rowIndex: number){
 
-    //TODO: period shadow
-
-    //TODO: nyilakra kattintás shadow
-    //TODO: nyilakra hover szinezes
-    
-    //TODO: megjegyzés tooltip
-
-    //TODO: havi összes munkaidő az utolsó nap után
-
     //TODO: saját ikon mentéshez (sima, kattintott, letiltott)
+
+    //TODO: havi összes munkaidő az utolsó nap után (legalább annyi hely kell , hogy az utolsó nap max magasságos tooltipje kiférjen)
+
+    
 
     //TODO: confirm modal törlés
 
@@ -143,30 +133,25 @@ export class WorkingTimeCalendarComponent implements OnInit {
     //TODO: az első töltésig (bárkié) lehessen visszamenni
 
     //TODO: bevezetni az istouched-et, mentés csak akkor, ha true , elnavigálás esetén rákérdezni, hogy elveti-e a módosításait
+
+    //TODO: kitalálni, hogy az üres sorok nem kiválasztott kötelező értékeivel mi legyen
     
-    this.fakeData[dayNumber].splice(rowIndex, 1);
+    this.calendarService.getCalendarActualData()[dayNumber].splice(rowIndex, 1);
   }
 
 
 
-  previewComment(comment: string, e: any) {
+  previewComment(dataPosition: any, e: any) {
     if(this.commentbox && !this.commentbox.isEditing){
-      let position = { 
-        x: e.target.getBoundingClientRect().x,  
-        y: e.target.getBoundingClientRect().y + this.scrollOffsetService.getOffsetY()
-      };
-      this.commentbox.preview(position, comment);
+      this.commentbox.preview(e.target, dataPosition);
     }
   }
 
-  editComment(comment: string, e: any) {
+  editComment(dataPosition: any, e: any) {
+    if(!this.isEditable) return;
     if(this.commentbox && this.commentbox.isEditing) { this.commentbox.hide(); return; }
     if(this.commentbox){
-      let position = { 
-        x: e.target.getBoundingClientRect().x,  
-        y: e.target.getBoundingClientRect().y + this.scrollOffsetService.getOffsetY()
-      };
-      this.commentbox.edit(position, comment);
+      this.commentbox.edit(e.target, dataPosition);
     }
   }
 
@@ -174,10 +159,10 @@ export class WorkingTimeCalendarComponent implements OnInit {
     if(this.commentbox){
       this.commentbox.isNewDisplayInTimeout = false;
       setTimeout(() => {
-        if(this.commentbox && this.commentbox.isPreview && !this.commentbox.isEditing && !this.commentbox.isPreviewInFocus && !this.commentbox.isNewDisplayInTimeout){ 
+        if(this.commentbox && this.commentbox.isPreview && !this.commentbox.isEditing && !this.commentbox.isCommentInFocus && !this.commentbox.isNewDisplayInTimeout){ 
           this.commentbox.hide(); 
         }
-      }, 300);
+      }, 100);
     }
   }
 
@@ -187,9 +172,8 @@ export class WorkingTimeCalendarComponent implements OnInit {
   }
 
   saveCalendar(){
+    if(!this.isEditable || !this.isCalDataValid()) { return; }
     console.log(this.isCalDataValid())
+    console.log(this.calendarData)
   }
-
-
-
 }

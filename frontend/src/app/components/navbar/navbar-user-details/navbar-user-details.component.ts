@@ -4,7 +4,7 @@ import { interval, of } from 'rxjs';
 import { switchMap, takeWhile } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-navbar-user-details',
+  selector: 'navbar-user-details',
   templateUrl: './navbar-user-details.component.html',
   styleUrls: ['./navbar-user-details.component.css']
 })

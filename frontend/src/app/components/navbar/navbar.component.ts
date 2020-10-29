@@ -7,7 +7,7 @@ import { User } from '@app/_models/user';
 import { Role } from '@app/_models/role';
 
 @Component({
-  selector: 'app-navbar',
+  selector: 'navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
   animations: [

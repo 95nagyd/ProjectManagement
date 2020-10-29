@@ -25,11 +25,12 @@
     border: 1px solid rgb(75, 75, 75); 
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
-    background-color: rgb(192, 218, 237); 
+    background-color: rgb(192, 218, 237);
 }
 
 .calendar-slider-period{
     width: 300px;
+    text-shadow: 3px 4px 3px rgba(0,0,0,0.3);
 }
 
 .calendar-slider-left{
@@ -48,23 +49,44 @@
     cursor: pointer;
 }
 
-.calendar-slider-right-save{
-    font-size: 32px;
-    font-weight: 500;
+.arrow:hover {
+    text-shadow: 0px 4px 3px rgba(0,0,0,0.3);
 }
 
-.save-valid{
-    color: rgb(0, 95, 0);
-    text-shadow: 0px 0px 1px rgb(0, 95, 0);
+.arrow:active {
+    font-size: 21px;
+    text-shadow: 0px 4px 3px rgba(0,0,0,0.3);
 }
 
-.save-valid:active{
-    text-shadow: 2px 2px 2px rgb(0, 95, 0);
+.save-container{
+    width: 50%;
+    display: block;
+    margin-top: -11px;
 }
 
-.save-error{
-    color: rgb(219, 0, 0);
-    text-shadow: 0px 0px 1px rgb(219, 0, 0);
+.save {
+    background-image: url("../../../../assets/img/save/normal.png"); 
+    background-size: 55px 55px;
+    background-position: center;
+    height: 55px; 
+    width: 55px;
+    display: block;
+    float: right;
+    cursor: pointer;
+}
+
+.save:active {
+    background-image: url('../../../../assets/img/save/active.png');
+}
+
+.save-error {
+    background-image: url('../../../../assets/img/save/disabled.png');
+    cursor: not-allowed;
+}
+
+.save-error:active {
+    background-image: url('../../../../assets/img/save/disabled.png');
+    cursor: not-allowed;
 }
 
 .save-error:active{
@@ -93,6 +115,10 @@
     background-color: rgb(136, 159, 168); 
     font-weight: 700;
     margin-bottom: 1px;
+}
+
+.header div {
+    text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.479);
 }
 
 .header div:not(:first-child) {

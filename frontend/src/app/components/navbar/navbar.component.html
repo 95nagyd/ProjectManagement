@@ -5,7 +5,7 @@
         </div>
     </div>
     <div *ngIf="isExpandable()" class="ml-auto p-0 col-4">
-        <app-navbar-user-details></app-navbar-user-details>
+        <navbar-user-details></navbar-user-details>
     </div>
     <button class="navbar-toggler" type="button" (click)="toggleNavbar()">
         <span class="navbar-toggler-icon"></span>
@@ -58,7 +58,7 @@
             </li>
             <div class="navbar-nav ml-auto align-items-center col-sm-4 p-0">
                 <div *ngIf="!isExpandable()" class="ml-auto col">
-                    <app-navbar-user-details></app-navbar-user-details>
+                    <navbar-user-details></navbar-user-details>
                 </div>
                 <li class="nav-item ml-auto">
                     <a class="nav-link text-right p-0 col" (click)="logout()">

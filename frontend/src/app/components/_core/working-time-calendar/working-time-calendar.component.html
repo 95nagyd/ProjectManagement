@@ -1,8 +1,8 @@
-<comment-box #commentbox></comment-box>
+<comment-box [isDisabled]="!isEditable" #commentbox></comment-box>
 <div class="calendar-container">
     <div class="calendar-slider p-2">
         <div class="calendar-slider-left">
-           <i  class="fa fa-arrow-left pr-2 cursor-pointer" 
+           <i  class="fa fa-arrow-left pr-2 cursor-pointer arrow" 
                (click)="changeMonth('previous')"
                aria-hidden="true"></i>
         </div>
@@ -11,15 +11,14 @@
         </div>
         <div class="calendar-slider-right">
             <div class="w-50">
-                <i  class="fa fa-arrow-right pl-2 cursor-pointer" 
+                <i  class="fa fa-arrow-right pl-2 cursor-pointer arrow" 
                     (click)="changeMonth('next')"
                     aria-hidden="true"></i>
             </div>
-           <div class="w-50 text-right pr-2">
-                <i class="fa fa-floppy-o cursor-pointer calendar-slider-right-save" 
+           <div class="save-container">
+                <span class="save" 
                     (click)="saveCalendar();"
-                    [ngClass]="!isInitComplete || isCalDataValid() ? 'save-valid' : 'save-error'" 
-                    aria-hidden="true"></i>
+                    [ngClass]="(isInitComplete && isCalDataValid() && isEditable) ? '' : 'save-error'"></span>
            </div>
         </div>
     </div>
@@ -49,7 +48,7 @@
             <i class="fa fa-pencil" aria-hidden="true"></i>
         </div>
     </div>
-    <div class="calendar-content" #cal>
+    <div class="calendar-content">
         <table cellspacing="0" cellpadding="0">
             <tbody>
                 <tr *ngFor="let dayData of daysOfMonth; last as isLast;" 
@@ -67,10 +66,11 @@
                     <!-- Munkaidő cella -->
                     <td class="working-time-cell-w">
                         <table>
-                            <tr *ngFor="let cellData of fakeData[dayData.number];">
+                            <tr *ngFor="let cellData of calendarData[dayData.number]; index as dataRowIndex;">
                                 <td>
                                     <div>
-                                        <formatted-time value="{{cellData ? cellData.workingTime : '00:00'}}"
+                                        <formatted-time value="{{cellData.workingTime}}"
+                                                        [dataPosition]="{'dayNumber': dayData.number, 'dataIndex': dataRowIndex}"
                                                         [isDisabled]="!isEditable">
                                         </formatted-time>
                                     </div>
@@ -81,7 +81,7 @@
                     <!-- Projekt cella -->
                     <td>
                         <table>
-                            <tr *ngFor="let cellData of fakeData[dayData.number];">
+                            <tr *ngFor="let cellData of calendarData[dayData.number];">
                                 <td>
                                     <div>
                                         <span>{{cellData.project}}</span>
@@ -93,7 +93,7 @@
                     <!-- Tervfázis cella -->
                     <td>
                         <table>
-                            <tr *ngFor="let cellData of fakeData[dayData.number];">
+                            <tr *ngFor="let cellData of calendarData[dayData.number];">
                                 <td>
                                     <div>
                                         <span>{{cellData.designPhase}}</span>
@@ -105,7 +105,7 @@
                     <!-- Szerkezeti elem cella -->
                     <td >
                         <table>
-                            <tr *ngFor="let cellData of fakeData[dayData.number];">
+                            <tr *ngFor="let cellData of calendarData[dayData.number];">
                                 <td>
                                     <div>
                                         <span>{{cellData.structuralElement}}</span>
@@ -117,7 +117,7 @@
                     <!-- Részfeladat cella -->
                     <td >
                         <table>
-                            <tr *ngFor="let cellData of fakeData[dayData.number];">
+                            <tr *ngFor="let cellData of calendarData[dayData.number];">
                                 <td>
                                     <div>
                                         <span>{{cellData.subtask}}</span>
@@ -129,25 +129,21 @@
                     <!-- Megjegyzés cella -->
                     <td class="comment-cell-w">
                         <table>
-                            <tr *ngFor="let cellData of fakeData[dayData.number];">
+                            <tr *ngFor="let cellData of calendarData[dayData.number]; index as dataRowIndex;">
                                 <td>
-                                    <div [ngSwitch]="cellData.comment && cellData.length != 0">
-                                        <div>
-                                            <i *ngSwitchCase="true" 
-                                                class="fa fa-comment cursor-pointer" 
-                                                aria-hidden="true"
-                                                (mouseenter)="previewComment(cellData.comment, $event);" 
-                                                (mouseleave)="hideComment();"
-                                                (click)="editComment(cellData.comment, $event);"></i>
-                                        </div>
-                                        <div>
-                                            <i *ngSwitchCase="false" 
-                                                [ngClass]="isEditable ? 'cursor-pointer' : ''"
-                                                class="fa fa-comment-o" 
-                                                aria-hidden="true"
-                                                (mouseenter)="previewComment(cellData.comment, $event);" 
-                                                (mouseleave)="hideComment();"></i>
-                                        </div>
+                                    <div *ngIf="cellData.comment && cellData.length != 0">
+                                        <i  [ngClass]="isEditable ? 'cursor-pointer' : ''"
+                                            class="fa fa-comment" 
+                                            aria-hidden="true"
+                                            (mouseenter)="previewComment({'dayNumber': dayData.number, dataIndex: dataRowIndex}, $event);" 
+                                            (mouseleave)="hideComment();"
+                                            (click)="editComment({'dayNumber': dayData.number, dataIndex: dataRowIndex}, $event);"></i>
+                                    </div>
+                                    <div *ngIf="!cellData.comment || cellData.length == 0">
+                                        <i  [ngClass]="isEditable ? 'cursor-pointer' : ''"
+                                            class="fa fa-comment-o" 
+                                            aria-hidden="true"
+                                            (click)="editComment({'dayNumber': dayData.number, dataIndex: dataRowIndex}, $event);"></i>
                                     </div>
                                 </td>
                             </tr>
@@ -157,17 +153,17 @@
                     <td class="modify-cell modify-cell-w"
                         [ngClass]="isLast ? 'last-tr-right' : ''">
                         <table>
-                            <tr *ngFor="let cellData of fakeData[dayData.number]; index as rowIndex; last as isLastRow; count as rowCount;">
+                            <tr *ngFor="let cellData of calendarData[dayData.number]; index as dataRowIndex; last as isLastRow; count as rowCount;">
                                 <td>
                                     <div class="modify">
                                         <div class="m-auto modify-add cursor-pointer" 
                                                 [ngClass]="!isEditable || !isLastRow ? 'modify-disabled' : ''"
-                                                (click)="isEditable && isLastRow ? addRow(dayData.number) : null;">
+                                                (click)="isEditable && isLastRow ? addEmptyRow(dayData.number) : null;">
                                             <i class="fa fa-plus-square-o" aria-hidden="true"></i>
                                         </div>
                                         <div class="m-auto modify-delete cursor-pointer"
                                                 [ngClass]="!isEditable || rowCount === 1 ? 'modify-disabled' : ''"
-                                                (click)="isEditable && rowCount != 1 ? deleteRow(dayData.number, rowIndex) : null;">
+                                                (click)="isEditable && rowCount != 1 ? deleteRow(dayData.number, dataRowIndex) : null;">
                                             <i class="fa fa-trash-o" aria-hidden="true"></i>
                                         </div>
                                     </div>
