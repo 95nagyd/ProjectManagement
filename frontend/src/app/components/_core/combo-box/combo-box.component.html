@@ -1,1 +1,56 @@
-<span></span>
+<div *ngIf="!isDisabled"
+    class="combo-container" 
+    [ngStyle]="{'width': comboWidth + 'px'}"
+    (clickOutside)="isActive ? clickedOutside() : ''">
+
+    <span   class="dropdown-control" 
+            [ngClass]="{ 'invalid': hasError, 'dropdown-visible': isActive }">
+            
+        <input  type="text"
+                class="input-search"
+                [ngClass]="{ 'dropdown-visible': isActive }"
+                [ngStyle]="{'width': (!isActive && !hasError && hasValue) ? 'calc(calc(100%) - 32px)' : 'calc(calc(100%) - 20px)'}"
+                placeholder="Kérem válasszon..."
+                (click)="toggleDropdown($event, true);"
+                [(ngModel)]="searchValue"
+                (ngModelChange)="filter($event);"
+                (keypress)="onKeyPress($event);"
+                (keydown)="onKeyDown($event);" />
+            
+        <span   *ngIf="!isActive && !hasError && hasValue"
+                class="d-inline-block clear"
+                (click)="clearValue();">
+                    <i class="fa fa-times clear-icon" aria-hidden="true"></i>
+        </span>
+        
+        <span   class="d-inline-block toggle"
+                (click)="toggleDropdown($event);">
+                    <i class="toggle-icon" [ngClass]="isActive ? 'fa fa-angle-up' : 'fa fa-angle-down'" aria-hidden="true"></i>
+        </span>
+        
+    </span>
+</div>
+
+
+<div *ngIf="isDisabled"
+    class="combo-container"
+    [ngStyle]="{'width': comboWidth + 'px'}">
+
+    <div    *ngIf="!hasValue" 
+            class="no-value">
+                &mdash;
+    </div>
+
+    <span   *ngIf="hasValue"
+            class="dropdown-control disabled">
+
+        <div class="input-search disabled">
+            {{chosen}}
+        </div>
+
+        <span   class="d-inline-block toggle pull-right">
+                    <i class="fa fa-angle-down toggle-icon" aria-hidden="true"></i>
+        </span>
+    </span>
+</div>
+

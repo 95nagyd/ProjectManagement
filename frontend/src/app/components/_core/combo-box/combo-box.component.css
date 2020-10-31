@@ -1,7 +1,95 @@
-span {
-    background-image: url("../../../../assets/img/save/normal.png"); 
-    background-size: 200px 200px;
-    height: 200px; 
-    width: 200px;
-    display: block;
+.combo-container {
+    z-index: 1;
+    height: 24px;
+    margin: auto;
+    padding-top: 2px;
+    width: 160px;
 }
+
+.dropdown-control {
+    display: inline-block;
+    width: 100%;
+    cursor: pointer;
+    height: 20px;
+    padding: 0;
+    border: 1px solid black;
+    border-radius: 3px; 
+    background-color: white;
+    
+}
+
+.dropdown-visible {
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+.invalid {
+    border: 1px solid red;
+}
+
+.dropdown-control.disabled{
+    cursor: not-allowed;
+    color: rgb(65, 65, 65);
+    background-color: rgb(219, 219, 219);
+    text-align: left;
+}
+
+.input-search {
+    display: inline-block;
+    vertical-align: top;
+    height: 18px;
+    border: none;
+    border-radius: 3px; 
+    outline: none;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    padding-left: 4px;
+    padding-bottom: 2px;
+    line-height: 1;
+}
+
+.input-search:focus {
+    cursor: text;
+    font-style: italic;
+    background-color:rgb(221, 235, 248);
+}
+
+.input-search:placeholder-shown{
+    font-size: 12px;
+}
+
+.input-search.disabled {
+    line-height: 1;
+    cursor: not-allowed;
+}
+
+.clear {
+    width: 12px; 
+    height: 18px; 
+}
+
+.clear-icon {
+    font-size: 10px;
+    vertical-align: top;
+    padding-top: 4px;
+}
+
+.toggle {
+    width: 20px; 
+    height: 18px;
+    text-align: center;
+}
+
+.toggle-icon {
+    vertical-align: top;
+    padding-top: 1px;
+}
+
+
+
+.no-value{
+    line-height: 1;
+}
+
+

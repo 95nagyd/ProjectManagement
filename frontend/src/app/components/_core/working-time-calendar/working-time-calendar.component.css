@@ -14,7 +14,7 @@
 .calendar-slider {
     position: sticky;
     top: 0;
-    z-index: 4;
+    z-index: 100;
     font-size: 22px; 
     display: flex;
     flex-direction: row; 
@@ -65,7 +65,6 @@
 }
 
 .save {
-    background-image: url("../../../../assets/img/save/normal.png"); 
     background-size: 55px 55px;
     background-position: center;
     height: 55px; 
@@ -75,7 +74,21 @@
     cursor: pointer;
 }
 
-.save:active {
+.save-valid{
+    background-image: url("../../../../assets/img/save/normal.png"); 
+    animation: shake 0.82s cubic-bezier(.36, .07, .19, .97) both infinite;
+}
+
+@keyframes shake {
+    10%, 20%, 30%, 50%, 70%, 80%, 90%, 100% {
+      transform: translate3d(0, 0, 0);
+    }
+    40%, 60% {
+      transform: translate3d(0, -2px, 0);
+    }
+  }
+
+.save-valid:active {
     background-image: url('../../../../assets/img/save/active.png');
 }
 
@@ -84,21 +97,8 @@
     cursor: not-allowed;
 }
 
-.save-error:active {
-    background-image: url('../../../../assets/img/save/disabled.png');
-    cursor: not-allowed;
-}
-
-.save-error:active{
-    text-shadow: 2px 2px 2px rgb(219, 0, 0);
-}
 
 
-
-
-.calendar-slider-right-disabled{
-    cursor: not-allowed;
-}
 
 
 .header {
@@ -106,7 +106,7 @@
     flex-direction: row;
     position: sticky;
     top: 50px;
-    z-index: 3;
+    z-index: 100;
     width: 100%;
     font-size: 18px;
     text-align: center;
@@ -133,22 +133,6 @@
 .working-time-header-cell-w{
     width: 112px;
     max-width: 112px;
-}
-
-.project-header-cell-w{
-    width: calc(calc(100% - 445px) * 0.25);
-}
-
-.design-phase-header-cell-w{
-    width: calc(calc(100% - 445px) * 0.25);
-}
-
-.structural-element-header-cell-w{
-    width: calc(calc(100% - 445px) * 0.25);
-}
-
-.subtask-header-cell-w{
-    width: calc(calc(100% - 445px) * 0.25);
 }
 
 .comment-header-cell-w{

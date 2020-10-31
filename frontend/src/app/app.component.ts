@@ -25,7 +25,7 @@ export class AppComponent {
                   
     this.spinner.show();
 
-    scrollOffsetService.register(this);
+    this.scrollOffsetService.register(this);
 
     this.isLoggedInPastState = this.isLoggedIn();
                   

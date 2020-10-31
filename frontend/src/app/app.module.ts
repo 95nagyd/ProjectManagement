@@ -27,6 +27,8 @@ import { WorkingTimeCalendarComponent } from './components/_core/working-time-ca
 import { FormattedTimeComponent } from './components/_core/working-time-calendar/formatted-time/formatted-time.component';
 import { CommentBoxComponent } from './components/_core/working-time-calendar/comment-box/comment-box.component';
 import { ComboBoxComponent } from './components/_core/combo-box/combo-box.component';
+import { ComboBoxDropdownComponent } from './components/_core/combo-box/combo-box-dropdown/combo-box-dropdown.component';
+import { ClickInsideDirective } from './_custom/click-inside.directive';
 
 
 @NgModule({
@@ -45,7 +47,9 @@ import { ComboBoxComponent } from './components/_core/combo-box/combo-box.compon
     WorkingTimeCalendarComponent,
     FormattedTimeComponent,
     CommentBoxComponent,
-    ComboBoxComponent
+    ComboBoxComponent,
+    ComboBoxDropdownComponent,
+    ClickInsideDirective
   ],
   imports: [
     BrowserModule,

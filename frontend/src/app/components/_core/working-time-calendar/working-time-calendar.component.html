@@ -18,27 +18,27 @@
            <div class="save-container">
                 <span class="save" 
                     (click)="saveCalendar();"
-                    [ngClass]="(isInitComplete && isCalDataValid() && isEditable) ? '' : 'save-error'"></span>
+                    [ngClass]="isCalSavable() ? 'save-valid' : 'save-error'"></span>
            </div>
         </div>
     </div>
-    <div class="header">
+    <div class="header" #header>
         <div class="date-header-cell-w">
             Dátum
         </div>
         <div class="working-time-header-cell-w">
             Munkaidő
         </div>
-        <div class="project-header-cell-w">
+        <div [ngStyle]="{'width': comboColWidth+'px'}">
             Projekt
         </div>
-        <div class="design-phase-header-cell-w">
+        <div [ngStyle]="{'width': comboColWidth+'px'}">
             Tervfázis
         </div>
-        <div class="structural-element-header-cell-w">
+        <div [ngStyle]="{'width': comboColWidth+'px'}">
             Szerkezeti&nbsp;elem
         </div>
-        <div class="subtask-header-cell-w">
+        <div [ngStyle]="{'width': comboColWidth+'px'}">
             Részfeladat
         </div>
         <div class="comment-header-cell-w">
@@ -57,10 +57,14 @@
                     <td class="date-cell date-cell-w"
                         [ngClass]="isLast ? 'last-tr-left' : ''">
                         <div class="day" 
-                             [ngStyle]="dayData.name === 'szombat' ? { 'background-color': 'rgb(130, 130, 130)', color: 'rgb(235, 235, 235)' } : dayData.name === 'vasárnap' ? { 'background-color': 'rgb(130, 130, 130)', color: 'rgb(186, 4, 4)' } : {}"
+                             [ngStyle]="dayData.name === 'szombat' 
+                                ? { 'background-color': 'rgb(130, 130, 130)', 'color': 'rgb(245, 245, 245)', 'font-weight': 'bold', 'text-shadow': '0px 0px 5px rgb(0, 0, 0)' } 
+                                : dayData.name === 'vasárnap' 
+                                    ? { 'background-color': 'rgb(130, 130, 130)', 'color': 'rgb(237, 2, 2)', 'font-weight': 'bold', 'text-shadow': '0px 0px 5px rgb(0, 0, 0)' } 
+                                    : {}"
                              [ngClass]="isLast ? 'last-tr-left' : ''">
                             <div class="day-number">{{dayData.number}}.</div>
-                            <div class="day-name" [ngStyle]="dayData.name === 'vasárnap' ? { 'font-weight': 'bold' } : {}">{{dayData.name}}</div>
+                            <div class="day-name">{{dayData.name}}</div>
                         </div>
                     </td>
                     <!-- Munkaidő cella -->
@@ -80,11 +84,16 @@
                     </td>
                     <!-- Projekt cella -->
                     <td>
-                        <table>
-                            <tr *ngFor="let cellData of calendarData[dayData.number];">
+                        <table style="height: 100%;">
+                            <tr *ngFor="let cellData of calendarData[dayData.number]; index as dataRowIndex;">
                                 <td>
                                     <div>
-                                        <span>{{cellData.project}}</span>
+                                        <combo-box  [comboWidth]="comboColWidth*0.95"
+                                                    [isDisabled]="!isEditable"
+                                                    [chosen]="cellData.project"
+                                                    [choices]="projectList"
+                                                    [isRequired]="false"
+                                                    (update)="updateCombo('project', $event, dayData.number, dataRowIndex);"></combo-box>
                                     </div>
                                 </td>
                             </tr>
@@ -93,10 +102,15 @@
                     <!-- Tervfázis cella -->
                     <td>
                         <table>
-                            <tr *ngFor="let cellData of calendarData[dayData.number];">
+                            <tr *ngFor="let cellData of calendarData[dayData.number]; index as dataRowIndex;">
                                 <td>
                                     <div>
-                                        <span>{{cellData.designPhase}}</span>
+                                        <combo-box  [comboWidth]="comboColWidth*0.95"
+                                                    [isDisabled]="!isEditable"
+                                                    [chosen]="cellData.designPhase"
+                                                    [choices]="designPhaseList"
+                                                    [isRequired]="false"
+                                                    (update)="updateCombo('designPhase', $event, dayData.number, dataRowIndex);"></combo-box>
                                     </div>
                                 </td>
                             </tr>
@@ -105,10 +119,15 @@
                     <!-- Szerkezeti elem cella -->
                     <td >
                         <table>
-                            <tr *ngFor="let cellData of calendarData[dayData.number];">
+                            <tr *ngFor="let cellData of calendarData[dayData.number]; index as dataRowIndex;">
                                 <td>
                                     <div>
-                                        <span>{{cellData.structuralElement}}</span>
+                                        <combo-box  [comboWidth]="comboColWidth*0.95"
+                                                    [isDisabled]="!isEditable"
+                                                    [chosen]="cellData.structuralElement"
+                                                    [choices]="structuralElementList"
+                                                    [isRequired]="false"
+                                                    (update)="updateCombo('structuralElement', $event, dayData.number, dataRowIndex);"></combo-box>
                                     </div>
                                 </td>
                             </tr>
@@ -117,10 +136,15 @@
                     <!-- Részfeladat cella -->
                     <td >
                         <table>
-                            <tr *ngFor="let cellData of calendarData[dayData.number];">
+                            <tr *ngFor="let cellData of calendarData[dayData.number]; index as dataRowIndex;">
                                 <td>
                                     <div>
-                                        <span>{{cellData.subtask}}</span>
+                                        <combo-box  [comboWidth]="comboColWidth*0.95"
+                                                    [isDisabled]="!isEditable"
+                                                    [chosen]="cellData.subtask"
+                                                    [choices]="subtaskList"
+                                                    [isRequired]="false"
+                                                    (update)="updateCombo('subtask', $event, dayData.number, dataRowIndex);"></combo-box>
                                     </div>
                                 </td>
                             </tr>

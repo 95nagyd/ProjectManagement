@@ -4,7 +4,7 @@
         type="text" 
         maxlength="5"
         class="pretty-time" 
-        [ngClass]="{ 'invalid': !isValid }"
+        [ngClass]="{ 'invalid': hasError }"
         [(ngModel)]="value"
         (blur)="onFocusOut();"
         (keypress)="onKeyPress($event);"/>

@@ -6,6 +6,7 @@ import { PageContentScrollOffsetService } from '@app/_services/page-content-scro
 import { WorkingTimeCalendarService } from '@app/_services/working-time-calendar.service';
 import { CalendarDayDetails } from '@app/_models/calendarDayDetails';
 import { CalendarDayData } from '@app/_models/calendarDayData';
+import { ComboBoxService } from '@app/_services/combo-box.service';
 
 @Component({
   selector: 'working-time-calendar',
@@ -17,23 +18,33 @@ export class WorkingTimeCalendarComponent implements OnInit {
 
   @ViewChildren(FormattedTimeComponent) workingTimeInputList!: QueryList<FormattedTimeComponent>;
 
-  private choosenPeriod: Date;
+  private chosenPeriod: Date;
   isInitComplete: Boolean;
+  comboColWidth: number;
   period: string;
   monthNames: string[];
   dayNames: string[];
   daysOfMonth: CalendarDayDetails[] = [];
   calendarData: CalendarDayData[] = [];
+  projectList: string[];
+  designPhaseList: string[];
+  structuralElementList: string[];
+  subtaskList: string[];
 
   constructor(private spinner: SpinnerService, private scrollOffsetService: PageContentScrollOffsetService, 
-    private calendarService: WorkingTimeCalendarService) { 
+    private calendarService: WorkingTimeCalendarService, private comboBoxService: ComboBoxService) { 
+      //ezek majd api hívások az adminservice-ből
+      this.projectList = ['Project1', 'Project2', 'Project3', 'Project11'];
+      this.designPhaseList = ['DesignPhase1', 'DesignPhase2', 'DesignPhase3'];
+      this.structuralElementList = ['StructuralElement1', 'StructuralElement2', 'StructuralElement3', 'StructuralElement4'];
+      this.subtaskList = ['Subtask1', 'Subtask2', 'Subtask3', 'Subtask4', 'Subtask5'];
     }
 
   ngOnInit(): void { 
     this.spinner.show();
 
-    this.choosenPeriod = new Date();
-    this.choosenPeriod.setDate(1);
+    this.chosenPeriod = new Date();
+    this.chosenPeriod.setDate(1);
 
     this.monthNames = ['január','február','március','április','május','június','július','augusztus','szeptember','október','november','december'];
 
@@ -46,20 +57,22 @@ export class WorkingTimeCalendarComponent implements OnInit {
   ngAfterViewInit() {
     setTimeout(() => {
       this.isInitComplete = true;
+      this.comboColWidth = (this.header.nativeElement.getBoundingClientRect().width - 445) * 0.25;
     }, 0);
     this.spinner.hide();
   }
 
   @Input() isEditable: Boolean;
   @ViewChild('commentbox') commentbox: CommentBoxComponent;
+  @ViewChild('header') header: ElementRef;
 
-  setPeriod() { this.period = this.choosenPeriod.getFullYear().toString() + ' ' + this.monthNames[this.choosenPeriod.getMonth()] }
+  setPeriod() { this.period = this.chosenPeriod.getFullYear().toString() + ' ' + this.monthNames[this.chosenPeriod.getMonth()] }
 
   refreshCalendar() {
     this.spinner.show();
     this.daysOfMonth = [];
     for(let dayIndex = 1; dayIndex <= this.getDaysInMonth(); dayIndex++){
-      let tempDate = new Date(this.choosenPeriod);
+      let tempDate = new Date(this.chosenPeriod);
       tempDate.setDate(dayIndex);
       this.daysOfMonth.push({
          number : (dayIndex < 10 ? '0'+dayIndex : dayIndex.toString()), 
@@ -70,25 +83,27 @@ export class WorkingTimeCalendarComponent implements OnInit {
     this.updateCalendarData();
     this.scrollOffsetService.setOffsetY(0);
     if(this.commentbox) { this.commentbox.hide(); }
+    this.comboBoxService.externalCloseDropdown();
+
     setTimeout(() => {
       this.spinner.hide();
-    }, 700);
+    }, 1000);
   }
 
   public changeMonth(direction: string) { 
 
-    this.choosenPeriod.setMonth(this.choosenPeriod.getMonth() + (direction === 'previous' ? -1 : 1)); 
+    this.chosenPeriod.setMonth(this.chosenPeriod.getMonth() + (direction === 'previous' ? -1 : 1)); 
     
     this.setPeriod();
     this.refreshCalendar();
 
   }
 
-  getDaysInMonth() { return new Date(this.choosenPeriod.getFullYear(), this.choosenPeriod.getMonth()+1, 0).getDate(); }
+  getDaysInMonth() { return new Date(this.chosenPeriod.getFullYear(), this.chosenPeriod.getMonth()+1, 0).getDate(); }
 
   private updateCalendarData() {
     //ide majd api hívással lekérni a beállított hónaphoz tartozó adatokat, ami most a fakeData
-    this.calendarData = this.calendarService.getCalendarDataDataAccessOperation(this.choosenPeriod);
+    this.calendarData = this.calendarService.getCalendarDataDataAccessOperation(this.chosenPeriod);
     this.daysOfMonth.forEach(dayData => {
       if(!this.calendarData[dayData.number]) { 
         this.calendarData[dayData.number] = [];
@@ -100,11 +115,11 @@ export class WorkingTimeCalendarComponent implements OnInit {
   addEmptyRow(dayNumber: string) {
     const newRow: CalendarDayData = {
       workingTime : '',
-      project: 'Ürömhegyi lejtő...',
-      designPhase: 'Munkatársakkal...',
-      structuralElement: 'aaaaaaaaaaaaaaaaaaaa',
-      subtask: 'QQQQQQQQQQQQQQQQQQQQ',
-      comment: 'csp egységárhoz tonna becslés tisztázás, axis modell átnézés, Zsolt VT-nek ajánlatkérés, belső egyeztetés'
+      project: '',
+      designPhase: '',
+      structuralElement: '',
+      subtask: '',
+      comment: ''
     }
 
     this.calendarData[dayNumber].push(newRow);
@@ -112,33 +127,62 @@ export class WorkingTimeCalendarComponent implements OnInit {
 
   deleteRow(dayNumber: string, rowIndex: number){
 
-    //TODO: saját ikon mentéshez (sima, kattintott, letiltott)
 
-    //TODO: havi összes munkaidő az utolsó nap után (legalább annyi hely kell , hogy az utolsó nap max magasságos tooltipje kiférjen)
+    //TODO: interface helyett példányosított osztályok konstruktorral(alap érték beállításhoz) (deserialize-el)
+
+    //TODO: calendar mentéskor sorokat validáli, ha valami nem jó akkor az ahhoz tartozó elem haserror true 
+
+
+    //TODO: data index passzolások helyett output a timepicker-ben
 
     
 
-    //TODO: confirm modal törlés
+    //TODO: havi összes munkaidő az utolsó nap után (legalább annyi hely kell , hogy az utolsó nap max magasságos tooltipje kiférjen)
+
+    //TODO: confirm modal sor törléskor
 
     //TODO: max 10 sor adható hozzá
 
     //TODO: sort csak akkor lehet hozzáadni, ha van projekt és tervfázis kiválasztva
 
-    //TODO: combó komponens
+    
 
-    //TODO: long text shortener ... ha a div szélessége nagyobb mint az oszlop szélessége minusz pár px
+    //TODO: long text shortener ... 
 
     //TODO: szabadság, betegszabadság (akkor a sor más szinű) (datpickerrel gombról megnyílik modal)
 
     //TODO: az első töltésig (bárkié) lehessen visszamenni
 
-    //TODO: bevezetni az istouched-et, mentés csak akkor, ha true , elnavigálás esetén rákérdezni, hogy elveti-e a módosításait
+    //TODO: bevezetni az istouched-et, mentés csak akkor, ha true (mozogjon a mentés), elnavigálás esetén rákérdezni, hogy elveti-e a módosításait
 
-    //TODO: kitalálni, hogy az üres sorok nem kiválasztott kötelező értékeivel mi legyen
+    
+
+    //TODO: kitalálni, hogy az üres sorok nem kiválasztott kötelező értékeivel mi legyen (dto-n belül lesz metódus)
     
     this.calendarService.getCalendarActualData()[dayNumber].splice(rowIndex, 1);
   }
 
+
+  updateCombo(combo: string, chosen: string, dayNumber: string, dataIndex: number){
+    switch(combo) { 
+      case 'project': { 
+        this.calendarData[dayNumber][dataIndex].project = chosen;
+         break; 
+      } 
+      case 'designPhase': { 
+        this.calendarData[dayNumber][dataIndex].designPhase = chosen;
+         break; 
+      } 
+      case 'structuralElement': { 
+        this.calendarData[dayNumber][dataIndex].structuralElement = chosen;
+         break; 
+      } 
+      case 'subtask': { 
+        this.calendarData[dayNumber][dataIndex].subtask = chosen;
+         break; 
+      }
+    }
+  }
 
 
   previewComment(dataPosition: any, e: any) {
@@ -168,12 +212,23 @@ export class WorkingTimeCalendarComponent implements OnInit {
 
 
   isCalDataValid(){
-    return  !this.workingTimeInputList.some(workingTimeInput => workingTimeInput.isValid === false);
+    return  !this.workingTimeInputList.some(workingTimeInput => workingTimeInput.hasError === true);
+    //kiszedni az indexét hogy meyik projekt és tervfázis sorba van érték, és egyeznie kell az indexeknek + az értéknek benne kell lennie a choicesben, ahol nem egyezik ott haserror-t beállítani truera
+    //csak akkorhibás akkor, ha close után nincs a choices között
+  }
+
+  isCalSavable(){
+    return this.isInitComplete && this.isEditable && this.isCalDataValid()
   }
 
   saveCalendar(){
-    if(!this.isEditable || !this.isCalDataValid()) { return; }
+    if(!this.isCalSavable()) { return; }
     console.log(this.isCalDataValid())
     console.log(this.calendarData)
+  }
+
+  @HostListener('window:resize')
+  onResize() {
+    this.comboColWidth = (this.header.nativeElement.getBoundingClientRect().width - 445) * 0.25;
   }
 }

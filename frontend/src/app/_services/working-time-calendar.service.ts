@@ -14,12 +14,13 @@ export class WorkingTimeCalendarService {
   }
 
   //majd dao-s getcalendardata api hívással
-  getCalendarDataDataAccessOperation(choosenPeriod: Date){
+  getCalendarDataDataAccessOperation(chosenPeriod: Date){
     this.calendarViewData["01"] = [
       {
         workingTime:'01:00',
-        project:'asdasd',
-        designPhase:'izébizé'
+        project:'Project1',
+        designPhase:'DesignPhase2',
+        structuralElement:'StructuralElement3'
       }
     ];
      return this.calendarViewData;

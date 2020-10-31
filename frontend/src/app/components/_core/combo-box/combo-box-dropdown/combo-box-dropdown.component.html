@@ -1,0 +1,19 @@
+<div [ngStyle]="{'min-width': styleData.minWidth + 'px', 'left':  styleData.x + 'px', 'top': styleData.y + 'px', 'visibility': isVisible ? 'initial' : 'hidden'}"
+     class="choices-container"
+     (clickOutside)="isVisible ? onClickOutside() : ''"
+     (clickInside)="isVisible ? onClickInside() : ''">
+
+    <p *ngFor="let item of choices; index as choiceIndex; first as isFirst;"
+        class="choices-item"
+        (click)="choose(choiceIndex);"
+        [ngClass]="{ 'selected': item===chosen || (isFirst && !isExactMatch()) }">  
+            {{item}}
+    </p>
+    <p *ngIf="choices.length == 0"
+        class="not-found">
+        <span   class="d-inline-block">
+            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+        </span>
+        Nincs találat!
+    </p>
+</div>

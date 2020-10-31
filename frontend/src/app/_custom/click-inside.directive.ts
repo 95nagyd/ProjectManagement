@@ -2,11 +2,11 @@ import { Directive, Input, Output, EventEmitter, ElementRef, HostListener } from
 import { SpinnerService } from '@app/_services/spinner.service';
 
 @Directive({
-  selector: '[clickOutside]',
+  selector: '[clickInside]',
 })
-export class ClickOutsideDirective {
+export class ClickInsideDirective {
 
-  @Output() clickOutside = new EventEmitter<void>();
+  @Output() clickInside = new EventEmitter<void>();
 
   constructor(private el: ElementRef, private spinner: SpinnerService) { 
   }
@@ -17,7 +17,7 @@ export class ClickOutsideDirective {
       if(this.el.nativeElement.classList.contains('combo-container') && !this.el.nativeElement.children[0].classList.contains('dropdown-visible')){
         return;
       }
-      if(!this.el.nativeElement.contains(target)){ this.clickOutside.emit(); }
+      if(this.el.nativeElement.contains(target)){ this.clickInside.emit(); }
     }
   }
 }

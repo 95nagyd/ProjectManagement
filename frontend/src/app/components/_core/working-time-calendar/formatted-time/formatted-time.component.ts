@@ -8,7 +8,7 @@ import { WorkingTimeCalendarService } from '@app/_services/working-time-calendar
 })
 export class FormattedTimeComponent implements OnInit {
 
-  private hasError: Boolean;
+  hasError: Boolean;
   private pattern: any;
 
   constructor(private calendarService: WorkingTimeCalendarService) { 
@@ -30,9 +30,6 @@ export class FormattedTimeComponent implements OnInit {
   @Input() value: string;
   @Input() isDisabled: Boolean;
   @Input() dataPosition: any;
-
-
-  public get isValid() : Boolean { return !this.hasError; }
 
   onFocusOut() {
     const input = this.value;

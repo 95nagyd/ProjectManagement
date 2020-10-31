@@ -135,7 +135,9 @@ export class CommentBoxComponent implements OnInit {
 
   @HostListener('window:resize')
   onResize() {
-    this.setPosition();
-    this.autosize();
+    if(this.isVisible){
+      this.setPosition();
+      this.autosize();
+    }
   }
 }
