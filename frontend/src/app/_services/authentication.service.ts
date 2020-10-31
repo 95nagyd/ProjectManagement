@@ -37,7 +37,7 @@ export class AuthenticationService {
             if (res.accessToken && res.refreshToken) {
               localStorage.setItem(this.ACCESS_TOKEN, res.accessToken);
               localStorage.setItem(this.REFRESH_TOKEN, res.refreshToken);
-              this.currentUser = new User().deserialize(this.getAccessTokenPayload());
+              this.currentUser = new User(this.getAccessTokenPayload());
             }
         }))
   }
@@ -79,7 +79,7 @@ export class AuthenticationService {
 
   isLoggedIn() {
     if(!!this.getAccessToken() && !!this.getRefreshToken()) {
-      if(!this.currentUser) this.currentUser = new User().deserialize(this.getAccessTokenPayload());
+      if(!this.currentUser) this.currentUser = new User(this.getAccessTokenPayload());
 
       return true;
     }

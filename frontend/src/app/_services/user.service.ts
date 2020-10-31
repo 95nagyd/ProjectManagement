@@ -16,9 +16,17 @@ export class UserService {
   public getAll(): Observable<User[]> {
     return this.http.get<any>(`${environment.apiUrl}/users`).pipe(
       map(data => {
-        data.map((user: any) => new User().deserialize(user))
+        data.map((user: any) => new User(user))
         return data;
       })
+    );
+  }
+
+  public getFullName(user: User) {
+    return ((user.title ? user.title + '. ' : '') + 
+            user.lastName + ' ' + 
+            (user.middleName ? user.middleName + ' ' : '') +
+            user.firstName
     );
   }
   

@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AuthenticationService } from '@app/_services/authentication.service';
+import { UserService } from '@app/_services/user.service';
 import { interval, of } from 'rxjs';
 import { switchMap, takeWhile } from 'rxjs/operators';
 
@@ -16,12 +17,12 @@ export class NavbarUserDetailsComponent implements OnInit {
   intervalId: any;
   isViewReady: any;
 
-  constructor(private authenticationService: AuthenticationService) { 
+  constructor(private authenticationService: AuthenticationService, private userService: UserService) { 
     this.initInterval();
   }
 
   ngOnInit(): void { 
-    this.currentUserFullName = this.authenticationService.getCurrentUser().fullName;
+    this.currentUserFullName = this.userService.getFullName(this.authenticationService.getCurrentUser());
   }
 
   initInterval() {

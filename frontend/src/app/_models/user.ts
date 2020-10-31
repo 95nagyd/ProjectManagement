@@ -1,7 +1,7 @@
-import { Deserializable } from './deserializable';
 import { Role } from "./role";
 
-export class User implements Deserializable {
+
+export class User {
 
     id: number;
     title: string;
@@ -10,19 +10,14 @@ export class User implements Deserializable {
     firstName: string;
     role: Role;
 
-    deserialize(input: any): this {
-        Object.assign(this, input);
-        
-        //this.cars = input.cars.map(car => new Car().deserialize(car));
-        return this;
-    }
+    constructor(data?: User) {
+        data = data || <User>{};
 
-    public get fullName() {
-        return (
-            (this.title ? this.title + '. ' : '') + 
-            this.lastName + ' ' + 
-            (this.middleName ? this.middleName + ' ' : '') +
-            this.firstName
-        );
+        this.id = data.id || -1;
+        this.title = data.title || '';
+        this.lastName = data.lastName || '';
+        this.middleName = data.middleName || '';
+        this.firstName = data.firstName || '';
+        this.role = data.role || Role.User;
     }
 }

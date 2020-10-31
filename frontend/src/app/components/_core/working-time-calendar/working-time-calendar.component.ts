@@ -4,8 +4,7 @@ import { SpinnerService } from '@app/_services/spinner.service';
 import { CommentBoxComponent } from '@app/components/_core/working-time-calendar/comment-box/comment-box.component';
 import { PageContentScrollOffsetService } from '@app/_services/page-content-scroll-offset.service';
 import { WorkingTimeCalendarService } from '@app/_services/working-time-calendar.service';
-import { CalendarDayDetails } from '@app/_models/calendarDayDetails';
-import { CalendarDayData } from '@app/_models/calendarDayData';
+import { CalendarDayDetails, CalendarDayData } from '@app/_models/calendar';
 import { ComboBoxService } from '@app/_services/combo-box.service';
 
 @Component({
@@ -113,23 +112,16 @@ export class WorkingTimeCalendarComponent implements OnInit {
   }
 
   addEmptyRow(dayNumber: string) {
-    const newRow: CalendarDayData = {
-      workingTime : '',
-      project: '',
-      designPhase: '',
-      structuralElement: '',
-      subtask: '',
-      comment: ''
-    }
-
+    console.log(dayNumber)
+    const newRow = new CalendarDayData()
     this.calendarData[dayNumber].push(newRow);
   }
 
   deleteRow(dayNumber: string, rowIndex: number){
 
 
-    //TODO: interface helyett példányosított osztályok konstruktorral(alap érték beállításhoz) (deserialize-el)
-
+    //TODO: daysofmonth listába a number legyen szám, csinálni egy pipe-ot ami a jól adja vissza a számot
+    
     //TODO: calendar mentéskor sorokat validáli, ha valami nem jó akkor az ahhoz tartozó elem haserror true 
 
 
@@ -224,7 +216,7 @@ export class WorkingTimeCalendarComponent implements OnInit {
   saveCalendar(){
     if(!this.isCalSavable()) { return; }
     console.log(this.isCalDataValid())
-    console.log(this.calendarData)
+    console.log(JSON.parse(JSON.stringify(this.calendarData)))
   }
 
   @HostListener('window:resize')

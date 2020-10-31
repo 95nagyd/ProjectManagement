@@ -20,11 +20,17 @@ export class AdminComponent implements OnInit {
     this.spinner.show();
     this.userService.getAll().subscribe(users => {
       this.users = users;
+      users.map(x => { this.users.push(new User(x)) });
+
       this.spinner.hide();
     }, error => {
       alert("Hiba a felhasználók lekérdezésekor!")
       this.spinner.hide();
     });
+  }
+
+  test(){
+  
   }
 
 }
