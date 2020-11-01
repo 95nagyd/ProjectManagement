@@ -1,7 +1,11 @@
 export interface CalendarDayDetails {
-  number: string;
+  number: number;
   name: string;
   backgroundColor: string;
+}
+
+export interface CalendarData {
+  [outerKey: number] : CalendarDayData[] | any[]
 }
 
 export class CalendarDayData {

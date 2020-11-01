@@ -1,8 +1,8 @@
 import { animate, state, style, transition, trigger } from '@angular/animations';
-import { Component, ElementRef, HostListener, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { PageContentScrollOffsetService } from '@app/_services/page-content-scroll-offset.service';
 import { WorkingTimeCalendarService } from '@app/_services/working-time-calendar.service';
-
+import { EventEmitter } from '@angular/core'
 
 @Component({
   selector: 'comment-box',
@@ -12,11 +12,11 @@ import { WorkingTimeCalendarService } from '@app/_services/working-time-calendar
 export class CommentBoxComponent implements OnInit {
 
 
-  //TODO: comment box shadow
-
   @Input() isDisabled: Boolean;
   @ViewChild('textarea') textarea: ElementRef;
   @ViewChild('commentbox') commentbox: ElementRef;
+  @Output() update: EventEmitter<string>;
+
   isVisible: Boolean;
   isPreview: Boolean;
   isEditing: Boolean;
@@ -26,11 +26,10 @@ export class CommentBoxComponent implements OnInit {
   commentIcon: any;
   boxPosition: any;
   value: string;
-  dataPosition: any;
 
-  constructor(private scrollOffsetService: PageContentScrollOffsetService, 
-    private calendarService: WorkingTimeCalendarService) { 
-
+  constructor(private scrollOffsetService: PageContentScrollOffsetService) { 
+  
+    this.update = new EventEmitter();
     this.isVisible = false;
     this.isPreview = false;
     this.isEditing = false;
@@ -39,32 +38,29 @@ export class CommentBoxComponent implements OnInit {
     this.isNewDisplayInTimeout = false;
     this.commentIcon = null;
     this.boxPosition = {x: -2000, y:-2000, triangle: 'top'};
-    this.dataPosition = null;
   }
 
   ngOnInit(): void {
   }
 
-  preview(commentIcon: any, dataPosition: any){
+  preview(commentIcon: any, comment: string){
     this.isVisible = false;
     this.isPreview = true;
     this.isEditing = false;
     this.isNewDisplayInTimeout = true;
     this.commentIcon = commentIcon;
-    this.dataPosition = dataPosition;
-    this.value = this.calendarService.getCalendarActualData()[dataPosition.dayNumber][dataPosition.dataIndex].comment;
+    this.value = comment;
     this.setPosition();
     this.autosize();
   }
   
-  edit(commentIcon: any, dataPosition: any){
+  edit(commentIcon: any, comment: string){
     this.isVisible = false;
     this.isPreview = false;
     this.isEditing = true;
     this.isEditFromIcon = true;
     this.commentIcon = commentIcon;
-    this.dataPosition = dataPosition;
-    this.value = this.calendarService.getCalendarActualData()[dataPosition.dayNumber][dataPosition.dataIndex].comment;
+    this.value = comment;
     this.setPosition();
     this.autosize();
     setTimeout(() => {
@@ -100,7 +96,6 @@ export class CommentBoxComponent implements OnInit {
   hide(){
     if(this.commentbox){
       this.isVisible = false;
-      this.dataPosition = null;
       this.value = '';
       this.isPreview = false;
       this.isEditing = false;
@@ -128,9 +123,8 @@ export class CommentBoxComponent implements OnInit {
     }, 0);
   }
 
-  updateValue(e: any) {
-    this.value = e;
-    this.calendarService.getCalendarActualData()[this.dataPosition.dayNumber][this.dataPosition.dataIndex].comment = this.value;
+  updateValue(value: any) {
+    this.update.emit(value);
   }
 
   @HostListener('window:resize')

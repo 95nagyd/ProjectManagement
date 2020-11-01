@@ -4,7 +4,7 @@ import { SpinnerService } from '@app/_services/spinner.service';
 import { CommentBoxComponent } from '@app/components/_core/working-time-calendar/comment-box/comment-box.component';
 import { PageContentScrollOffsetService } from '@app/_services/page-content-scroll-offset.service';
 import { WorkingTimeCalendarService } from '@app/_services/working-time-calendar.service';
-import { CalendarDayDetails, CalendarDayData } from '@app/_models/calendar';
+import { CalendarDayDetails, CalendarDayData, CalendarData } from '@app/_models/calendar';
 import { ComboBoxService } from '@app/_services/combo-box.service';
 
 @Component({
@@ -24,23 +24,25 @@ export class WorkingTimeCalendarComponent implements OnInit {
   monthNames: string[];
   dayNames: string[];
   daysOfMonth: CalendarDayDetails[] = [];
-  calendarData: CalendarDayData[] = [];
+  calendarData: CalendarData;
   projectList: string[];
   designPhaseList: string[];
   structuralElementList: string[];
   subtaskList: string[];
+  editingComment: { dayNumber: number, dataIndex: number }
 
   constructor(private spinner: SpinnerService, private scrollOffsetService: PageContentScrollOffsetService, 
     private calendarService: WorkingTimeCalendarService, private comboBoxService: ComboBoxService) { 
-      //ezek majd api hívások az adminservice-ből
-      this.projectList = ['Project1', 'Project2', 'Project3', 'Project11'];
-      this.designPhaseList = ['DesignPhase1', 'DesignPhase2', 'DesignPhase3'];
-      this.structuralElementList = ['StructuralElement1', 'StructuralElement2', 'StructuralElement3', 'StructuralElement4'];
-      this.subtaskList = ['Subtask1', 'Subtask2', 'Subtask3', 'Subtask4', 'Subtask5'];
     }
 
   ngOnInit(): void { 
     this.spinner.show();
+
+    //ezek majd api hívások az adminservice-ből
+      this.projectList = ['Project1', 'Project2', 'Project3', 'Project11'];
+      this.designPhaseList = ['DesignPhase1', 'DesignPhase2', 'DesignPhase3'];
+      this.structuralElementList = ['StructuralElement1', 'StructuralElement2', 'StructuralElement3', 'StructuralElement4'];
+      this.subtaskList = ['Subtask1', 'Subtask2', 'Subtask3', 'Subtask4', 'Subtask5'];
 
     this.chosenPeriod = new Date();
     this.chosenPeriod.setDate(1);
@@ -74,7 +76,7 @@ export class WorkingTimeCalendarComponent implements OnInit {
       let tempDate = new Date(this.chosenPeriod);
       tempDate.setDate(dayIndex);
       this.daysOfMonth.push({
-         number : (dayIndex < 10 ? '0'+dayIndex : dayIndex.toString()), 
+         number : dayIndex, 
          name : this.dayNames[tempDate.getDay()],
          backgroundColor : dayIndex % 2 == 0 ? 'rgb(243, 243, 243)' : 'rgb(218, 218, 218)'
       });
@@ -111,21 +113,14 @@ export class WorkingTimeCalendarComponent implements OnInit {
     });
   }
 
-  addEmptyRow(dayNumber: string) {
-    console.log(dayNumber)
-    const newRow = new CalendarDayData()
-    this.calendarData[dayNumber].push(newRow);
+  addEmptyRow(dayNumber: number) {
+    this.calendarData[dayNumber].push(new CalendarDayData());
   }
 
-  deleteRow(dayNumber: string, rowIndex: number){
-
-
-    //TODO: daysofmonth listába a number legyen szám, csinálni egy pipe-ot ami a jól adja vissza a számot
+  deleteRow(dayNumber: number, rowIndex: number){
     
+
     //TODO: calendar mentéskor sorokat validáli, ha valami nem jó akkor az ahhoz tartozó elem haserror true 
-
-
-    //TODO: data index passzolások helyett output a timepicker-ben
 
     
 
@@ -154,8 +149,11 @@ export class WorkingTimeCalendarComponent implements OnInit {
     this.calendarService.getCalendarActualData()[dayNumber].splice(rowIndex, 1);
   }
 
+  updateWorkingTime(value: string, dayNumber: number, dataIndex: number){
+    this.calendarData[dayNumber][dataIndex].workingTime = value;
+  }
 
-  updateCombo(combo: string, chosen: string, dayNumber: string, dataIndex: number){
+  updateCombo(combo: string, chosen: string, dayNumber: number, dataIndex: number){
     switch(combo) { 
       case 'project': { 
         this.calendarData[dayNumber][dataIndex].project = chosen;
@@ -177,17 +175,19 @@ export class WorkingTimeCalendarComponent implements OnInit {
   }
 
 
-  previewComment(dataPosition: any, e: any) {
+  previewComment(e: any, dayNumber: number, dataIndex: number) {
     if(this.commentbox && !this.commentbox.isEditing){
-      this.commentbox.preview(e.target, dataPosition);
+      this.editingComment = { dayNumber: dayNumber, dataIndex: dataIndex }
+      this.commentbox.preview(e.target, this.calendarData[dayNumber][dataIndex].comment);
     }
   }
 
-  editComment(dataPosition: any, e: any) {
+  editComment(e: any, dayNumber: number, dataIndex: number) {
     if(!this.isEditable) return;
     if(this.commentbox && this.commentbox.isEditing) { this.commentbox.hide(); return; }
     if(this.commentbox){
-      this.commentbox.edit(e.target, dataPosition);
+      this.editingComment = { dayNumber: dayNumber, dataIndex: dataIndex }
+      this.commentbox.edit(e.target, this.calendarData[dayNumber][dataIndex].comment);
     }
   }
 
@@ -197,9 +197,14 @@ export class WorkingTimeCalendarComponent implements OnInit {
       setTimeout(() => {
         if(this.commentbox && this.commentbox.isPreview && !this.commentbox.isEditing && !this.commentbox.isCommentInFocus && !this.commentbox.isNewDisplayInTimeout){ 
           this.commentbox.hide(); 
+          this.editingComment = { dayNumber: -1, dataIndex: -1 }
         }
       }, 100);
     }
+  }
+
+  updateComment(value: string){
+    this.calendarData[this.editingComment.dayNumber][this.editingComment.dataIndex].comment = value;
   }
 
 

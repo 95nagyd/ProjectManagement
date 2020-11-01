@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CalendarDayData } from '@app/_models/calendar';
+import { CalendarData, CalendarDayData } from '@app/_models/calendar';
 
 
 @Injectable({
@@ -7,48 +7,44 @@ import { CalendarDayData } from '@app/_models/calendar';
 })
 export class WorkingTimeCalendarService {
 
-  private calendarViewData: CalendarDayData[] = [];
+  private calendarViewData: CalendarData;
 
   constructor() { 
-    this.calendarViewData = [];
+    this.calendarViewData = {};
   }
 
   //majd dao-s getcalendardata api hívással
   getCalendarDataDataAccessOperation(chosenPeriod: Date){
-    /*
-    let fakeData = {
-      "01" : [
+
+    let test: CalendarData = {
+      1 : [
         {
-          0 : {
-            workingTime:'01:00',
-            project:'Project1',
-            designPhase:'DesignPhase1',
-            structuralElement:'StructuralElement1',
-            subtask:'',
-            comment:''
-          }
-        }
-      ],
-      "02" : [
+          workingTime:'01:00',
+          project:'Project1',
+          designPhase:'DesignPhase1',
+          structuralElement:'StructuralElement1',
+          subtask:'Subtask1',
+          comment:'Comment1'
+        },
         {
-          0 : {
-            workingTime:'02:00',
-            project:'Project2',
-            designPhase:'DesignPhase2',
-            structuralElement:'StructuralElement2',
-            subtask:'',
-            comment:''
-          }
+          workingTime:'02:00',
+          project:'Project2',
+          designPhase:'DesignPhase2',
+          structuralElement:'StructuralElement2',
+          subtask:'Subtask2',
+          comment:'Comment2'
         }
       ]
     }
-    */
-    //console.log(fakeData)
-    this.calendarViewData = [];
-     return this.calendarViewData;
+    //console.log(JSON.parse(JSON.stringify(test)))
+    //console.log(test)
+    
+    this.calendarViewData = {};
+    this.calendarViewData = test;
+    return this.calendarViewData;
   }
 
-  getCalendarActualData(): CalendarDayData[]{
+  getCalendarActualData(): CalendarData {
      return this.calendarViewData;
   }
   

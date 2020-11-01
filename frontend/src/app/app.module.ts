@@ -29,6 +29,7 @@ import { CommentBoxComponent } from './components/_core/working-time-calendar/co
 import { ComboBoxComponent } from './components/_core/combo-box/combo-box.component';
 import { ComboBoxDropdownComponent } from './components/_core/combo-box/combo-box-dropdown/combo-box-dropdown.component';
 import { ClickInsideDirective } from './_custom/click-inside.directive';
+import { TwoDigitNumberPipe } from './_custom/two-digit-number.pipe';
 
 
 @NgModule({
@@ -49,7 +50,8 @@ import { ClickInsideDirective } from './_custom/click-inside.directive';
     CommentBoxComponent,
     ComboBoxComponent,
     ComboBoxDropdownComponent,
-    ClickInsideDirective
+    ClickInsideDirective,
+    TwoDigitNumberPipe
   ],
   imports: [
     BrowserModule,

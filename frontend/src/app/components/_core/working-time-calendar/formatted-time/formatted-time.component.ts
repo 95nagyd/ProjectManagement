@@ -1,5 +1,6 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, Output } from '@angular/core';
 import { WorkingTimeCalendarService } from '@app/_services/working-time-calendar.service';
+import { EventEmitter } from '@angular/core'
 
 @Component({
   selector: 'formatted-time',
@@ -14,6 +15,7 @@ export class FormattedTimeComponent implements OnInit {
   constructor(private calendarService: WorkingTimeCalendarService) { 
     this.hasError = false;
     this.pattern = /^[0-9]{0,2}[\:]?[0-9]{0,2}$/;
+    this.update = new EventEmitter();
   }
 
   ngOnInit(): void { 
@@ -30,6 +32,7 @@ export class FormattedTimeComponent implements OnInit {
   @Input() value: string;
   @Input() isDisabled: Boolean;
   @Input() dataPosition: any;
+  @Output() update: EventEmitter<string>;
 
   onFocusOut() {
     const input = this.value;
@@ -89,7 +92,7 @@ export class FormattedTimeComponent implements OnInit {
 
   updateValue(){
     //TODO: split : , parseintelső *60 + parseint második
-    this.calendarService.getCalendarActualData()[this.dataPosition.dayNumber][this.dataPosition.dataIndex].workingTime = this.value;
+    this.update.emit(this.value);
   }
 
   onKeyPress(event: any){

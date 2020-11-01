@@ -1,4 +1,7 @@
-<comment-box [isDisabled]="!isEditable" #commentbox></comment-box>
+<comment-box    [isDisabled]="!isEditable" 
+                #commentbox 
+                (update)="updateComment($event);"></comment-box>
+                
 <div class="calendar-container">
     <div class="calendar-slider p-2">
         <div class="calendar-slider-left">
@@ -63,7 +66,7 @@
                                     ? { 'background-color': 'rgb(130, 130, 130)', 'color': 'rgb(237, 2, 2)', 'font-weight': 'bold', 'text-shadow': '0px 0px 5px rgb(0, 0, 0)' } 
                                     : {}"
                              [ngClass]="isLast ? 'last-tr-left' : ''">
-                            <div class="day-number">{{dayData.number}}.</div>
+                            <div class="day-number">{{dayData.number | twoDigitNumber}}.</div>
                             <div class="day-name">{{dayData.name}}</div>
                         </div>
                     </td>
@@ -75,7 +78,8 @@
                                     <div>
                                         <formatted-time value="{{cellData.workingTime}}"
                                                         [dataPosition]="{'dayNumber': dayData.number, 'dataIndex': dataRowIndex}"
-                                                        [isDisabled]="!isEditable">
+                                                        [isDisabled]="!isEditable"
+                                                        (update)="updateWorkingTime($event, dayData.number, dataRowIndex);">
                                         </formatted-time>
                                     </div>
                                 </td>
@@ -159,15 +163,15 @@
                                         <i  [ngClass]="isEditable ? 'cursor-pointer' : ''"
                                             class="fa fa-comment" 
                                             aria-hidden="true"
-                                            (mouseenter)="previewComment({'dayNumber': dayData.number, dataIndex: dataRowIndex}, $event);" 
+                                            (mouseenter)="previewComment($event, dayData.number, dataRowIndex);" 
                                             (mouseleave)="hideComment();"
-                                            (click)="editComment({'dayNumber': dayData.number, dataIndex: dataRowIndex}, $event);"></i>
+                                            (click)="editComment($event, dayData.number, dataRowIndex);"></i>
                                     </div>
                                     <div *ngIf="!cellData.comment || cellData.length == 0">
                                         <i  [ngClass]="isEditable ? 'cursor-pointer' : ''"
                                             class="fa fa-comment-o" 
                                             aria-hidden="true"
-                                            (click)="editComment({'dayNumber': dayData.number, dataIndex: dataRowIndex}, $event);"></i>
+                                            (click)="editComment($event, dayData.number, dataRowIndex);"></i>
                                     </div>
                                 </td>
                             </tr>
