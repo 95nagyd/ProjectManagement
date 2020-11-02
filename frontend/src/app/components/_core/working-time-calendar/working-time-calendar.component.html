@@ -21,7 +21,7 @@
            <div class="save-container">
                 <span class="save" 
                     (click)="saveCalendar();"
-                    [ngClass]="isCalSavable() ? 'save-valid' : 'save-error'"></span>
+                    [ngClass]="isCalSavable() && isCalendarDataChanged() ? 'save-valid' : 'save-disabled'"></span>
            </div>
         </div>
     </div>
@@ -73,7 +73,7 @@
                     <!-- Munkaidő cella -->
                     <td class="working-time-cell-w">
                         <table>
-                            <tr *ngFor="let cellData of calendarData[dayData.number]; index as dataRowIndex;">
+                            <tr *ngFor="let cellData of calendarViewData[dayData.number]; index as dataRowIndex;">
                                 <td>
                                     <div>
                                         <formatted-time value="{{cellData.workingTime}}"
@@ -89,10 +89,11 @@
                     <!-- Projekt cella -->
                     <td>
                         <table style="height: 100%;">
-                            <tr *ngFor="let cellData of calendarData[dayData.number]; index as dataRowIndex;">
+                            <tr *ngFor="let cellData of calendarViewData[dayData.number]; index as dataRowIndex;">
                                 <td>
                                     <div>
-                                        <combo-box  [comboWidth]="comboColWidth*0.95"
+                                        <combo-box  #projectComboList
+                                                    [comboWidth]="comboColWidth*0.95"
                                                     [isDisabled]="!isEditable"
                                                     [chosen]="cellData.project"
                                                     [choices]="projectList"
@@ -106,10 +107,11 @@
                     <!-- Tervfázis cella -->
                     <td>
                         <table>
-                            <tr *ngFor="let cellData of calendarData[dayData.number]; index as dataRowIndex;">
+                            <tr *ngFor="let cellData of calendarViewData[dayData.number]; index as dataRowIndex;">
                                 <td>
                                     <div>
-                                        <combo-box  [comboWidth]="comboColWidth*0.95"
+                                        <combo-box  #designPhaseComboList
+                                                    [comboWidth]="comboColWidth*0.95"
                                                     [isDisabled]="!isEditable"
                                                     [chosen]="cellData.designPhase"
                                                     [choices]="designPhaseList"
@@ -123,7 +125,7 @@
                     <!-- Szerkezeti elem cella -->
                     <td >
                         <table>
-                            <tr *ngFor="let cellData of calendarData[dayData.number]; index as dataRowIndex;">
+                            <tr *ngFor="let cellData of calendarViewData[dayData.number]; index as dataRowIndex;">
                                 <td>
                                     <div>
                                         <combo-box  [comboWidth]="comboColWidth*0.95"
@@ -140,7 +142,7 @@
                     <!-- Részfeladat cella -->
                     <td >
                         <table>
-                            <tr *ngFor="let cellData of calendarData[dayData.number]; index as dataRowIndex;">
+                            <tr *ngFor="let cellData of calendarViewData[dayData.number]; index as dataRowIndex;">
                                 <td>
                                     <div>
                                         <combo-box  [comboWidth]="comboColWidth*0.95"
@@ -157,7 +159,7 @@
                     <!-- Megjegyzés cella -->
                     <td class="comment-cell-w">
                         <table>
-                            <tr *ngFor="let cellData of calendarData[dayData.number]; index as dataRowIndex;">
+                            <tr *ngFor="let cellData of calendarViewData[dayData.number]; index as dataRowIndex;">
                                 <td>
                                     <div *ngIf="cellData.comment && cellData.length != 0">
                                         <i  [ngClass]="isEditable ? 'cursor-pointer' : ''"
@@ -181,17 +183,17 @@
                     <td class="modify-cell modify-cell-w"
                         [ngClass]="isLast ? 'last-tr-right' : ''">
                         <table>
-                            <tr *ngFor="let cellData of calendarData[dayData.number]; index as dataRowIndex; last as isLastRow; count as rowCount;">
+                            <tr *ngFor="let cellData of calendarViewData[dayData.number]; index as dataRowIndex; last as isLastRow; count as rowCount;">
                                 <td>
                                     <div class="modify">
                                         <div class="m-auto modify-add cursor-pointer" 
-                                                [ngClass]="!isEditable || !isLastRow ? 'modify-disabled' : ''"
-                                                (click)="isEditable && isLastRow ? addEmptyRow(dayData.number) : null;">
+                                                [ngClass]="!isEditable || !isLastRow || (cellData.workingTime === '00:00' && !cellData.project && !cellData.designPhase && !cellData.structuralElement && !cellData.subtask && !cellData.comment) || rowCount === 10 ? 'modify-disabled' : ''"
+                                                (click)="!isEditable || !isLastRow || (cellData.workingTime === '00:00' && !cellData.project && !cellData.designPhase && !cellData.structuralElement && !cellData.subtask && !cellData.comment) || rowCount === 10 ? null : addEmptyRow(dayData.number);">
                                             <i class="fa fa-plus-square-o" aria-hidden="true"></i>
                                         </div>
                                         <div class="m-auto modify-delete cursor-pointer"
                                                 [ngClass]="!isEditable || rowCount === 1 ? 'modify-disabled' : ''"
-                                                (click)="isEditable && rowCount != 1 ? deleteRow(dayData.number, dataRowIndex) : null;">
+                                                (click)="!isEditable || rowCount === 1 ? null : deleteRow(dayData.number, dataRowIndex);">
                                             <i class="fa fa-trash-o" aria-hidden="true"></i>
                                         </div>
                                     </div>

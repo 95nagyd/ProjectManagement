@@ -34,6 +34,10 @@ export class FormattedTimeComponent implements OnInit {
   @Input() dataPosition: any;
   @Output() update: EventEmitter<string>;
 
+  onFocus(event: any){
+    event.target.select();
+  }
+
   onFocusOut() {
     const input = this.value;
     let hours = 0;

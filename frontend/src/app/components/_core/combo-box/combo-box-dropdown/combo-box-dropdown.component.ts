@@ -74,12 +74,10 @@ export class ComboBoxDropdownComponent implements OnInit {
   }
 
   onClickOutside() {
-    console.log("dropdown out")
     this.isClickOutside = true;
   }
 
   onClickInside(){
-    console.log("dropdown in")
     this.isClickOutside = false;
   }
 

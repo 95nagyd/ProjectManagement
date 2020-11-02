@@ -11,7 +11,6 @@ import { EventEmitter } from '@angular/core'
 })
 export class CommentBoxComponent implements OnInit {
 
-
   @Input() isDisabled: Boolean;
   @ViewChild('textarea') textarea: ElementRef;
   @ViewChild('commentbox') commentbox: ElementRef;
@@ -26,6 +25,7 @@ export class CommentBoxComponent implements OnInit {
   commentIcon: any;
   boxPosition: any;
   value: string;
+  mouseEventCounter: number;
 
   constructor(private scrollOffsetService: PageContentScrollOffsetService) { 
   
@@ -38,6 +38,7 @@ export class CommentBoxComponent implements OnInit {
     this.isNewDisplayInTimeout = false;
     this.commentIcon = null;
     this.boxPosition = {x: -2000, y:-2000, triangle: 'top'};
+    this.mouseEventCounter = 0;
   }
 
   ngOnInit(): void {
@@ -61,6 +62,7 @@ export class CommentBoxComponent implements OnInit {
     this.isEditFromIcon = true;
     this.commentIcon = commentIcon;
     this.value = comment;
+    this.mouseEventCounter = 0;
     this.setPosition();
     this.autosize();
     setTimeout(() => {
@@ -73,6 +75,7 @@ export class CommentBoxComponent implements OnInit {
     this.isPreview = false;
     this.isEditing = true;
     this.isEditFromIcon = false;
+    this.mouseEventCounter = 0;
     this.autosize();
   }
 
@@ -94,13 +97,14 @@ export class CommentBoxComponent implements OnInit {
   }
 
   hide(){
-    if(this.commentbox){
+    if(this.commentbox && this.mouseEventCounter === 0){
       this.isVisible = false;
       this.value = '';
       this.isPreview = false;
       this.isEditing = false;
       this.isEditFromIcon = false;
       this.commentIcon = null;
+      return;
     }
   }
   
@@ -125,6 +129,14 @@ export class CommentBoxComponent implements OnInit {
 
   updateValue(value: any) {
     this.update.emit(value);
+  }
+
+  onMouseEvent(add: number){
+    this.mouseEventCounter += add;
+  }
+
+  onClickOutside(){
+    if(this.mouseEventCounter === -1 || this.mouseEventCounter === 1) { this.mouseEventCounter = 0; }
   }
 
   @HostListener('window:resize')

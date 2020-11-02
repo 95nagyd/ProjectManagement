@@ -47,6 +47,10 @@
     padding-left: 4px;
     padding-bottom: 2px;
     line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 1px;
 }
 
 .input-search:focus {

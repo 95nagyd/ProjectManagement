@@ -92,7 +92,7 @@
     background-image: url('../../../../assets/img/save/active.png');
 }
 
-.save-error {
+.save-disabled {
     background-image: url('../../../../assets/img/save/disabled.png');
     cursor: not-allowed;
 }

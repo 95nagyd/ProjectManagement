@@ -4,9 +4,12 @@
     (clickOutside)="isActive ? clickedOutside() : ''">
 
     <span   class="dropdown-control" 
-            [ngClass]="{ 'invalid': hasError, 'dropdown-visible': isActive }">
+            [ngClass]="{ 'invalid': hasError, 'dropdown-visible': isActive }"
+            placement="top" 
+            [ngbTooltip]="!this.isActive && isTooltipRequired() ? searchValue : ''">
             
-        <input  type="text"
+        <input  #search
+                type="text"
                 class="input-search"
                 [ngClass]="{ 'dropdown-visible': isActive }"
                 [ngStyle]="{'width': (!isActive && !hasError && hasValue) ? 'calc(calc(100%) - 32px)' : 'calc(calc(100%) - 20px)'}"
@@ -15,7 +18,7 @@
                 [(ngModel)]="searchValue"
                 (ngModelChange)="filter($event);"
                 (keypress)="onKeyPress($event);"
-                (keydown)="onKeyDown($event);" />
+                (keydown)="onKeyDown($event);"/>
             
         <span   *ngIf="!isActive && !hasError && hasValue"
                 class="d-inline-block clear"
@@ -42,9 +45,13 @@
     </div>
 
     <span   *ngIf="hasValue"
-            class="dropdown-control disabled">
+            class="dropdown-control disabled"
+            placement="top" 
+            [ngbTooltip]="isTooltipRequired() ? searchValue : ''">
 
-        <div class="input-search disabled">
+        <div    #search
+                class="input-search disabled"
+                [ngStyle]="{'width': 'calc(calc(100%) - 20px)'}">
             {{chosen}}
         </div>
 

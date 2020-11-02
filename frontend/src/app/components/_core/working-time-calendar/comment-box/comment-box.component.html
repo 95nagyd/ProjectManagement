@@ -1,10 +1,11 @@
-<div (clickOutside)="isEditing && !isEditFromIcon ? hide() : ''"
+<div #commentbox
+     (clickOutside)="isEditing && !isEditFromIcon ? hide() : ''"
      (mouseenter)="SetCommentInFocus(true);"
      (mouseleave)="SetCommentInFocus(false);"
-     #commentbox
      class="comment-box-container"
      [ngStyle]="{'left':  boxPosition.x + 'px', 'top': boxPosition.y + 'px', 'visibility': isVisible ? 'initial' : 'hidden'}" >
     <div class="comment-box">
+
         <div class="comment-box-content">
             <h5 class="comment-box-header">Megjegyzés</h5>
             <div class="comment-container">
@@ -14,6 +15,9 @@
                             (keydown)="autosize();"
                             (keyup)="autosize();"
                             (blur)="autosize();"
+                            (mouseup)="onMouseEvent(-1);"
+                            (mousedown)="onMouseEvent(1);"
+                            (clickOutside)="onClickOutside();"
                             [(ngModel)]=value
                             (ngModelChange)="updateValue($event);"></textarea>
                 <div [hidden]="!isPreview"

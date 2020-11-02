@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, Input, OnInit, Output } from '@angular/core';
+import { Component, ElementRef, HostListener, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { ComboBoxService } from '@app/_services/combo-box.service';
 import { EventEmitter } from '@angular/core'
 
@@ -17,7 +17,7 @@ export class ComboBoxComponent implements OnInit {
   searchValue: string;
   arrowIndex: number;
 
-
+  @ViewChild('search') search: ElementRef;
   @Input() isDisabled: Boolean;
   @Input() chosen: string;
   @Input() choices: string[];
@@ -25,7 +25,7 @@ export class ComboBoxComponent implements OnInit {
   @Input() isRequired: Boolean;
   @Output() update: EventEmitter<string>;
 
-  constructor(private comboBoxService: ComboBoxService) { 
+  constructor(private comboBoxService: ComboBoxService, public elementRef: ElementRef) { 
     this.hasError = false;
     this.hasValue = false;
     this.isActive = false;
@@ -39,6 +39,7 @@ export class ComboBoxComponent implements OnInit {
     this.searchResult = this.choices;
     this.searchValue = this.chosen;
   }
+  
   
   toggleDropdown(event: any, fromInput?: Boolean) {
     if(this.isActive && fromInput) {
@@ -73,7 +74,9 @@ export class ComboBoxComponent implements OnInit {
 
   clickedOutside(){
     if(this.comboBoxService.isLastClickOutOfDropdown()){
-      if(this.searchValue != this.chosen) this.searchValue = this.chosen;
+      if(this.searchValue != this.chosen) {
+        this.searchValue = this.chosen;
+      }
       this.closeComboBox();
     }
   }
@@ -86,9 +89,8 @@ export class ComboBoxComponent implements OnInit {
   }
 
   updateValue(choiceIndex?: number) {
-    this.arrowIndex = choiceIndex ? choiceIndex : this.arrowIndex;
+    this.arrowIndex = choiceIndex === undefined ? this.arrowIndex : choiceIndex;
     if(this.searchResult.length > 0) {
-      console.log(this.searchResult[this.arrowIndex] + " ;service update match index "+ this.arrowIndex)
       this.searchValue = this.searchResult[this.arrowIndex];
       this.comboBoxService.updateDropdown(this.searchResult, this.searchValue);
       this.chosen = this.searchValue;
@@ -140,7 +142,9 @@ export class ComboBoxComponent implements OnInit {
     this.comboBoxService.updateDropdown(this.searchResult, this.searchResult[0]);
   }
 
-  
-  
+  isTooltipRequired(){
+    if(!this.search) { return false; }
+    return this.search.nativeElement.offsetWidth < this.search.nativeElement.scrollWidth
+  }
 
 }

@@ -6,30 +6,60 @@ import { PageContentScrollOffsetService } from '@app/_services/page-content-scro
 import { WorkingTimeCalendarService } from '@app/_services/working-time-calendar.service';
 import { CalendarDayDetails, CalendarDayData, CalendarData } from '@app/_models/calendar';
 import { ComboBoxService } from '@app/_services/combo-box.service';
+import * as _ from 'lodash-es';
+import { ComboBoxComponent } from '../combo-box/combo-box.component';
 
 @Component({
   selector: 'working-time-calendar',
   templateUrl: './working-time-calendar.component.html',
-  styleUrls: ['./working-time-calendar.component.css']
+  styleUrls: ['./working-time-calendar.component.css'],
 })
 
 export class WorkingTimeCalendarComponent implements OnInit {
 
+  @Input() isEditable: Boolean;
+  @ViewChild('commentbox') commentbox: CommentBoxComponent;
+  @ViewChild('header') header: ElementRef;
   @ViewChildren(FormattedTimeComponent) workingTimeInputList!: QueryList<FormattedTimeComponent>;
-
-  private chosenPeriod: Date;
+  @ViewChildren('projectComboList') projectComboList!: QueryList<ComboBoxComponent>;
+  @ViewChildren('designPhaseComboList') designPhaseComboList!: QueryList<ComboBoxComponent>;
+  
   isInitComplete: Boolean;
-  comboColWidth: number;
-  period: string;
   monthNames: string[];
   dayNames: string[];
   daysOfMonth: CalendarDayDetails[] = [];
-  calendarData: CalendarData;
+
+
+  private chosenPeriod: Date;
+  period: string;
+
+  comboColWidth: number;
+  
+  calendarViewData: CalendarData;
+  calendarOldData: CalendarData;
+
   projectList: string[];
   designPhaseList: string[];
   structuralElementList: string[];
   subtaskList: string[];
   editingComment: { dayNumber: number, dataIndex: number }
+
+    //TODO: settimeout-ok helyett ngzone run kipróbálás this._ngZone.runOutsideAngular(_ => {  //code });
+    //TODO: ngAfterViewInit helyet ngAfterViewInitChecked-ben kipróbálni settimeout nélkül
+  
+
+    //TODO: havi összes munkaidő az utolsó nap után (legalább annyi hely kell , hogy az utolsó nap max magasságos tooltipje kiférjen)
+
+    //TODO: confirm modal sor törléskor
+
+    //TODO: pipe-ok ahol lehet, hogy ne pörögjön annyiszor a changedetection
+
+    
+    
+
+    //TODO: szabadság, betegszabadság (akkor a sor más szinű) (datpickerrel gombról megnyílik modal)
+    //TODO: az első töltésig (bárkié) lehessen visszamenni
+    //TODO: képek css-ből legyenek
 
   constructor(private spinner: SpinnerService, private scrollOffsetService: PageContentScrollOffsetService, 
     private calendarService: WorkingTimeCalendarService, private comboBoxService: ComboBoxService) { 
@@ -63,16 +93,17 @@ export class WorkingTimeCalendarComponent implements OnInit {
     this.spinner.hide();
   }
 
-  @Input() isEditable: Boolean;
-  @ViewChild('commentbox') commentbox: CommentBoxComponent;
-  @ViewChild('header') header: ElementRef;
-
+  //#region calendar control
+  
   setPeriod() { this.period = this.chosenPeriod.getFullYear().toString() + ' ' + this.monthNames[this.chosenPeriod.getMonth()] }
+
+  getDaysInMonth() { return new Date(this.chosenPeriod.getFullYear(), this.chosenPeriod.getMonth()+1, 0).getDate(); }
 
   refreshCalendar() {
     this.spinner.show();
     this.daysOfMonth = [];
-    for(let dayIndex = 1; dayIndex <= this.getDaysInMonth(); dayIndex++){
+    const daysInMonth = this.getDaysInMonth();
+    for(let dayIndex = 1; dayIndex <= daysInMonth; dayIndex++){
       let tempDate = new Date(this.chosenPeriod);
       tempDate.setDate(dayIndex);
       this.daysOfMonth.push({
@@ -81,7 +112,7 @@ export class WorkingTimeCalendarComponent implements OnInit {
          backgroundColor : dayIndex % 2 == 0 ? 'rgb(243, 243, 243)' : 'rgb(218, 218, 218)'
       });
     }
-    this.updateCalendarData();
+    this.updateCalendarViewData();
     this.scrollOffsetService.setOffsetY(0);
     if(this.commentbox) { this.commentbox.hide(); }
     this.comboBoxService.externalCloseDropdown();
@@ -91,94 +122,67 @@ export class WorkingTimeCalendarComponent implements OnInit {
     }, 1000);
   }
 
-  public changeMonth(direction: string) { 
-
+  changeMonth(direction: string) { 
     this.chosenPeriod.setMonth(this.chosenPeriod.getMonth() + (direction === 'previous' ? -1 : 1)); 
-    
     this.setPeriod();
     this.refreshCalendar();
-
   }
 
-  getDaysInMonth() { return new Date(this.chosenPeriod.getFullYear(), this.chosenPeriod.getMonth()+1, 0).getDate(); }
-
-  private updateCalendarData() {
+  private updateCalendarViewData() {
     //ide majd api hívással lekérni a beállított hónaphoz tartozó adatokat, ami most a fakeData
-    this.calendarData = this.calendarService.getCalendarDataDataAccessOperation(this.chosenPeriod);
+    this.calendarViewData = this.calendarService.getCalendarDataDataAccessOperation(this.chosenPeriod);
+    this.calendarOldData = _.cloneDeep<CalendarData>(this.calendarViewData);
     this.daysOfMonth.forEach(dayData => {
-      if(!this.calendarData[dayData.number]) { 
-        this.calendarData[dayData.number] = [];
+      if(!this.calendarViewData[dayData.number]) { 
+        this.calendarViewData[dayData.number] = [];
         this.addEmptyRow(dayData.number); 
       }
     });
   }
 
-  addEmptyRow(dayNumber: number) {
-    this.calendarData[dayNumber].push(new CalendarDayData());
+  addEmptyRow(dayNumber: number) { this.calendarViewData[dayNumber].push(new CalendarDayData()); }
+
+  deleteRow(dayNumber: number, rowIndex: number){ 
+    this.calendarService.getCalendarActualData()[dayNumber].splice(rowIndex, 1); 
   }
 
-  deleteRow(dayNumber: number, rowIndex: number){
-    
+  //#endregion
 
-    //TODO: calendar mentéskor sorokat validáli, ha valami nem jó akkor az ahhoz tartozó elem haserror true 
-
-    
-
-    //TODO: havi összes munkaidő az utolsó nap után (legalább annyi hely kell , hogy az utolsó nap max magasságos tooltipje kiférjen)
-
-    //TODO: confirm modal sor törléskor
-
-    //TODO: max 10 sor adható hozzá
-
-    //TODO: sort csak akkor lehet hozzáadni, ha van projekt és tervfázis kiválasztva
-
-    
-
-    //TODO: long text shortener ... 
-
-    //TODO: szabadság, betegszabadság (akkor a sor más szinű) (datpickerrel gombról megnyílik modal)
-
-    //TODO: az első töltésig (bárkié) lehessen visszamenni
-
-    //TODO: bevezetni az istouched-et, mentés csak akkor, ha true (mozogjon a mentés), elnavigálás esetén rákérdezni, hogy elveti-e a módosításait
-
-    
-
-    //TODO: kitalálni, hogy az üres sorok nem kiválasztott kötelező értékeivel mi legyen (dto-n belül lesz metódus)
-    
-    this.calendarService.getCalendarActualData()[dayNumber].splice(rowIndex, 1);
-  }
+  //#region cell control
 
   updateWorkingTime(value: string, dayNumber: number, dataIndex: number){
-    this.calendarData[dayNumber][dataIndex].workingTime = value;
+    this.calendarViewData[dayNumber][dataIndex].workingTime = value;
   }
 
   updateCombo(combo: string, chosen: string, dayNumber: number, dataIndex: number){
     switch(combo) { 
       case 'project': { 
-        this.calendarData[dayNumber][dataIndex].project = chosen;
+        this.calendarViewData[dayNumber][dataIndex].project = chosen;
          break; 
       } 
       case 'designPhase': { 
-        this.calendarData[dayNumber][dataIndex].designPhase = chosen;
+        this.calendarViewData[dayNumber][dataIndex].designPhase = chosen;
          break; 
       } 
       case 'structuralElement': { 
-        this.calendarData[dayNumber][dataIndex].structuralElement = chosen;
+        this.calendarViewData[dayNumber][dataIndex].structuralElement = chosen;
          break; 
       } 
       case 'subtask': { 
-        this.calendarData[dayNumber][dataIndex].subtask = chosen;
+        this.calendarViewData[dayNumber][dataIndex].subtask = chosen;
          break; 
       }
     }
   }
 
+  updateComment(value: string){
+    this.calendarViewData[this.editingComment.dayNumber][this.editingComment.dataIndex].comment = value;
+  }
 
   previewComment(e: any, dayNumber: number, dataIndex: number) {
     if(this.commentbox && !this.commentbox.isEditing){
       this.editingComment = { dayNumber: dayNumber, dataIndex: dataIndex }
-      this.commentbox.preview(e.target, this.calendarData[dayNumber][dataIndex].comment);
+      this.commentbox.preview(e.target, this.calendarViewData[dayNumber][dataIndex].comment);
     }
   }
 
@@ -187,7 +191,7 @@ export class WorkingTimeCalendarComponent implements OnInit {
     if(this.commentbox && this.commentbox.isEditing) { this.commentbox.hide(); return; }
     if(this.commentbox){
       this.editingComment = { dayNumber: dayNumber, dataIndex: dataIndex }
-      this.commentbox.edit(e.target, this.calendarData[dayNumber][dataIndex].comment);
+      this.commentbox.edit(e.target, this.calendarViewData[dayNumber][dataIndex].comment);
     }
   }
 
@@ -202,27 +206,87 @@ export class WorkingTimeCalendarComponent implements OnInit {
       }, 100);
     }
   }
+  
+  //#endregion
 
-  updateComment(value: string){
-    this.calendarData[this.editingComment.dayNumber][this.editingComment.dataIndex].comment = value;
+  //#region save
+
+  isCalendarDataChanged(){
+    return !(_.isEqual(this.calendarOldData, this.removeEmptyRows(_.cloneDeep(this.calendarViewData))));
   }
 
+  removeEmptyRows(data: CalendarData){
+    const daysInMonth = this.getDaysInMonth();
+    for(let dayIndex = 1; dayIndex <= daysInMonth; dayIndex++){
+      data[dayIndex] = data[dayIndex].filter(dataRow => {
+        return !this.isDataRowEmpty(dataRow);
+      });
+      if(data[dayIndex].length < 1) { delete data[dayIndex]; }
+    }
+    return data;
+  }
 
-  isCalDataValid(){
-    return  !this.workingTimeInputList.some(workingTimeInput => workingTimeInput.hasError === true);
-    //kiszedni az indexét hogy meyik projekt és tervfázis sorba van érték, és egyeznie kell az indexeknek + az értéknek benne kell lennie a choicesben, ahol nem egyezik ott haserror-t beállítani truera
-    //csak akkorhibás akkor, ha close után nincs a choices között
+  isDataRowEmpty(dataRow: CalendarDayData){
+    return (dataRow.workingTime === '00:00' && !dataRow.project && !dataRow.designPhase && !dataRow.structuralElement && !dataRow.subtask && !dataRow.comment);
+  }
+  
+  validateCalendar(){
+    if(this.workingTimeInputList.some(workingTimeInput => workingTimeInput.hasError === true)) { return false; };
+    let temp: CalendarData = _.cloneDeep<CalendarData>(this.calendarViewData);
+    this.removeEmptyRows(temp);
+    let isCalValid = true;
+    for (const [dayKey, data] of Object.entries(temp)) {
+      data.forEach((dataRow: CalendarDayData, index: number) => {
+        if(dataRow.workingTime !== '00:00' || dataRow.project || dataRow.designPhase || dataRow.structuralElement || dataRow.subtask || dataRow.comment){
+          const dayText = (parseInt(dayKey) < 10 ? '0' + dayKey : dayKey) + '.';
+          if(!dataRow.project){
+            isCalValid = false;
+            this.projectComboList.filter(projectCombo => 
+              projectCombo.elementRef.nativeElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.firstChild.firstChild.firstChild.textContent 
+                === dayText
+            )[index].hasError = true;
+          }
+          if(!dataRow.designPhase){
+            isCalValid = false;
+            this.designPhaseComboList.filter(designPhaseCombo => 
+              designPhaseCombo.elementRef.nativeElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.firstChild.firstChild.firstChild.textContent 
+                === dayText
+            )[index].hasError = true;
+          }
+        }
+      });
+    }
+    return isCalValid;
   }
 
   isCalSavable(){
-    return this.isInitComplete && this.isEditable && this.isCalDataValid()
+    return this.isInitComplete && this.isEditable 
+      && (!this.workingTimeInputList.some(workingTimeInput => workingTimeInput.hasError === true)
+      && !this.projectComboList.some(projectCombo => projectCombo.hasError === true)
+      && !this.designPhaseComboList.some(designPhaseCombo => designPhaseCombo.hasError === true))
   }
 
   saveCalendar(){
-    if(!this.isCalSavable()) { return; }
-    console.log(this.isCalDataValid())
-    console.log(JSON.parse(JSON.stringify(this.calendarData)))
+    if(!this.isCalSavable() || !this.isCalendarDataChanged()){ return; }
+    this.spinner.show();
+
+    if(!this.validateCalendar()){
+      //TODO: Kérem javítsa a hibás mezőket! toaster
+
+      this.spinner.hide();
+      return;
+    }
+    
+    let saveData = _.cloneDeep<CalendarData>(this.calendarViewData);
+    this.removeEmptyRows(saveData);
+    
+    console.log(JSON.parse(JSON.stringify(saveData)))
+    
+    this.updateCalendarViewData();
+    this.spinner.hide();
   }
+
+  //#endregion
 
   @HostListener('window:resize')
   onResize() {

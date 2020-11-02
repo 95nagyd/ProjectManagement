@@ -36,10 +36,8 @@ export class AppComponent {
 
 
   ngAfterViewInit() {
-    setTimeout(() => {
-      this.scrollOffsetService.setOffsetY(0);
-      this.spinner.hide();
-    }, 0);
+    this.scrollOffsetService.setOffsetY(0);
+    this.spinner.hide();
   }
 
   initInterval() {
