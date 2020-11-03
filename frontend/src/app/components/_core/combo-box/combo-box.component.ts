@@ -1,11 +1,13 @@
-import { Component, ElementRef, HostListener, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { ComboBoxService } from '@app/_services/combo-box.service';
 import { EventEmitter } from '@angular/core'
+import { ChangeDetectionStrategy } from '@angular/compiler/src/core';
 
 @Component({
   selector: 'combo-box',
   templateUrl: './combo-box.component.html',
-  styleUrls: ['./combo-box.component.css']
+  styleUrls: ['./combo-box.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ComboBoxComponent implements OnInit {
 
@@ -25,7 +27,7 @@ export class ComboBoxComponent implements OnInit {
   @Input() isRequired: Boolean;
   @Output() update: EventEmitter<string>;
 
-  constructor(private comboBoxService: ComboBoxService, public elementRef: ElementRef) { 
+  constructor(private comboBoxService: ComboBoxService, public elementRef: ElementRef, private cdRef: ChangeDetectorRef) { 
     this.hasError = false;
     this.hasValue = false;
     this.isActive = false;
@@ -41,21 +43,19 @@ export class ComboBoxComponent implements OnInit {
   }
   
   
-  toggleDropdown(event: any, fromInput?: Boolean) {
-    if(this.isActive && fromInput) {
+  toggleDropdown(fromClick?: Boolean) {
+    if(this.isActive && fromClick) {
       return;
     }
     if(!this.isActive){
-      const currentParentNode = event.currentTarget.parentNode;
-      setTimeout(() => {
-        this.comboBoxService.registerComboBox(this);
-        this.isActive = true;
-        this.searchResult = this.choices;
-        this.arrowIndex = (this.choices && this.choices.indexOf(this.chosen) != -1) ? this.choices.indexOf(this.chosen) : 0;
-        this.comboBoxService.openDropdown(currentParentNode, this.searchValue, this.searchResult);
-        currentParentNode.children[0].focus();
-        currentParentNode.children[0].select();
-      }, 0);
+      this.comboBoxService.registerComboBox(this);
+      const currentParentNode = this.elementRef.nativeElement.children[0].firstChild;
+      this.isActive = true;
+      this.searchResult = this.choices;
+      this.arrowIndex = (this.choices && this.choices.indexOf(this.chosen) != -1) ? this.choices.indexOf(this.chosen) : 0;
+      this.comboBoxService.openDropdown(currentParentNode, this.searchValue, this.searchResult);
+      currentParentNode.children[0].focus();
+      currentParentNode.children[0].select();
       return;
     } 
     this.closeComboBox();
@@ -63,13 +63,12 @@ export class ComboBoxComponent implements OnInit {
   }
 
   closeComboBox(){
-    this.comboBoxService.deregisterComboBox();
     this.isActive = false;
     this.arrowIndex = 0;
     this.searchResult = [];
     this.comboBoxService.closeDropdown();
-    
     this.hasError = !this.isValueValid();
+    this.comboBoxService.deregisterComboBox();
   }
 
   clickedOutside(){
@@ -80,6 +79,7 @@ export class ComboBoxComponent implements OnInit {
       this.closeComboBox();
     }
   }
+
 
   isValueValid(){
     if(this.isRequired){
@@ -112,12 +112,16 @@ export class ComboBoxComponent implements OnInit {
   onKeyPress(event: any){
     if(event.key === 'Enter') { 
       this.updateValue();
-      event.currentTarget.blur()
+      event.currentTarget.blur();
       return; 
     }
   }
 
   onKeyDown(event: any){
+    if(event.code === 'Tab') { 
+      this.closeComboBox();
+      return; 
+    }
     if (event.code === 'ArrowUp') { 
       this.arrowIndex = this.arrowIndex === 0 ? this.arrowIndex : this.arrowIndex-1; 
       event.preventDefault();
@@ -146,5 +150,4 @@ export class ComboBoxComponent implements OnInit {
     if(!this.search) { return false; }
     return this.search.nativeElement.offsetWidth < this.search.nativeElement.scrollWidth
   }
-
 }
