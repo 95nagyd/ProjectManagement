@@ -7,7 +7,10 @@
             [ngClass]="{ 'invalid': hasError, 'dropdown-visible': isActive }"
             placement="top" 
             [ngbTooltip]="!this.isActive && isTooltipRequired() ? searchValue : ''"
-            (click)="toggleDropdown(true);">
+            (click)="toggleDropdown($event);"
+            (mouseup)="onMouseEvent(0);"
+            (mousedown)="onMouseEvent(1);"
+            (clickOutside)="clickOutsidePreventClose()">
             
         <input  #search
                 type="text"
@@ -15,16 +18,15 @@
                 [ngClass]="{ 'dropdown-visible': isActive }"
                 [ngStyle]="{'width': (!isActive && !hasError && hasValue) ? 'calc(calc(100%) - 32px)' : 'calc(calc(100%) - 20px)'}"
                 placeholder="Kérem válasszon..."
-                (focus)="toggleDropdown();"
+                (focus)="toggleDropdown($event);"
                 [(ngModel)]="searchValue"
                 (ngModelChange)="filter($event);"
                 (keypress)="onKeyPress($event);"
                 (keydown)="onKeyDown($event);"/>
             
         <span   *ngIf="!isActive && !hasError && hasValue"
-                class="d-inline-block clear"
-                (click)="clearValue();">
-                    <i class="fa fa-times clear-icon" aria-hidden="true"></i>
+                class="d-inline-block clear">
+                    <i class="fa fa-times clear-icon" aria-hidden="true" (click)="clearValue();"></i>
         </span>
         
         <span   class="d-inline-block toggle">

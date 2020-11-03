@@ -89,8 +89,8 @@ export class WorkingTimeCalendarComponent implements OnInit {
     setTimeout(() => {
       this.isInitComplete = true;
       this.comboColWidth = (this.header.nativeElement.getBoundingClientRect().width - 445) * 0.25;
+      this.spinner.hide();
     }, 0);
-    this.spinner.hide();
   }
 
   //#region calendar control
@@ -115,17 +115,18 @@ export class WorkingTimeCalendarComponent implements OnInit {
     this.updateCalendarViewData();
     this.scrollOffsetService.setOffsetY(0);
     if(this.commentbox) { this.commentbox.hide(); }
-    this.comboBoxService.externalCloseDropdown();
 
     setTimeout(() => {
       this.spinner.hide();
-    }, 1000);
+    }, 200);
   }
 
   changeMonth(direction: string) { 
+    this.spinner.show();
     this.chosenPeriod.setMonth(this.chosenPeriod.getMonth() + (direction === 'previous' ? -1 : 1)); 
     this.setPeriod();
     this.refreshCalendar();
+    this.spinner.hide();
   }
 
   private updateCalendarViewData() {

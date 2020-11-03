@@ -1,6 +1,7 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ComboBoxService } from '@app/_services/combo-box.service';
 import { PageContentScrollOffsetService } from '@app/_services/page-content-scroll-offset.service';
+import { ComboBoxComponent } from '../combo-box.component';
 
 @Component({
   selector: 'combo-box-dropdown',
@@ -11,7 +12,6 @@ export class ComboBoxDropdownComponent implements OnInit {
 
   isVisible: Boolean;
   styleData: any;
-  dropdownControl: any;
   chosen: string;
   choices: string[];
   isClickOutside: Boolean;
@@ -24,10 +24,9 @@ export class ComboBoxDropdownComponent implements OnInit {
 
     this.isVisible = false;
     this.styleData = {x: -2000, y:-2000, minWidth: 0};
-    this.dropdownControl = null;
     this.chosen = '';
     this.choices = [];
-    this.isClickOutside = true;
+    this.isClickOutside = false;
   }
 
   ngOnInit(): void {
@@ -37,59 +36,44 @@ export class ComboBoxDropdownComponent implements OnInit {
     return this.choices.includes(this.chosen)
   }
 
-  show(dropdownControl: any, chosen: string, choices: string[]){
-    setTimeout(() => {
-      if(dropdownControl)  this.dropdownControl = dropdownControl;
-      this.chosen = chosen;
-      this.choices = choices;
-      this.isVisible = true;
-
+  show(){
+    this.comboBoxService.getComboRefList().then((comboBoxRefList: ComboBoxComponent[]) => {
+      this.chosen = comboBoxRefList[0].searchValue;
+      this.choices = comboBoxRefList[0].searchResult;
       this.setPosition();
-    }, 50);
-    
+    });
   }
 
   setPosition(){
-    setTimeout(() => {
-      if(this.dropdownControl){
-        let position = { 
-          x: this.dropdownControl.getBoundingClientRect().x,  
-          y: this.dropdownControl.getBoundingClientRect().y + this.scrollOffsetService.getOffsetY(),
-          minWidth: this.dropdownControl.getBoundingClientRect().width
-        };
-        position.x -= 9;
-        position.y -= 56;
-        this.styleData = position;
-        this.isVisible = true;
-      }
-    }, 0);
+    this.comboBoxService.getComboRefList().then((comboBoxRefList: ComboBoxComponent[]) => {
+      let dropdownControl = comboBoxRefList[0].elementRef.nativeElement.firstElementChild.firstElementChild;
+      let position = { 
+        x: dropdownControl.getBoundingClientRect().x,  
+        y: dropdownControl.getBoundingClientRect().y + this.scrollOffsetService.getOffsetY(),
+        minWidth: dropdownControl.getBoundingClientRect().width
+      };
+      position.x -= 9;
+      position.y -= 56;
+      this.styleData = position;
+      this.isVisible = true;
+      dropdownControl.firstElementChild.focus();
+      dropdownControl.firstElementChild.select();
+    });
   }
 
   hide(){
-    if(this.dropdownControl){
-      this.isVisible = false;
-      this.dropdownControl = null;
-      this.isClickOutside = true;
-    }
-  }
-
-  onClickOutside() {
-    this.isClickOutside = true;
-  }
-
-  onClickInside(){
+    this.isVisible = false;
     this.isClickOutside = false;
   }
 
-  choose(choiceIndex: any){
-    this.comboBoxService.chooseByClick(choiceIndex);
+  onClickInOutEvent(isOut: Boolean) {
+    this.isClickOutside = isOut;
   }
 
-  @HostListener('window:resize')
-  onResize() {
-    if(this.dropdownControl && this.isVisible){
-      this.setPosition();
-    }
+  choose(choiceIndex: any){
+    this.comboBoxService.getComboRefList().then((comboBoxRefList: ComboBoxComponent[]) => {
+      comboBoxRefList[0].updateValue(choiceIndex);
+    });
   }
 
 }

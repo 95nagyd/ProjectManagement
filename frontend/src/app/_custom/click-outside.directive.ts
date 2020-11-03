@@ -14,7 +14,10 @@ export class ClickOutsideDirective {
   @HostListener('document:click', ['$event.target'])
   public onClick(target: any) {
     if(!this.spinner.isSpinnerVisible()) {
-      if(this.el.nativeElement.classList.contains('combo-container') && !this.el.nativeElement.children[0].classList.contains('dropdown-visible')){
+      if(this.el.nativeElement.classList.contains('combo-container') 
+          && target?.parentElement?.classList.contains('dropdown-control') 
+            || target?.parentElement?.parentElement?.classList.contains('dropdown-control')
+      ){
         return;
       }
       if(!this.el.nativeElement.contains(target)){ this.clickOutside.emit(); }

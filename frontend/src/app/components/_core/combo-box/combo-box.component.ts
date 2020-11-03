@@ -1,7 +1,8 @@
-import { ChangeDetectorRef, Component, ElementRef, HostListener, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, Input, NgZone, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { ComboBoxService } from '@app/_services/combo-box.service';
 import { EventEmitter } from '@angular/core'
 import { ChangeDetectionStrategy } from '@angular/compiler/src/core';
+import { SpinnerService } from '@app/_services/spinner.service';
 
 @Component({
   selector: 'combo-box',
@@ -18,6 +19,7 @@ export class ComboBoxComponent implements OnInit {
   searchResult: string[];
   searchValue: string;
   arrowIndex: number;
+  mouseEventCounter: number;
 
   @ViewChild('search') search: ElementRef;
   @Input() isDisabled: Boolean;
@@ -27,13 +29,14 @@ export class ComboBoxComponent implements OnInit {
   @Input() isRequired: Boolean;
   @Output() update: EventEmitter<string>;
 
-  constructor(private comboBoxService: ComboBoxService, public elementRef: ElementRef, private cdRef: ChangeDetectorRef) { 
+  constructor(private comboBoxService: ComboBoxService, public elementRef: ElementRef, private spinner: SpinnerService, private _ngZone: NgZone) { 
+    this.spinner.show();
     this.hasError = false;
     this.hasValue = false;
     this.isActive = false;
     this.searchResult = [];
     this.update = new EventEmitter();
-    
+    this.mouseEventCounter = 0;
   }
 
   ngOnInit(): void {
@@ -41,45 +44,59 @@ export class ComboBoxComponent implements OnInit {
     this.searchResult = this.choices;
     this.searchValue = this.chosen;
   }
+
+  ngAfterViewChecked(): void {
+    this.spinner.hide();
+  }
   
   
-  toggleDropdown(fromClick?: Boolean) {
-    if(this.isActive && fromClick) {
+  toggleDropdown(event: any) {
+    const isToggle = event.target.classList.contains('toggle') || event.target.classList.contains('toggle-icon')
+    if((this.isActive && !isToggle) || event.target.classList.contains('clear-icon')) {
       return;
     }
     if(!this.isActive){
-      this.comboBoxService.registerComboBox(this);
-      const currentParentNode = this.elementRef.nativeElement.children[0].firstChild;
-      this.isActive = true;
-      this.searchResult = this.choices;
-      this.arrowIndex = (this.choices && this.choices.indexOf(this.chosen) != -1) ? this.choices.indexOf(this.chosen) : 0;
-      this.comboBoxService.openDropdown(currentParentNode, this.searchValue, this.searchResult);
-      currentParentNode.children[0].focus();
-      currentParentNode.children[0].select();
+      this.openComboBox();
       return;
     } 
-    this.closeComboBox();
+    this.comboBoxService.hideDropdown();
+    this.comboBoxService.removeAndCloseGivenComboRef(this);
+  }
 
+  openComboBox(){
+    this.comboBoxService.removeAndCloseOldComboRef(this).then(() => {
+      this.comboBoxService.addComboRef(this).then(() => {
+        this.isActive = true;
+        this.searchResult = this.choices;
+        this.arrowIndex = (this.choices && this.choices.indexOf(this.searchValue) != -1) ? this.choices.indexOf(this.searchValue) : 0;
+        this.comboBoxService.showDropdown();
+      });
+    });
   }
 
   closeComboBox(){
     this.isActive = false;
-    this.arrowIndex = 0;
     this.searchResult = [];
-    this.comboBoxService.closeDropdown();
+    this.arrowIndex = 0;
     this.hasError = !this.isValueValid();
-    this.comboBoxService.deregisterComboBox();
   }
+  
 
   clickedOutside(){
-    if(this.comboBoxService.isLastClickOutOfDropdown()){
-      if(this.searchValue != this.chosen) {
-        this.searchValue = this.chosen;
-      }
-      this.closeComboBox();
+    if(this.comboBoxService.isLastClickOutOfDropdown() && this.mouseEventCounter === 0){
+      if(this.searchValue != this.chosen) { this.searchValue = this.chosen; }
+      this.comboBoxService.hideDropdown();
+      this.comboBoxService.removeAndCloseGivenComboRef(this);
     }
   }
 
+  onMouseEvent(add: number){
+    this.mouseEventCounter = add;
+  }
+
+  clickOutsidePreventClose(){
+    if(this.mouseEventCounter !== 0) { this.mouseEventCounter = 0; }
+  }
 
   isValueValid(){
     if(this.isRequired){
@@ -87,6 +104,7 @@ export class ComboBoxComponent implements OnInit {
     }
     return !this.searchValue || this.searchValue.length === 0 || this.choices.includes(this.searchValue);
   }
+
 
   updateValue(choiceIndex?: number) {
     this.arrowIndex = choiceIndex === undefined ? this.arrowIndex : choiceIndex;
@@ -97,9 +115,10 @@ export class ComboBoxComponent implements OnInit {
       this.hasValue = !(!this.chosen || this.chosen.length === 0);
       this.update.emit(this.chosen);
     }
-
     this.hasError = !this.isValueValid();
-    this.closeComboBox();
+    this.comboBoxService.hideDropdown();
+    this.comboBoxService.removeAndCloseGivenComboRef(this);
+    
   }
 
   clearValue(){
@@ -119,7 +138,8 @@ export class ComboBoxComponent implements OnInit {
 
   onKeyDown(event: any){
     if(event.code === 'Tab') { 
-      this.closeComboBox();
+      this.comboBoxService.hideDropdown();
+      this.comboBoxService.removeAndCloseGivenComboRef(this);
       return; 
     }
     if (event.code === 'ArrowUp') { 
@@ -150,4 +170,11 @@ export class ComboBoxComponent implements OnInit {
     if(!this.search) { return false; }
     return this.search.nativeElement.offsetWidth < this.search.nativeElement.scrollWidth
   }
+
+  @HostListener('window:resize')
+  onResize() {
+    this.comboBoxService.hideDropdown();
+    this.comboBoxService.removeAndCloseGivenComboRef(this);
+  }
+
 }
