@@ -52,8 +52,8 @@
         </div>
     </div>
     <div class="calendar-content">
-        <table cellspacing="0" cellpadding="0">
-            <tbody>
+        <table cellspacing="0" cellpadding="0" >
+            <tbody *ngIf="calendarViewData">
                 <tr *ngFor="let dayData of daysOfMonth; last as isLast;" 
                     [ngStyle]="{'background-color': dayData.backgroundColor}">
                     <!-- Dátum cella -->
@@ -66,7 +66,7 @@
                                     ? { 'background-color': 'rgb(130, 130, 130)', 'color': 'rgb(237, 2, 2)', 'font-weight': 'bold', 'text-shadow': '0px 0px 5px rgb(0, 0, 0)' } 
                                     : {}"
                              [ngClass]="isLast ? 'last-tr-left' : ''">
-                            <div class="day-number">{{dayData.number | twoDigitNumber}}.</div>
+                            <div class="day-number">{{dayData.number+1 | twoDigitNumber}}.</div>
                             <div class="day-name">{{dayData.name}}</div>
                         </div>
                     </td>
@@ -88,7 +88,7 @@
                     </td>
                     <!-- Projekt cella -->
                     <td>
-                        <table style="height: 100%;">
+                        <table>
                             <tr *ngFor="let cellData of calendarViewData[dayData.number]; index as dataRowIndex;">
                                 <td>
                                     <div>

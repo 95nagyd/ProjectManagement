@@ -1,7 +1,7 @@
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { Component, ElementRef, HostListener, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { PageContentScrollOffsetService } from '@app/_services/page-content-scroll-offset.service';
-import { WorkingTimeCalendarService } from '@app/_services/working-time-calendar.service';
+import { CalendarService } from '@app/_services/calendar.service';
 import { EventEmitter } from '@angular/core'
 
 @Component({

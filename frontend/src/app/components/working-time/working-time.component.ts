@@ -16,15 +16,6 @@ export class WorkingTimeComponent implements OnInit {
   constructor(public authenticationService: AuthenticationService, private spinner: SpinnerService) { }
 
   ngOnInit(): void {
-
-    
-    this.spinner.show();
-    setTimeout(() => {
-      this.spinner.hide();
-    }, 1000);
-    
-    //this.spinner.show();
     this.currentUser = this.authenticationService.getCurrentUser();
-    //this.spinner.hide();
   }
 }

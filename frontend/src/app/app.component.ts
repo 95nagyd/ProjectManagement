@@ -23,7 +23,6 @@ export class AppComponent {
   constructor(private authenticationService: AuthenticationService, private router: Router, 
                 private _ngZone: NgZone, private spinner: SpinnerService, private scrollOffsetService: PageContentScrollOffsetService) { 
                   
-    this.spinner.show();
 
     this.scrollOffsetService.register(this);
 
@@ -37,8 +36,8 @@ export class AppComponent {
 
   ngAfterViewInit() {
     this.scrollOffsetService.setOffsetY(0);
-    this.spinner.hide();
   }
+
 
   initInterval() {
     interval(500).pipe(

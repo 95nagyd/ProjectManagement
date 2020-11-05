@@ -4,9 +4,11 @@ export interface CalendarDayDetails {
   backgroundColor: string;
 }
 
+
 export interface CalendarData {
-  [outerKey: number] : CalendarDayData[] | any[]
+  [index: number] : CalendarDayData[] | any[]
 }
+
 
 export class CalendarDayData {
   workingTime: string;

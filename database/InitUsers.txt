@@ -1,0 +1,29 @@
+use appDB
+
+db.users.insertMany([
+	{
+		username: 'adminuser', 
+      	password: 'adminuser',
+      	title: 'Titulus',
+      	lastName: 'VezetékAdmin',
+      	middleName: 'KözépsőAdmin',
+      	firstName: 'KeresztAdmin',
+      	role: 'admin'
+	},
+	{
+		username: 'simpleuser',
+		password: 'simpleuser',
+		title: '',
+		lastName: 'UserVezeték',
+		middleName: '',
+		firstName: 'UserKereszt',
+		role: 'user'
+    }
+])
+
+
+ 
+
+
+
+

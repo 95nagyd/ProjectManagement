@@ -7,6 +7,8 @@ const _ = require("underscore");
 
 const app = express();
 
+const userService = require('./Services/userService');
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.options('*', cors());
@@ -19,29 +21,6 @@ app.use(function (req, res, next) {
     next();
 });
 
-const users = [
-    {
-      id: 0,
-      username: 'adminuser', 
-      password: 'adminuser',
-      title: 'Titulus',
-      lastName: 'VezetékAdmin',
-      middleName: 'KözépsőAdmin',
-      firstName: 'KeresztAdmin',
-      role: 'admin'
-    },
-    {
-      id: 1,
-      username: 'simpleuser',
-      password: 'simpleuser',
-      title: '',
-      lastName: 'UserVezeték',
-      middleName: '',
-      firstName: 'UserKereszt',
-      role: 'user'
-    }
-]
-
 let refreshTokens = []
 
 app.post('/token', (req, res) => {
@@ -53,14 +32,15 @@ app.post('/token', (req, res) => {
         const accessToken = generateAccessToken(
             _.pick(user, 
                 [
-                    'id', 
+                    '_id', 
                     'title', 
                     'lastName',
                     'middleName',
                     'firstName',
                     'role'
                 ]
-        ));
+            )
+        );
         res.json({ accessToken: accessToken })
     });
 });
@@ -76,23 +56,28 @@ app.post('/login', (req, res) => {
     const { username, password } = req.body;
     console.log(req.body);
 
-    let user = users.find((x) => {
-        if(x.username == username && x.password == password) return x;
-    })
-    if(user == null) res.status(401).json({ message: "Hibás felhasználónév vagy jelszó" });
+    userService.getUsers({ username: username, password: password }).then((users) => {
+        console.log(users)
+        if(users.length == 0) res.status(401).json({ message: "Hibás felhasználónév vagy jelszó!" });
 
-    const accessToken = generateAccessToken(user);
-    const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET);
-    refreshTokens.push(refreshToken);
+        const user = users[0];
+        const accessToken = generateAccessToken(user);
+        const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET);
 
-    res.json({ accessToken: accessToken, refreshToken: refreshToken });
+        refreshTokens.push(refreshToken);
+
+        res.json({ accessToken: accessToken, refreshToken: refreshToken });
+    }, (error) => {
+        console.log(error)
+        res.status(401).json({ message: "Adatbázis hiba!" });
+    });
 });
 
 
 function generateAccessToken(user) {
     return jwt.sign(
         _.pick(user, [
-            'id', 
+            '_id', 
             'title', 
             'lastName',
             'middleName',

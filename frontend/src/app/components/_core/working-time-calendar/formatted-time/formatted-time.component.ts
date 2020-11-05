@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, Output } from '@angular/core';
-import { WorkingTimeCalendarService } from '@app/_services/working-time-calendar.service';
+import { CalendarService } from '@app/_services/calendar.service';
 import { EventEmitter } from '@angular/core'
 
 @Component({
@@ -12,7 +12,7 @@ export class FormattedTimeComponent implements OnInit {
   hasError: Boolean;
   private pattern: any;
 
-  constructor(private calendarService: WorkingTimeCalendarService) { 
+  constructor(private calendarService: CalendarService) { 
     this.hasError = false;
     this.pattern = /^[0-9]{0,2}[\:]?[0-9]{0,2}$/;
     this.update = new EventEmitter();

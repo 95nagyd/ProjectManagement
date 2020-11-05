@@ -1,0 +1,2 @@
+mongo localhost/appDB
+pause

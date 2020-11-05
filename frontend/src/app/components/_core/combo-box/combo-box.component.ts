@@ -30,7 +30,6 @@ export class ComboBoxComponent implements OnInit {
   @Output() update: EventEmitter<string>;
 
   constructor(private comboBoxService: ComboBoxService, public elementRef: ElementRef, private spinner: SpinnerService, private _ngZone: NgZone) { 
-    this.spinner.show();
     this.hasError = false;
     this.hasValue = false;
     this.isActive = false;
@@ -45,10 +44,6 @@ export class ComboBoxComponent implements OnInit {
     this.searchValue = this.chosen;
   }
 
-  ngAfterViewChecked(): void {
-    this.spinner.hide();
-  }
-  
   
   toggleDropdown(event: any) {
     const isToggle = event.target.classList.contains('toggle') || event.target.classList.contains('toggle-icon')

@@ -3,7 +3,7 @@ import { Role } from "./role";
 
 export class User {
 
-    id: number;
+    _id: string;
     title: string;
     lastName: string;
     middleName: string;
@@ -13,7 +13,7 @@ export class User {
     constructor(data?: User) {
         data = data || <User>{};
 
-        this.id = data.id || -1;
+        this._id = data._id || '';
         this.title = data.title || '';
         this.lastName = data.lastName || '';
         this.middleName = data.middleName || '';

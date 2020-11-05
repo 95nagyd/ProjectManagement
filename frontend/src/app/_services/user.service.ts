@@ -13,7 +13,7 @@ export class UserService {
 
   constructor(private http: HttpClient) { }
 
-  public getAll(): Observable<User[]> {
+  getAll(): Observable<User[]> {
     return this.http.get<any>(`${environment.apiUrl}/users`).pipe(
       map(data => {
         data.map((user: any) => new User(user))
@@ -22,7 +22,7 @@ export class UserService {
     );
   }
 
-  public getFullName(user: User) {
+  getFullName(user: User) {
     return ((user.title ? user.title + '. ' : '') + 
             user.lastName + ' ' + 
             (user.middleName ? user.middleName + ' ' : '') +
