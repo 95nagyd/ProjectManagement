@@ -37,7 +37,7 @@ export class UserModalComponent implements OnInit {
   open(editUser?: User) {
     this.state = editUser ? 'edit' : 'add'
     
-    this.modalService.open(this.modalRef, {ariaLabelledBy: 'modal-add', centered: true, windowClass: 'custom-class'}).result.then((result) => {
+    this.modalService.open(this.modalRef, {ariaLabelledBy: 'modal-add', centered: true, windowClass: 'modal-holder'}).result.then((result) => {
       this.closeResult = `Closed with: ${result}`;
     }, (reason) => {
       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;

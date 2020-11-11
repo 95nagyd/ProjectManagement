@@ -13,3 +13,13 @@ html, body {
     height: calc(100% - 0.5rem);
     display: relative;
 }
+
+.modal-holder{
+  animation-name: open;
+  animation-duration: 0.3s;
+}
+
+@keyframes open {
+  0%   {transform: scale(0.5)}
+  100% {transform: scale(1)}
+}
