@@ -38,7 +38,16 @@ app.get('/users', verifyToken, (req, res) => {
 
 
 app.get('/workingTime/:period', verifyToken, (req, res) => {
-    workingTimeService.getCurrentUserWorkingTimeByGivenPeriod(req.user._id, req.params.period).then((result) => {
+    workingTimeService.getWorkingTimeByGivenUserIdAndPeriod(req.user._id, req.params.period).then((result) => {
+        var workingTime = result[0] === undefined ? [] : result[0].workingTime;
+        res.status(200).json(workingTime);
+    }, (error) => {
+        res.status(400).json({ message: error });
+    });
+});
+
+app.get('/workingTime/:userId/:period', verifyToken, (req, res) => {
+    workingTimeService.getWorkingTimeByGivenUserIdAndPeriod(req.params.userId, req.params.period).then((result) => {
         var workingTime = result[0] === undefined ? [] : result[0].workingTime;
         res.status(200).json(workingTime);
     }, (error) => {

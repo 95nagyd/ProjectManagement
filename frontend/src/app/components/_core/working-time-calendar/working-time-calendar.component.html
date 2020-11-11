@@ -4,14 +4,27 @@
                 
 <div class="calendar-container">
     <div class="calendar-slider p-2">
+
         <div class="calendar-slider-left">
-           <i  class="fa fa-arrow-left pr-2 cursor-pointer arrow" 
-               (click)="changeMonth('previous')"
-               aria-hidden="true"></i>
+            <div class="w-75 text-left d-flex flex-row">
+                <div *ngIf="user" class="d-flex flex-row">
+                    <i class="fa fa-reply d-flex flex-column justify-content-center cursor-pointer arrow" aria-hidden="true"></i>
+                    <span class="d-flex flex-column justify-content-center h-100 ml-3 name">
+                        {{userFullName}}
+                    </span>
+                </div>
+            </div>
+            <div class="w-25">
+                <i  class="fa fa-arrow-left pr-2 cursor-pointer arrow" 
+                    (click)="changeMonth('previous')"
+                    aria-hidden="true"></i>
+            </div>
         </div>
+
         <div class="calendar-slider-period">
                {{period}}
         </div>
+        
         <div class="calendar-slider-right">
             <div class="w-50">
                 <i  class="fa fa-arrow-right pl-2 cursor-pointer arrow" 
@@ -24,6 +37,7 @@
                     [ngClass]="isCalSavable() && isCalendarDataChanged() ? 'save-valid' : 'save-disabled'"></span>
            </div>
         </div>
+
     </div>
     <div class="header" #header>
         <div class="date-header-cell-w">

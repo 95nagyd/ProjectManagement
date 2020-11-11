@@ -61,6 +61,7 @@ export class AppComponent {
     if(this.page) { this.page.nativeElement.scrollTop = offset; }
   }
 
+  //TODO: ha a modal látszik akkor valahogy megoldani, hogy a háttérben ne lehessen gombokat nyomogatni
   @HostListener('document:keydown', ['$event'])   
   onKeydown(event: KeyboardEvent) {
     if(this.spinner.isSpinnerVisible()){

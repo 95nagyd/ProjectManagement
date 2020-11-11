@@ -1,0 +1,86 @@
+<ng-template #modal let-modal >
+    
+  <div class="modal-header" style="background-color: rgb(184, 184, 184);">
+    <h5 class="modal-title" id="modal-add">{{state === 'add' ? 'Új felhasználó hozzáadása' : 'Felhasználó szerkesztése' }}</h5>
+  </div>
+
+  <div class="modal-body">
+    <form class="w-100" style="text-align: center;" ngbAutofocus>
+        <!-- Felhasználónév -->
+        <mat-form-field appearance="outline" style="width: 300px;">
+            <mat-label>Felhasználónév</mat-label>
+            <input matInput #username minlength="6" maxlength="20" autocomplete="off">
+            <mat-hint class="hint-right">{{username.value.length}} / 20</mat-hint>
+        </mat-form-field>
+
+        <!-- Jelszó -->
+        <mat-form-field appearance="outline" style="width: 300px;">
+            <mat-label>{{state === 'add' ? 'Jelszó' : 'Új jelszó' }}</mat-label>
+            <input matInput #password="matInput" minlength="6" maxlength="20" autocomplete="off" [type]="isPassVisible ? 'text' : 'password'">
+            <span matSuffix>
+                <i [ngClass]="isPassVisible ? 'fa fa-eye' : 'fa fa-eye-slash'" (click)="isPassVisible = !isPassVisible;" style="font-size: 16px; color: rgb(224, 224, 224); cursor: pointer;" [ngStyle]="{'color': password.focused ? 'rgb(0, 0, 0)' : 'rgb(224, 224, 224)'}" aria-hidden="true"></i>
+            </span>
+            <mat-hint class="hint-right">{{password.value.length}} / 20</mat-hint>
+        </mat-form-field>
+
+        <!-- Titulus -->
+        <mat-form-field appearance="outline" style="width: 300px;">
+            <mat-label>Titulus</mat-label>
+            <input matInput #title maxlength="20" autocomplete="off">
+            <mat-hint class="hint-right">{{title.value.length}} / 20</mat-hint>
+        </mat-form-field>
+
+        <!-- Vezetéknév -->
+        <mat-form-field appearance="outline" style="width: 300px;">
+            <mat-label>Vezetéknév</mat-label>
+            <input matInput #lastname maxlength="20" autocomplete="off">
+            <mat-hint class="hint-right">{{lastname.value.length}} / 20</mat-hint>
+        </mat-form-field>
+
+        <!-- Középső név -->
+        <mat-form-field appearance="outline" style="width: 300px;">
+            <mat-label>Középső név</mat-label>
+            <input matInput #middlename maxlength="15" autocomplete="off">
+            <mat-hint class="hint-right">{{middlename.value.length}} / 15</mat-hint>
+        </mat-form-field>
+
+        <!-- Keresztnév -->
+        <mat-form-field appearance="outline" style="width: 300px;">
+            <mat-label>Keresztnév</mat-label>
+            <input matInput #firstname maxlength="15" autocomplete="off">
+            <mat-hint class="hint-right">{{firstname.value.length}} / 15</mat-hint>
+        </mat-form-field>
+
+        <!-- Szerepkör -->
+        <div style="display: flex; flex-direction: column; width: 300px; text-align: left; margin: auto;">
+            <span style="font-size: 13px; padding-left: 12px;">Szerepkör</span>
+            <mat-radio-group aria-labelledby="role-radio-group-label"
+                             style="padding-left: 12px; padding-top: 5px;"
+                             [(ngModel)]="role">
+                <mat-radio-button #user value="user" [checked]="role === user.value">Felhasználó</mat-radio-button>
+                <mat-radio-button #admin value="admin" [checked]="role === admin.value" style="padding-left: 20px;">Admin</mat-radio-button>
+            </mat-radio-group>
+        </div>
+        
+
+        <!-- Telefonszám -->
+        <mat-form-field appearance="outline" style="width: 300px;">
+            <mat-label>Telefonszám</mat-label>
+            <input matInput #firstname autocomplete="off" type="tel">
+            <mat-hint>Telefon regex</mat-hint>
+        </mat-form-field>
+
+        <!-- E-mail -->
+        <mat-form-field appearance="outline" style="width: 300px;">
+            <mat-label>E-mail cím</mat-label>
+            <input matInput #firstname autocomplete="off" type="email">
+            <mat-hint>E-mail regex</mat-hint>
+        </mat-form-field>
+
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-success" style="outline: none;" (click)="modal.close('Save click')">Save</button>
+    <button type="button" class="btn btn-secondary" style="outline: none;" (click)="modal.dismiss('Close click')">Close</button>
+  </div>
+</ng-template>

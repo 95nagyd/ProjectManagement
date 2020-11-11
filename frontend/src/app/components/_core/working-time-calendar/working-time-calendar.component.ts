@@ -8,6 +8,8 @@ import { CalendarDayDetails, CalendarDayData, CalendarData } from '@app/_models/
 import { ComboBoxService } from '@app/_services/combo-box.service';
 import * as _ from 'lodash-es';
 import { ComboBoxComponent } from '../combo-box/combo-box.component';
+import { User } from '@app/_models/user';
+import { UserService } from '@app/_services/user.service';
 
 @Component({
   selector: 'working-time-calendar',
@@ -18,6 +20,10 @@ import { ComboBoxComponent } from '../combo-box/combo-box.component';
 export class WorkingTimeCalendarComponent implements OnInit {
 
   @Input() isEditable: Boolean;
+  @Input() user?: User;
+
+  userFullName: string;
+
   @ViewChild('commentbox') commentbox: CommentBoxComponent;
   @ViewChild('header') header: ElementRef;
   @ViewChildren(FormattedTimeComponent) workingTimeInputList!: QueryList<FormattedTimeComponent>;
@@ -45,6 +51,12 @@ export class WorkingTimeCalendarComponent implements OnInit {
   editingComment: { dayNumber: number, dataIndex: number }
 
 
+  //TODO: munkaidő millisec-be legyen tárolva
+  //TODO: menüváltáskor is zárja a combo-t
+  //TODO: ha látszik a spinnek akkor click preventdefault
+  //TODO: aktuális napra színes keret
+  //TODO: naptár szürke színeket kicsit kékebbé
+
     //TODO: havi összes munkaidő az utolsó nap után (legalább annyi hely kell , hogy az utolsó nap max magasságos tooltipje kiférjen)
 
     //TODO: confirm modal sor törléskor
@@ -57,9 +69,9 @@ export class WorkingTimeCalendarComponent implements OnInit {
     //TODO: képek css-ből legyenek
 
   constructor(private spinner: SpinnerService, private scrollOffsetService: PageContentScrollOffsetService, 
-    private calendarService: CalendarService) { 
+    private calendarService: CalendarService, private userService: UserService) { 
       
-      //TODO: ezek majd api hívások az adminservice-ből
+      
       this.spinner.show();
       this.calendarService.getFirstSavedPeriod().subscribe((firstPeriod) => {
         console.log("firstPeriod:"+ firstPeriod)
@@ -69,6 +81,7 @@ export class WorkingTimeCalendarComponent implements OnInit {
         this.spinner.forceHide();
       });
 
+      //TODO: ezek majd api hívások az adminservice-ből
       this.projectList = ['Project1', 'Project2', 'Project3', 'Project11'];
       this.designPhaseList = ['DesignPhase1', 'DesignPhase2', 'DesignPhase3'];
       this.structuralElementList = ['StructuralElement1', 'StructuralElement2', 'StructuralElement3', 'StructuralElement4'];
@@ -86,6 +99,7 @@ export class WorkingTimeCalendarComponent implements OnInit {
 
   ngOnInit(): void { 
     this.spinner.show();
+    this.userFullName = this.user ? this.userService.getFullName(this.user) : '';
     this.setPeriod();
     this.refreshCalendar();
   }
@@ -104,12 +118,14 @@ export class WorkingTimeCalendarComponent implements OnInit {
 
   getDaysInMonth() { return new Date(this.chosenPeriod.getFullYear(), this.chosenPeriod.getMonth()+1, 0).getDate(); }
 
-  changeMonth(direction: string) { 
+  changeMonth(direction: string) {
+    //TODO: ide validáció, hogy ha változott akkor modal kérdezzen, hogy elveti e a módosításait 
+    this.spinner.show();
     this.chosenPeriod.setMonth(this.chosenPeriod.getMonth() + (direction === 'previous' ? -1 : 1)); 
-    //TODO: ide validáció, hogy ha változott akkor modal kérdezzen, hogy elveti e a módosításait
     this.calendarViewData = null;
     this.setPeriod();
     this.refreshCalendar();
+    this.spinner.hide();
   }
 
   refreshCalendar() {
@@ -133,23 +149,37 @@ export class WorkingTimeCalendarComponent implements OnInit {
 
   private updateCalendarViewData() {
     this.spinner.show();
-    this.calendarService.getWorkingTimeByGivenPeriod(this.chosenPeriod.getTime()).subscribe((workingTime) => {
-      this.calendarViewData = workingTime;
-      this.calendarOldData = _.cloneDeep<CalendarData>(this.calendarViewData);
-      this.daysOfMonth.forEach(dayData => {
-        if(!this.calendarViewData[dayData.number]) { 
-          this.calendarViewData[dayData.number] = [];
-          this.addEmptyRow(dayData.number); 
-        }
+    if(this.user){
+      this.calendarService.getUserWorkingTimeByGivenPeriod(this.chosenPeriod.getTime(), this.user._id).subscribe((workingTime) => {
+        this.calendarViewData = workingTime;
+        this.calendarOldData = _.cloneDeep<CalendarData>(this.calendarViewData);
+        this.daysOfMonth.forEach(dayData => {
+          if(!this.calendarViewData[dayData.number]) { 
+            this.calendarViewData[dayData.number] = [];
+            this.addEmptyRow(dayData.number); 
+          }
+        });
+        this.spinner.hide();
+      }, (error) => {
+        alert("nem sikerült lekérdezni a hónaphoz tartozó adatokat")
+        this.spinner.forceHide();
       });
-      //console.log(this.calendarViewData)
-      //console.log(this.calendarOldData)
-      //console.log(this.removeEmptyRows(this.calendarViewData))
-      this.spinner.hide();
-    }, (error) => {
-      alert("nem sikerült lekérdezni a hónaphoz tartozó adatokat")
-      this.spinner.forceHide();
-    });
+    } else {
+      this.calendarService.getUserWorkingTimeByGivenPeriod(this.chosenPeriod.getTime()).subscribe((workingTime) => {
+        this.calendarViewData = workingTime;
+        this.calendarOldData = _.cloneDeep<CalendarData>(this.calendarViewData);
+        this.daysOfMonth.forEach(dayData => {
+          if(!this.calendarViewData[dayData.number]) { 
+            this.calendarViewData[dayData.number] = [];
+            this.addEmptyRow(dayData.number); 
+          }
+        });
+        this.spinner.hide();
+      }, (error) => {
+        alert("nem sikerült lekérdezni a hónaphoz tartozó adatokat")
+        this.spinner.forceHide();
+      });
+    }
   }
 
   addEmptyRow(dayNumber: number) { this.calendarViewData[dayNumber].push(new CalendarDayData()); }

@@ -11,11 +11,13 @@ import { AuthenticationService } from '@app/_services/authentication.service';
   styleUrls: ['./working-time.component.css']
 })
 export class WorkingTimeComponent implements OnInit {
-  currentUser: User;
 
-  constructor(public authenticationService: AuthenticationService, private spinner: SpinnerService) { }
+  constructor(private spinner: SpinnerService) { 
+  }
 
   ngOnInit(): void {
-    this.currentUser = this.authenticationService.getCurrentUser();
+  }
+
+  ngAfterViewInit() {
   }
 }

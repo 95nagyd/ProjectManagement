@@ -3,7 +3,7 @@ const _ = require("underscore");
 var ObjectId = require("mongodb").ObjectId;
 
 
-async function getCurrentUserWorkingTimeByGivenPeriod(userId, period) {
+async function getWorkingTimeByGivenUserIdAndPeriod(userId, period) {
     return await mongoService.find('workingTimes', { userId: new ObjectId(userId), period:period}, { projection: { _id:0, workingTime:1 }});
 }
 
@@ -17,7 +17,7 @@ async function getFirstSavedPeriod(){
 }
 
 module.exports = {
-    getCurrentUserWorkingTimeByGivenPeriod: getCurrentUserWorkingTimeByGivenPeriod,
+    getWorkingTimeByGivenUserIdAndPeriod: getWorkingTimeByGivenUserIdAndPeriod,
     saveCurrentUserWorkingTimeByGivenPeriod: saveCurrentUserWorkingTimeByGivenPeriod,
     getFirstSavedPeriod: getFirstSavedPeriod
 }

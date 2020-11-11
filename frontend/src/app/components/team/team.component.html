@@ -1,1 +1,60 @@
-<p>team works!</p>
+<user-modal *ngIf="users && !selectedUser && isAdmin"></user-modal>
+
+<div *ngIf="users && !selectedUser" 
+     class="list-container">
+    <div class="header">
+        <div class="col-title seq">
+            #
+        </div>
+        <div class="col-title"
+             [ngStyle]="{'width': isAdmin ? 'calc(calc(100% - 50px) * 0.33)' : 'calc(calc(100% - 100px) * 0.33)'}">
+            Név
+        </div>
+        <div class="col-title"
+             [ngStyle]="{'width': isAdmin ? 'calc(calc(100% - 50px) * 0.33)' : 'calc(calc(100% - 100px) * 0.33)'}">
+            Telefonszám
+        </div>
+        <div class="col-title"
+             [ngStyle]="{'width': isAdmin ? 'calc(calc(100% - 50px) * 0.33)' : 'calc(calc(100% - 100px) * 0.33)'}">
+            E-mail&nbsp;cím
+        </div>
+        <div class="add-user"
+            *ngIf="isAdmin">
+            <i class="fa fa-user-plus" aria-hidden="true" (click)="openUserModal();"></i>
+        </div>
+    </div>
+    <div class="list-content">
+
+        <div *ngFor="let user of users; index as rowIndex;"
+             class="user-row"
+             [ngStyle]="{'background-color': rowIndex % 2 === 0 ? 'rgb(255, 255, 255)' : 'rgb(235, 235, 235)'}"
+             (dblclick)="selectUser(user);">
+
+            <div class="cell seq">
+                    {{rowIndex+1}}
+            </div>
+            <div class="cell name"
+                 [ngStyle]="{'width': isAdmin ? 'calc(calc(100% - 50px) * 0.33)' : 'calc(calc(100% - 100px) * 0.33)'}">
+                    {{getUserFullName(user)}}
+            </div>
+            <div class="cell"
+                 [ngStyle]="{'width': isAdmin ? 'calc(calc(100% - 50px) * 0.33)' : 'calc(calc(100% - 100px) * 0.33)'}">
+                    Telefonszám
+            </div>
+            <div class="cell"
+                 [ngStyle]="{'width': isAdmin ? 'calc(calc(100% - 50px) * 0.33)' : 'calc(calc(100% - 100px) * 0.33)'}">
+                    E-mail&nbsp;cím
+            </div>
+            <div class="modify-user"
+                 *ngIf="isAdmin">
+                <i class="fa fa-pencil-square-o modify" aria-hidden="true" (click)="openUserModal(user);"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<working-time-calendar  *ngIf="users && selectedUser"
+                        [isEditable]="false" 
+                        [user]="selectedUser">
+</working-time-calendar>

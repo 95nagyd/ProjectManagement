@@ -17,8 +17,11 @@ export class CalendarService {
 
 
 
-  getWorkingTimeByGivenPeriod(period: number): Observable<any> {
-    return this.http.get<any>(`${environment.apiUrl}/workingTime/${period}`).pipe(
+  getUserWorkingTimeByGivenPeriod(period: number, userID?: string): Observable<any> {
+    const url = userID 
+      ? `${environment.apiUrl}/workingTime/${userID}/${period}`
+      : `${environment.apiUrl}/workingTime/${period}`
+    return this.http.get<any>(url).pipe(
       map(data => {
         return data;
       })

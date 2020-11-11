@@ -18,6 +18,24 @@ db.users.insertMany([
 		middleName: '',
 		firstName: 'UserKereszt',
 		role: 'user'
+    },
+	{
+		username: 'simpleuser1',
+		password: 'simpleuser1',
+		title: 'Dr',
+		lastName: 'Kerekes',
+		middleName: '',
+		firstName: 'Béla',
+		role: 'user'
+    },
+	{
+		username: 'simpleuser2',
+		password: 'simpleuser2',
+		title: '',
+		lastName: 'Kovács',
+		middleName: 'István',
+		firstName: 'János',
+		role: 'user'
     }
 ])
 

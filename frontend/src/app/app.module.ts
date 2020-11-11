@@ -7,6 +7,11 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { environment } from '@environments/environment';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatRadioModule } from '@angular/material/radio';
+
+
 
 
 import { LoginComponent } from './components/login/login.component';
@@ -30,6 +35,7 @@ import { ComboBoxComponent } from './components/_core/combo-box/combo-box.compon
 import { ComboBoxDropdownComponent } from './components/_core/combo-box/combo-box-dropdown/combo-box-dropdown.component';
 import { ClickInsideDirective } from './_custom/click-inside.directive';
 import { TwoDigitNumberPipe } from './_custom/two-digit-number.pipe';
+import { UserModalComponent } from './components/team/user-modal/user-modal.component';
 
 
 @NgModule({
@@ -51,7 +57,8 @@ import { TwoDigitNumberPipe } from './_custom/two-digit-number.pipe';
     ComboBoxComponent,
     ComboBoxDropdownComponent,
     ClickInsideDirective,
-    TwoDigitNumberPipe
+    TwoDigitNumberPipe,
+    UserModalComponent
   ],
   imports: [
     BrowserModule,
@@ -61,7 +68,10 @@ import { TwoDigitNumberPipe } from './_custom/two-digit-number.pipe';
     ReactiveFormsModule,
     NgbModule,
     HttpClientModule,
-    NgxSpinnerModule
+    NgxSpinnerModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatRadioModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   providers: [

@@ -16,9 +16,7 @@ export class SpinnerService {
   show() {
     if(this.callCount === 0) this.spinner.show();
 
-    this._ngZone.runOutsideAngular(() => {
-      this.comboBoxService.externalCloseComboAndHideDropdown();
-    });
+    this.comboBoxService.externalCloseComboAndHideDropdown();
 
     this.callCount++;
   }
