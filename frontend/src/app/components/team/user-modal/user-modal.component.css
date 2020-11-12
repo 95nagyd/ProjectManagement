@@ -50,3 +50,7 @@
 ::ng-deep .mat-radio-button.mat-accent .mat-radio-ripple .mat-ripple-element {
   background-color:rgba(39, 0, 148, 0.747);
 }
+
+[disabled] {
+  cursor: not-allowed !important;
+}

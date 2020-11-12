@@ -1,20 +1,22 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { first } from 'rxjs/operators';
 
 import { AuthenticationService } from '@app/_services/authentication.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, OnDestroy {
   loginForm: FormGroup;
   loading: boolean;
   submitted: boolean;
   error: any;
+  formValueChangeSubscription: Subscription;
 
   constructor(private formBuilder: FormBuilder, private router: Router, private authenticationService: AuthenticationService) { 
     this.loading = false;
@@ -30,9 +32,13 @@ export class LoginComponent implements OnInit {
       password: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(20)]]
     });
 
-    this.loginForm.valueChanges.subscribe(() => {
+    this.formValueChangeSubscription = this.loginForm.valueChanges.subscribe(() => {
         this.error = '';
     });
+  }
+
+  ngOnDestroy() {
+    this.formValueChangeSubscription?.unsubscribe();
   }
 
   get formControls() { return this.loginForm.controls; }

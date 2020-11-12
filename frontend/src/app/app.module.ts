@@ -36,6 +36,7 @@ import { ComboBoxDropdownComponent } from './components/_core/combo-box/combo-bo
 import { ClickInsideDirective } from './_custom/click-inside.directive';
 import { TwoDigitNumberPipe } from './_custom/two-digit-number.pipe';
 import { UserModalComponent } from './components/team/user-modal/user-modal.component';
+import { ErrorStateMatcher, ShowOnDirtyErrorStateMatcher } from '@angular/material/core';
 
 
 @NgModule({
@@ -77,6 +78,7 @@ import { UserModalComponent } from './components/team/user-modal/user-modal.comp
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+    { provide: ErrorStateMatcher, useClass: ShowOnDirtyErrorStateMatcher }
   ],
   bootstrap: [AppComponent]
 })

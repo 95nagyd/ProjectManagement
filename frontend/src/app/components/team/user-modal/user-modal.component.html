@@ -5,82 +5,141 @@
   </div>
 
   <div class="modal-body">
-    <form class="w-100" style="text-align: center;" ngbAutofocus>
+    <form #userFormId [formGroup]="userForm" (ngSubmit)="userForm.valid && save();" class="w-100" style="text-align: center;" ngbAutofocus>
         <!-- Felhasználónév -->
         <mat-form-field appearance="outline" style="width: 300px;">
             <mat-label>Felhasználónév</mat-label>
-            <input matInput #username minlength="6" maxlength="20" autocomplete="off">
+            <input formControlName="username" matInput #username autocomplete="off" required (focus)="onFocus('username');" (blur)="onBlur('username');">
+
+            <mat-error *ngIf="userFormControls.username.hasError('required')">
+                A felhasználónév kitöltése kötelező.
+            </mat-error>
+
+            <mat-error *ngIf="userFormControls.username.hasError('minlength') || userFormControls.username.hasError('maxlength')">
+                A felhasználónév 6-20 karakter között kell legyen!
+            </mat-error>
+            
             <mat-hint class="hint-right">{{username.value.length}} / 20</mat-hint>
         </mat-form-field>
 
         <!-- Jelszó -->
         <mat-form-field appearance="outline" style="width: 300px;">
             <mat-label>{{state === 'add' ? 'Jelszó' : 'Új jelszó' }}</mat-label>
-            <input matInput #password="matInput" minlength="6" maxlength="20" autocomplete="off" [type]="isPassVisible ? 'text' : 'password'">
+            <input formControlName="password" matInput #password="matInput" autocomplete="off" [type]="isPassVisible ? 'text' : 'password'" [required]="this.state !== 'edit'" (focus)="onFocus('password');" (blur)="onBlur('password');">
             <span matSuffix>
                 <i [ngClass]="isPassVisible ? 'fa fa-eye' : 'fa fa-eye-slash'" (click)="isPassVisible = !isPassVisible;" style="font-size: 16px; color: rgb(224, 224, 224); cursor: pointer;" [ngStyle]="{'color': password.focused ? 'rgb(0, 0, 0)' : 'rgb(224, 224, 224)'}" aria-hidden="true"></i>
             </span>
+
+            <mat-error *ngIf="userFormControls.password.hasError('required')">
+                A jelszó kitöltése kötelező.
+            </mat-error>
+
+            <mat-error *ngIf="userFormControls.password.hasError('minlength') || userFormControls.password.hasError('maxlength')">
+                A jelszó 6-20 karakter között kell legyen!
+            </mat-error>
+
             <mat-hint class="hint-right">{{password.value.length}} / 20</mat-hint>
         </mat-form-field>
 
         <!-- Titulus -->
         <mat-form-field appearance="outline" style="width: 300px;">
             <mat-label>Titulus</mat-label>
-            <input matInput #title maxlength="20" autocomplete="off">
+            <input formControlName="title" matInput #title autocomplete="off" (focus)="onFocus('title');" (blur)="onBlur('title');">
+
+            <mat-error *ngIf="userFormControls.title.hasError('maxlength')">
+                A titulus maximum 20 karakter lehet!
+            </mat-error>
+
             <mat-hint class="hint-right">{{title.value.length}} / 20</mat-hint>
         </mat-form-field>
 
         <!-- Vezetéknév -->
         <mat-form-field appearance="outline" style="width: 300px;">
             <mat-label>Vezetéknév</mat-label>
-            <input matInput #lastname maxlength="20" autocomplete="off">
+            <input formControlName="lastname" matInput #lastname autocomplete="off" required (focus)="onFocus('lastname');" (blur)="onBlur('lastname');">
+
+            <mat-error *ngIf="userFormControls.lastname.hasError('required')">
+                A vezetéknév kitöltése kötelező.
+            </mat-error>
+
+            <mat-error *ngIf="userFormControls.lastname.hasError('maxlength')">
+                A vezetéknév maximum 20 karakter lehet!
+            </mat-error>
+
             <mat-hint class="hint-right">{{lastname.value.length}} / 20</mat-hint>
         </mat-form-field>
 
         <!-- Középső név -->
         <mat-form-field appearance="outline" style="width: 300px;">
             <mat-label>Középső név</mat-label>
-            <input matInput #middlename maxlength="15" autocomplete="off">
+            <input formControlName="middlename" matInput #middlename autocomplete="off" (focus)="onFocus('middlename');" (blur)="onBlur('middlename');">
+
+            <mat-error *ngIf="userFormControls.middlename.hasError('maxlength')">
+                A középső név maximum 15 karakter lehet!
+            </mat-error>
+
             <mat-hint class="hint-right">{{middlename.value.length}} / 15</mat-hint>
         </mat-form-field>
 
         <!-- Keresztnév -->
         <mat-form-field appearance="outline" style="width: 300px;">
             <mat-label>Keresztnév</mat-label>
-            <input matInput #firstname maxlength="15" autocomplete="off">
+            <input formControlName="firstname" matInput #firstname autocomplete="off" required (focus)="onFocus('firstname');" (blur)="onBlur('firstname');">
+
+            <mat-error *ngIf="userFormControls.firstname.hasError('required')">
+                A keresztnév kitöltése kötelező.
+            </mat-error>
+
+            <mat-error *ngIf="userFormControls.firstname.hasError('maxlength')">
+                A keresztnév maximum 15 karakter lehet!
+            </mat-error>
+
             <mat-hint class="hint-right">{{firstname.value.length}} / 15</mat-hint>
         </mat-form-field>
 
         <!-- Szerepkör -->
-        <div style="display: flex; flex-direction: column; width: 300px; text-align: left; margin: auto;">
+        <div style="display: flex; flex-direction: column; width: 300px; text-align: left; margin: auto; padding-bottom: 5px;">
             <span style="font-size: 13px; padding-left: 12px;">Szerepkör</span>
-            <mat-radio-group aria-labelledby="role-radio-group-label"
-                             style="padding-left: 12px; padding-top: 5px;"
-                             [(ngModel)]="role">
-                <mat-radio-button #user value="user" [checked]="role === user.value">Felhasználó</mat-radio-button>
-                <mat-radio-button #admin value="admin" [checked]="role === admin.value" style="padding-left: 20px;">Admin</mat-radio-button>
+            <mat-radio-group formControlName="role"
+                             aria-labelledby="role-radio-group-label"
+                             style="padding-left: 12px; padding-top: 5px;">
+                <mat-radio-button value="user">Felhasználó</mat-radio-button>
+                <mat-radio-button value="admin" style="padding-left: 20px;">Admin</mat-radio-button>
             </mat-radio-group>
         </div>
         
-
         <!-- Telefonszám -->
         <mat-form-field appearance="outline" style="width: 300px;">
             <mat-label>Telefonszám</mat-label>
-            <input matInput #firstname autocomplete="off" type="tel">
-            <mat-hint>Telefon regex</mat-hint>
+            <input formControlName="telephone" matInput #telephone autocomplete="off" type="tel" (focus)="onFocus('telephone');" (blur)="onBlur('telephone');">
+
+            <mat-error *ngIf="userFormControls.telephone.hasError('pattern')">
+                A telefonszám formátuma nem megfelelő!
+            </mat-error>
+
+            <mat-hint class="hint-right">
+                <i class="fa fa-info-circle" aria-hidden="true" placement="top" ngbTooltip="Pl.: +36 70 123 4567" container="body"></i>
+            </mat-hint>
         </mat-form-field>
 
         <!-- E-mail -->
         <mat-form-field appearance="outline" style="width: 300px;">
             <mat-label>E-mail cím</mat-label>
-            <input matInput #firstname autocomplete="off" type="email">
-            <mat-hint>E-mail regex</mat-hint>
+            <input formControlName="email" matInput #email autocomplete="off" type="email" (focus)="onFocus('email');" (blur)="onBlur('email');">
+
+            <mat-error *ngIf="userFormControls.email.hasError('pattern')">
+                Az e-mail formátuma nem megfelelő!
+            </mat-error>
+
+            <mat-hint class="hint-right">
+                <i class="fa fa-info-circle" aria-hidden="true" placement="top" ngbTooltip="Pl.: email@example.com" container="body"></i>
+            </mat-hint>
         </mat-form-field>
 
     </form>
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-success" style="outline: none;" (click)="modal.close('Save click')">Save</button>
+    <button type="submit" form="userForm" (click)="save();" [disabled]="!userForm.valid" class="btn btn-success" style="outline: none;">Save</button>
     <button type="button" class="btn btn-secondary" style="outline: none;" (click)="modal.dismiss('Close click')">Close</button>
   </div>
 </ng-template>
