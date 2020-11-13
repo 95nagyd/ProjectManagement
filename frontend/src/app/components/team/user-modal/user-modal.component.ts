@@ -6,7 +6,7 @@ import { NgbModal, ModalDismissReasons, NgbModalRef } from '@ng-bootstrap/ng-boo
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UserService } from '@app/_services/user.service';
 import { GlobalModalsService } from '@app/_services/global-modals.service';
-import { ModalType } from '@app/_models/modals';
+import { ConfirmModalType } from '@app/_models/modals';
 
 @Component({
   selector: 'user-modal',
@@ -104,7 +104,7 @@ export class UserModalComponent implements OnInit, OnDestroy {
       beforeDismiss: () => {
         if(!this.userForm.dirty){ this.onClose.emit(); return true; }
 
-        return this.globalModalsService.openConfirmModal(ModalType.Discard).then((result => {
+        return this.globalModalsService.openConfirmModal(ConfirmModalType.Discard).then((result => {
           if(result) { this.onClose.emit(); };
           return result;
         }));

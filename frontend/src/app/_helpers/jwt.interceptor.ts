@@ -4,6 +4,7 @@ import { Observable, BehaviorSubject } from 'rxjs';
 
 import { environment } from '@environments/environment';
 import { AuthenticationService } from '@app/_services/authentication.service';
+import { take } from 'rxjs/operators';
 
 @Injectable()
 export class JwtInterceptor implements HttpInterceptor {
@@ -19,16 +20,17 @@ export class JwtInterceptor implements HttpInterceptor {
                 }
             });
             
-            this.authenticationService.renewAccessToken()
-                .subscribe(
+            if(!this.authenticationService.isTokenExpired()){ 
+                this.authenticationService.renewAccessToken().pipe(take(1)).subscribe(
                     () => { },
                     error => {
-                        alert("Hiba új token generálásakor!")
-                        //TODO: ok modal (A munkamenet lejárt.), ok-ra kijelentkeztetés
+                        //ha error modal nem látszik
+                        alert("Hiba új token generálásakor!");
+                        //TODO: error modal
                     }
-                ); 
+                );
+            }
         }
-
         return next.handle(request);
     }
 }

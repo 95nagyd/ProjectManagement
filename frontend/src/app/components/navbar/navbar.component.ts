@@ -44,10 +44,7 @@ export class NavbarComponent implements OnInit {
   }
 
   logout() {
-    this.authenticationService.logout().subscribe(() => {}, 
-      error => {
-        alert("Sikertelen kijelentkezés!")
-      });
+    this.authenticationService.logout();
   }
 
   isAdmin() { return this.currentUser && this.currentUser.role === Role.Admin; }

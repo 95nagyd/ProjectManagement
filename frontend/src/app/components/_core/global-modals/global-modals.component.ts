@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ModalData, ModalType, ModalTypeData } from '@app/_models/modals';
+import { ConfirmModalType, ConfirmModalData } from '@app/_models/modals';
 import { GlobalModalsService } from '@app/_services/global-modals.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -24,10 +24,9 @@ export class GlobalModalsComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  openConfirmModal(modalType: ModalType){
-    
-    this.confirmModalTitle = ModalTypeData[modalType].title;
-    this.confirmModalContent = ModalTypeData[modalType].content;
+  openConfirmModal(modalType: ConfirmModalType){
+    this.confirmModalTitle = ConfirmModalData[modalType].title;
+    this.confirmModalContent = ConfirmModalData[modalType].content;
     this.openConfirmModalRef = this.modalService.open(this.confirmModalRef, {centered: true, windowClass: 'modal-holder confirm-modal-' + modalType, backdrop: 'static', keyboard: false});
     return this.openConfirmModalRef.result;
   }

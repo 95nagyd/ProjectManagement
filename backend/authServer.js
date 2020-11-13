@@ -26,7 +26,7 @@ let refreshTokens = []
 app.post('/token', (req, res) => {
     const refreshToken = req.body.refreshToken;
     if(refreshToken == null) return res.sendStatus(401);
-    if(!refreshTokens.includes(refreshToken)) res.sendStatus(403);
+    if(!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
     jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
         if(err) return res.sendStatus(403);
         const accessToken = generateAccessToken(
@@ -41,7 +41,7 @@ app.post('/token', (req, res) => {
                 ]
             )
         );
-        res.json({ accessToken: accessToken })
+        res.status(200).json({ accessToken: accessToken });
     });
 });
 
@@ -49,7 +49,7 @@ app.delete('/logout', (req, res) => {
     console.log(refreshTokens)
     refreshTokens = refreshTokens.filter(refreskToken => refreskToken != req.body.refreshToken);
     console.log(refreshTokens)
-    res.sendStatus(204);
+    return res.sendStatus(204);
 });
 
 app.post('/login', (req, res) => {
@@ -85,7 +85,7 @@ function generateAccessToken(user) {
             'role'
         ]), 
         process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: 1200 }
+        { expiresIn: 20 }
     );
 }
 

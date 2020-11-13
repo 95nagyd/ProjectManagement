@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { EMPTY, Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { SpinnerService } from '@app/_services/spinner.service';
 
 import { AuthenticationService } from '@app/_services/authentication.service';
+import { environment } from '@environments/environment';
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
@@ -14,10 +15,11 @@ export class ErrorInterceptor implements HttpInterceptor {
         return next.handle(request).pipe(catchError(err => {
             console.log(err)
             if (err instanceof HttpErrorResponse && (err.status === 401 || err.status === 403)) {
-                this.authenticationService.logout().subscribe(() => {}, 
-                    error => {
-                        alert("Sikertelen kijelentkezés!")
-                    });
+                //open modal, result ba meghívni a logout-ot
+                if(request.url.startsWith(environment.apiUrl)){
+                    this.authenticationService.logout(true);
+                    return EMPTY;
+                }
             }
             
             if (err instanceof HttpErrorResponse && (err.status === 0)) {

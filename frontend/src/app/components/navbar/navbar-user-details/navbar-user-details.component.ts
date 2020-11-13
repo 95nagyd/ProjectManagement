@@ -35,11 +35,8 @@ export class NavbarUserDetailsComponent implements OnInit {
         return of(false);
       })
     ).subscribe((isExpired) => {
-      if(isExpired) this.authenticationService.logout().subscribe(() => {}, 
-        error => {
-          alert("Sikertelen kijelentkezés!")
-        });
-    })   
+      if(isExpired) this.authenticationService.logout(isExpired);
+    })
   }
 
   isTimeLeftIndicatorReady(){

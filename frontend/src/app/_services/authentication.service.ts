@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { map } from 'rxjs/operators';
+import { map, take } from 'rxjs/operators';
 import { JwtHelperService } from '@auth0/angular-jwt';
 
 import { environment } from '@environments/environment';
@@ -8,6 +8,8 @@ import { SpinnerService } from '@app/_services/spinner.service';
 import { User } from '@app/_models/user';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
+import { GlobalModalsService } from './global-modals.service';
+import { ConfirmModalType } from '@app/_models/modals';
 
 @Injectable({
   providedIn: 'root',
@@ -20,7 +22,7 @@ export class AuthenticationService {
   private jwtHelper: JwtHelperService;
   private currentUser: User;
 
-  constructor(private http: HttpClient, private spinner: SpinnerService, private router: Router) {
+  constructor(private http: HttpClient, private spinner: SpinnerService, private router: Router, private globalModalsService: GlobalModalsService) {
     this.jwtHelper = new JwtHelperService();
   }
 
@@ -42,7 +44,9 @@ export class AuthenticationService {
         }))
   }
 
-  logout(): Observable<any> {
+  logout(isExpired?: Boolean) {
+    //ha az expired modal nincs megnyitva
+    console.log("logout call")
     const options = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
@@ -51,15 +55,24 @@ export class AuthenticationService {
         refreshToken: this.getRefreshToken()
       }
     };
-    return this.http.delete<any>(`${environment.authApiUrl}/logout`, options).pipe(
-      map(() => {
+
+    this.spinner.forceHide();
+    if(isExpired){
+      //TODO: expired info modal
+      this.globalModalsService.openConfirmModal(ConfirmModalType.Delete).then((() => {
         this.router.navigate(['/login']);
         localStorage.removeItem(this.ACCESS_TOKEN);
         localStorage.removeItem(this.REFRESH_TOKEN);
         this.currentUser = null;
-        this.spinner.forceHide();
-      })
-    )
+      }));
+    } else {
+      this.router.navigate(['/login']);
+      localStorage.removeItem(this.ACCESS_TOKEN);
+      localStorage.removeItem(this.REFRESH_TOKEN);
+      this.currentUser = null;
+    }
+    
+    this.http.delete<any>(`${environment.authApiUrl}/logout`, options).pipe(take(1)).subscribe();
   }
 
   renewAccessToken(): Observable<any> {
@@ -77,10 +90,11 @@ export class AuthenticationService {
 
   getTokenExpirationDateTime(){ return this.jwtHelper.getTokenExpirationDate(this.getAccessToken()).getTime(); }
 
+  isTokenExpired(){ return this.jwtHelper.isTokenExpired(this.getAccessToken()) }
+
   isLoggedIn() {
     if(!!this.getAccessToken() && !!this.getRefreshToken()) {
       if(!this.currentUser) this.currentUser = new User(this.getAccessTokenPayload());
-
       return true;
     }
     return false;

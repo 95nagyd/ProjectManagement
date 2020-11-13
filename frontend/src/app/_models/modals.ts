@@ -1,15 +1,10 @@
-export enum ModalType {
+export enum ConfirmModalType {
   Discard = 'discard',
   Delete = 'delete'
 }
 
-export interface ModalData {
-  title: string;
-  content: string;
-}
 
-
-export const ModalTypeData = {
+export const ConfirmModalData = {
   'discard' : {
     title: 'Módosítások elvetése',
     content: 'A módosításait nem mentette. Biztos benne, hogy folytatja?'

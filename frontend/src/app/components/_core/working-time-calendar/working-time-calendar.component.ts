@@ -11,7 +11,7 @@ import { ComboBoxComponent } from '../combo-box/combo-box.component';
 import { User } from '@app/_models/user';
 import { UserService } from '@app/_services/user.service';
 import { GlobalModalsService } from '@app/_services/global-modals.service';
-import { ModalType } from '@app/_models/modals';
+import { ConfirmModalType } from '@app/_models/modals';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
@@ -54,6 +54,7 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
   editingComment: { dayNumber: number, dataIndex: number }
 
 
+  //TODO: vissza gomb
   //TODO: gombok szürkék hover-re lesz árnyék + fekete
   //TODO: első időszak ha nincs senkinek akkor -1 a minperiod az aktuális hónap 
   //TODO: munkaidő millisec-be legyen tárolva
@@ -128,7 +129,7 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
 
   changeMonth(direction: string) {
     if(this.isCalendarDataChanged()){
-      this.globalModalsService.openConfirmModal(ModalType.Discard).then((result => {
+      this.globalModalsService.openConfirmModal(ConfirmModalType.Discard).then((result => {
         if(result){
           this.spinner.show();
           this.chosenPeriod.setMonth(this.chosenPeriod.getMonth() + (direction === 'previous' ? -1 : 1)); 
@@ -181,7 +182,8 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
         });
         this.spinner.hide();
       }, (error) => {
-        alert("nem sikerült lekérdezni a hónaphoz tartozó adatokat")
+        //TODO: hiba modal
+        console.log(error)
         this.spinner.forceHide();
       });
     } else {
@@ -196,7 +198,8 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
         });
         this.spinner.hide();
       }, (error) => {
-        alert("nem sikerült lekérdezni a hónaphoz tartozó adatokat")
+        //TODO: hiba modal
+        console.log(error)
         this.spinner.forceHide();
       });
     }
@@ -205,7 +208,7 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
   addEmptyRow(dayNumber: number) { this.calendarViewData[dayNumber].push(new CalendarDayData()); }
 
   deleteRow(dayNumber: number, rowIndex: number){ 
-    this.globalModalsService.openConfirmModal(ModalType.Delete).then((result => {
+    this.globalModalsService.openConfirmModal(ConfirmModalType.Delete).then((result => {
       if(result) { 
         this.calendarViewData[dayNumber].splice(rowIndex, 1); 
       };
