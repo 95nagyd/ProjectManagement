@@ -1,0 +1,19 @@
+<ng-template #confirmModal let-modal>
+    <div class="modal-header" style="background-color: rgb(129, 194, 255);">
+
+        <div class="modal-title" id="modal-add" style="display: flex; flex-direction: row;">
+            <i class="fa fa-question-circle-o" aria-hidden="true" style="font-weight: bold; align-self: center; padding-right: 10px; font-size: 24px;"></i>
+            <span class="modal-title" style="font-weight: bold; font-size: 18px;">{{confirmModalTitle}}</span>
+        </div>
+
+    </div>
+
+    <div class="modal-body" ngbAutofocus>
+        <div style="font-size: 18px; font-weight: 600;">{{confirmModalContent}}</div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" style="outline: none;" (click)="modal.close(true)">Igen</button>
+        <button type="button" class="btn btn-primary" style="outline: none;" (click)="modal.close(false)">Nem</button>
+    </div>
+</ng-template>

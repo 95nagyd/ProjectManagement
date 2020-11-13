@@ -37,6 +37,7 @@ import { ClickInsideDirective } from './_custom/click-inside.directive';
 import { TwoDigitNumberPipe } from './_custom/two-digit-number.pipe';
 import { UserModalComponent } from './components/team/user-modal/user-modal.component';
 import { ErrorStateMatcher, ShowOnDirtyErrorStateMatcher } from '@angular/material/core';
+import { GlobalModalsComponent } from './components/_core/global-modals/global-modals.component';
 
 
 @NgModule({
@@ -59,7 +60,8 @@ import { ErrorStateMatcher, ShowOnDirtyErrorStateMatcher } from '@angular/materi
     ComboBoxDropdownComponent,
     ClickInsideDirective,
     TwoDigitNumberPipe,
-    UserModalComponent
+    UserModalComponent,
+    GlobalModalsComponent
   ],
   imports: [
     BrowserModule,

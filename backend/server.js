@@ -36,6 +36,24 @@ app.get('/users', verifyToken, (req, res) => {
     });
 });
 
+app.post('/saveUser', verifyToken, (req, res) => {
+    console.log(req.body.user)
+    if(req.body.user._id === '-1'){
+        userService.addUser(req.body.user).then(() => {
+            res.status(200).send();
+        }, (error) => {
+
+            res.status(422).send({ message: error });
+        });
+    } else {
+        userService.saveUser(req.body.user).then(() => {
+            res.status(200).send();
+        }, (error) => {
+            res.status(422).send({ message: error });
+        });
+    }
+});
+
 
 app.get('/workingTime/:period', verifyToken, (req, res) => {
     workingTimeService.getWorkingTimeByGivenUserIdAndPeriod(req.user._id, req.params.period).then((result) => {
@@ -59,7 +77,7 @@ app.post('/workingTime/save/:period', verifyToken, (req, res) => {
     workingTimeService.saveCurrentUserWorkingTimeByGivenPeriod(req.user._id, req.params.period, req.body.workingTime).then(() => {
         res.status(200).send();
     }, (error) => {
-        res.status(422).send();
+        res.status(422).send({ message: error });
     });
 });
 

@@ -1,54 +1,6 @@
-
-::ng-deep .modal-dialog { 
-  width: 350px;
-}  
-
-::ng-deep .mat-form-field-hint-spacer {
-  display: none;
-}
-
-::ng-deep .mat-form-field-flex > .mat-form-field-infix { 
-  padding: 0.4em 0px !important;
-}
-
-::ng-deep .mat-form-field-flex > .mat-form-field-suffix { 
-  padding: 0.3em 0px !important;
-}
-
-::ng-deep .mat-form-field-appearance-outline .mat-form-field-suffix {
-  top: -0.25em !important;
-}
-
-::ng-deep .mat-form-field-label-wrapper { 
-  top: -1.5em; 
-}
-
-::ng-deep .mat-form-field-appearance-outline.mat-form-field-can-float.mat-form-field-should-float .mat-form-field-label {
-  transform: translateY(-1.1em) scale(.75);
-  width: 133.33333%;
-}
-
 .hint-right {
   width: 100%;
   text-align: right;
-}
-
-
-::ng-deep .mat-form-field-flex:hover i {
-  color: rgb(0, 0, 0) !important;
-}
-
-::ng-deep .mat-radio-button.mat-accent.mat-radio-checked .mat-radio-outer-circle {
-  border-color:rgb(66, 134, 244); 
-}
-
-::ng-deep .mat-radio-button.mat-accent .mat-radio-inner-circle{
-  color:rgb(66, 134, 244);
-  background-color:rgb(66, 134, 244);
-}
-
-::ng-deep .mat-radio-button.mat-accent .mat-radio-ripple .mat-ripple-element {
-  background-color:rgba(39, 0, 148, 0.747);
 }
 
 [disabled] {

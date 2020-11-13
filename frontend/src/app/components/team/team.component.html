@@ -1,4 +1,5 @@
-<user-modal *ngIf="users && !selectedUser && isAdmin"></user-modal>
+<user-modal *ngIf="users && !selectedUser && isAdmin"
+            (onClose)="refreshUserList();"></user-modal>
 
 <div *ngIf="users && !selectedUser" 
      class="list-container">
@@ -24,6 +25,13 @@
         </div>
     </div>
     <div class="list-content">
+    
+        <span *ngIf="users.length === 0" class="no-data">
+            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+            <span>
+                Nincs megjeleníthető adat.
+            </span>
+        </span>
 
         <div *ngFor="let user of users; index as rowIndex;"
              class="user-row"
@@ -38,12 +46,12 @@
                     {{getUserFullName(user)}}
             </div>
             <div class="cell"
-                 [ngStyle]="{'width': isAdmin ? 'calc(calc(100% - 50px) * 0.33)' : 'calc(calc(100% - 100px) * 0.33)'}">
-                    Telefonszám
+                 [ngStyle]="{'width': isAdmin ? 'calc(calc(100% - 50px) * 0.33)' : 'calc(calc(100% - 100px) * 0.33)', 'padding-left': user.telephone ? '10px' : '55px' }">
+                    {{user.telephone || '&mdash;'}}
             </div>
             <div class="cell"
-                 [ngStyle]="{'width': isAdmin ? 'calc(calc(100% - 50px) * 0.33)' : 'calc(calc(100% - 100px) * 0.33)'}">
-                    E-mail&nbsp;cím
+                 [ngStyle]="{'width': isAdmin ? 'calc(calc(100% - 50px) * 0.33)' : 'calc(calc(100% - 100px) * 0.33)', 'padding-left': user.telephone ? '10px' : '50px' }">
+                    {{user.email || '&mdash;'}}
             </div>
             <div class="modify-user"
                  *ngIf="isAdmin">

@@ -47,6 +47,30 @@
     overflow-y: auto;
 }
 
+.no-data {
+    display: flex; 
+    flex-direction: row; 
+    padding-left: 10px; 
+    height: 50px; 
+    margin-top: 10px; 
+    border: 3px solid  rgb(211, 141, 11); 
+    border-radius: 15px; 
+    background-color: rgb(255, 242, 217);
+}
+
+.no-data i{
+    color: rgb(255, 166, 0); 
+    font-size: 32px; 
+    align-self: center;
+}
+
+.no-data span{
+    font-weight: 600; 
+    font-size: 26px; 
+    padding-left: 10px; 
+    align-self: center;
+}
+
 .list-content .user-row {
     display: flex; 
     flex-direction: row; 

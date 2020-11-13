@@ -22,6 +22,10 @@ export class UserService {
     );
   }
 
+  saveUser(user: User){
+    return this.http.post<any>(`${environment.apiUrl}/saveUser`, { user : user });
+  }
+
   getFullName(user: User) {
     return ((user.title ? user.title + '. ' : '') + 
             user.lastName + ' ' + 

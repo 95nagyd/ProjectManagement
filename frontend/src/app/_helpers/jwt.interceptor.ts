@@ -24,6 +24,7 @@ export class JwtInterceptor implements HttpInterceptor {
                     () => { },
                     error => {
                         alert("Hiba új token generálásakor!")
+                        //TODO: ok modal (A munkamenet lejárt.), ok-ra kijelentkeztetés
                     }
                 ); 
         }

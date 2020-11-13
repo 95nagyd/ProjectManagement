@@ -1,41 +1,43 @@
-import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { Role } from '@app/_models/role';
 import { User } from '@app/_models/user';
 import { SpinnerService } from '@app/_services/spinner.service';
-import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, ModalDismissReasons, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UserService } from '@app/_services/user.service';
+import { GlobalModalsService } from '@app/_services/global-modals.service';
+import { ModalType } from '@app/_models/modals';
 
 @Component({
   selector: 'user-modal',
   templateUrl: './user-modal.component.html',
   styleUrls: ['./user-modal.component.css']
 })
-export class UserModalComponent implements OnInit {
+export class UserModalComponent implements OnInit, OnDestroy {
 
   @ViewChild('modal') modalRef: ElementRef;
+  @Output() onClose: EventEmitter<string>;
   user?: User;
   state: string;
   userForm: FormGroup;
-  submitted: Boolean;
   hadErrorAfterBlur: Record<string, Boolean>;
   validations: Record<string, any>;
+  openNgbModal: any;
 
-  //TODO: modal záráskor ispassvisible false
-  //TODO: modal close, ha kijelentkeztet
-  //TODO: error hint
-  //TODO: formcontrol
-  //TODO: kötelezőségek
+  //TODO: jelszó karakterek validáció
+  //TODO: inputok felett padding
+  //TODO: enterre lose focus
 
   isPassVisible: Boolean;
   role: Role;
   
-  closeResult: string;
+  
 
-  constructor(private modalService: NgbModal, private spinner: SpinnerService, private formBuilder: FormBuilder) { 
+  constructor(private modalService: NgbModal, private globalModalsService: GlobalModalsService, private spinner: SpinnerService, private formBuilder: FormBuilder, private userService: UserService) { 
     this.spinner.show();
+    this.onClose = new EventEmitter();
     this.isPassVisible = false;
     this.role = Role.User;
-    this.submitted = false;
     this.hadErrorAfterBlur = {
       'username' : false,
       'password' : false,
@@ -59,11 +61,30 @@ export class UserModalComponent implements OnInit {
     }
   }
 
-  ngOnInit() { 
+  ngOnInit() { }
+
+  ngOnDestroy() {
+    this.openNgbModal?.close();
+    this.globalModalsService.closeConfirmModal();
+  }
+
+  ngAfterViewInit() {
     this.spinner.hide();
   }
 
   open(editUser?: User) {
+    this.isPassVisible = false;
+    this.hadErrorAfterBlur = {
+      'username' : false,
+      'password' : false,
+      'title' : false,
+      'lastname' : false,
+      'middlename' : false,
+      'firstname' : false,
+      'telephone' : false,
+      'email' : false
+    };
+    console.log("open")
     this.state = editUser ? 'edit' : 'add';
     this.user = editUser ? editUser : new User();
 
@@ -79,47 +100,54 @@ export class UserModalComponent implements OnInit {
       email: [this.user.email, this.validations['email']]
     });
     
-    this.modalService.open(this.modalRef, {ariaLabelledBy: 'modal-add', centered: true, windowClass: 'modal-holder'}).result.then((result) => {
-      this.closeResult = `Closed with: ${result}`;
-    }, (reason) => {
-      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-    });
+    this.openNgbModal = this.modalService.open(this.modalRef, {ariaLabelledBy: 'modal-add', centered: true, windowClass: 'modal-holder user-modal',
+      beforeDismiss: () => {
+        if(!this.userForm.dirty){ this.onClose.emit(); return true; }
+
+        return this.globalModalsService.openConfirmModal(ModalType.Discard).then((result => {
+          if(result) { this.onClose.emit(); };
+          return result;
+        }));
+      }});
   }
 
   get userFormControls() { return this.userForm.controls; }
 
   
   save() {
-    this.submitted = true;
-    if (this.userForm.invalid) {
-        //return;
-    }
-    
-    //TODO: api hívás post user mentés output emit, ami a team component-ben újra lekéri majd a listát
-    console.log(
-      this.user._id + '\n',
-      this.userFormControls.username.value + '\n',
-      this.userFormControls.password.value + '\n',
-      this.userFormControls.title.value + '\n',
-      this.userFormControls.lastname.value + '\n',
-      this.userFormControls.middlename.value + '\n',
-      this.userFormControls.firstname.value + '\n',
-      this.userFormControls.role.value + '\n',
-      this.userFormControls.telephone.value + '\n',
-      this.userFormControls.email.value + '\n'
-    )
+    //TODO: HA kivan töltve a kötelező és az utolsóba kattintok akkor ne legyen elérhető a save
 
-    /*
-    this.authenticationService.login(this.formControls.username.value, this.formControls.password.value)
-      .subscribe(() => {
-              this.router.navigate(['']);
-          }, error => {
-              this.error = error;
-              this.loading = false;
-          }
-      );   
+    console.log("save")
+    this.spinner.show();
 
-    */
+    let userToSave = new User();
+    userToSave._id = this.user._id;
+    userToSave.username = this.userFormControls.username.value.trim();
+    userToSave.password = this.userFormControls.password.value.trim();
+    userToSave.title = this.userFormControls.title.value.trim();
+    userToSave.lastName = this.userFormControls.lastname.value.trim();
+    userToSave.middleName = this.userFormControls.middlename.value.trim();
+    userToSave.firstName = this.userFormControls.firstname.value.trim();
+    userToSave.role = this.userFormControls.role.value.trim();
+    userToSave.telephone = this.userFormControls.telephone.value.trim();
+    userToSave.email = this.userFormControls.email.value.trim();
+
+    console.log(userToSave);
+
+    this.userService.saveUser(userToSave).subscribe(() => {
+      //TODO: sikeres mentés toaster
+      console.log("sikeres mentés toaster")
+      this.onClose.emit();
+      this.openNgbModal.close();
+      this.spinner.hide();
+    }, error => {
+      if(error.code === 11000){
+        this.userFormControls.username.setErrors({notUnique: true});
+      } else {
+        //TODO: error modal
+      }
+      this.spinner.forceHide();
+    });
   }
 
 
@@ -131,24 +159,12 @@ export class UserModalComponent implements OnInit {
   }
 
   onBlur(controlName: string){
-    controlName = controlName === 'password' ? (this.state === 'edit' ? (controlName + '-edit') : controlName) : controlName;
-    this.userFormControls[controlName].setValidators(this.validations[controlName]);
+    const validationField = controlName === 'password' ? (this.state === 'edit' ? (controlName + '-edit') : controlName) : controlName;
+
+    this.userFormControls[controlName].setValidators(this.validations[validationField]);
     this.userFormControls[controlName].updateValueAndValidity();
     this.hadErrorAfterBlur[controlName] = this.userFormControls[controlName].dirty || !!this.userFormControls[controlName].errors;
   }
-
-
-
-  private getDismissReason(reason: any): string {
-    if (reason === ModalDismissReasons.ESC) {
-      return 'by pressing ESC';
-    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
-      return 'by clicking on a backdrop';
-    } else {
-      return  `with: ${reason}`;
-    }
-  }
-  
 
 
 }

@@ -1,22 +1,31 @@
 <ng-template #modal let-modal >
     
-  <div class="modal-header" style="background-color: rgb(184, 184, 184);">
-    <h5 class="modal-title" id="modal-add">{{state === 'add' ? 'Új felhasználó hozzáadása' : 'Felhasználó szerkesztése' }}</h5>
+  <div class="modal-header" style="background-color: rgb(66, 164, 255);">
+
+    <div class="modal-title" id="modal-add" style="display: flex; flex-direction: row;">
+        <i [ngClass]="state === 'add' ? 'fa fa-user-plus' : 'fa fa-pencil-square-o'" aria-hidden="true" style="font-weight: bold; align-self: center; padding-right: 10px; font-size: 24px;"></i>
+        <span class="modal-title" style="font-weight: bold; font-size: 18px;">{{state === 'add' ? 'Új felhasználó hozzáadása' : 'Felhasználó szerkesztése' }}</span>
+    </div>
+
   </div>
 
   <div class="modal-body">
-    <form #userFormId [formGroup]="userForm" (ngSubmit)="userForm.valid && save();" class="w-100" style="text-align: center;" ngbAutofocus>
+    <form id="userFormId" [formGroup]="userForm" (ngSubmit)="userForm.valid && this.userForm.dirty && save();" class="w-100" style="text-align: center;" ngbAutofocus>
         <!-- Felhasználónév -->
         <mat-form-field appearance="outline" style="width: 300px;">
             <mat-label>Felhasználónév</mat-label>
             <input formControlName="username" matInput #username autocomplete="off" required (focus)="onFocus('username');" (blur)="onBlur('username');">
 
             <mat-error *ngIf="userFormControls.username.hasError('required')">
-                A felhasználónév kitöltése kötelező.
+                A felhasználónév kitöltése kötelező!
             </mat-error>
 
             <mat-error *ngIf="userFormControls.username.hasError('minlength') || userFormControls.username.hasError('maxlength')">
                 A felhasználónév 6-20 karakter között kell legyen!
+            </mat-error>
+
+            <mat-error *ngIf="userFormControls.username.hasError('notUnique')">
+                A felhasználónév foglalt!
             </mat-error>
             
             <mat-hint class="hint-right">{{username.value.length}} / 20</mat-hint>
@@ -31,7 +40,7 @@
             </span>
 
             <mat-error *ngIf="userFormControls.password.hasError('required')">
-                A jelszó kitöltése kötelező.
+                A jelszó kitöltése kötelező!
             </mat-error>
 
             <mat-error *ngIf="userFormControls.password.hasError('minlength') || userFormControls.password.hasError('maxlength')">
@@ -40,6 +49,17 @@
 
             <mat-hint class="hint-right">{{password.value.length}} / 20</mat-hint>
         </mat-form-field>
+
+        <!-- Szerepkör -->
+        <div style="display: flex; flex-direction: column; width: 300px; text-align: left; margin: auto; padding-bottom: 5px;">
+            <span style="font-size: 13px; padding-left: 12px;">Szerepkör</span>
+            <mat-radio-group formControlName="role"
+                             aria-labelledby="role-radio-group-label"
+                             style="padding-left: 12px; padding-top: 5px;">
+                <mat-radio-button value="user">Felhasználó</mat-radio-button>
+                <mat-radio-button value="admin" style="padding-left: 20px;">Admin</mat-radio-button>
+            </mat-radio-group>
+        </div>
 
         <!-- Titulus -->
         <mat-form-field appearance="outline" style="width: 300px;">
@@ -59,7 +79,7 @@
             <input formControlName="lastname" matInput #lastname autocomplete="off" required (focus)="onFocus('lastname');" (blur)="onBlur('lastname');">
 
             <mat-error *ngIf="userFormControls.lastname.hasError('required')">
-                A vezetéknév kitöltése kötelező.
+                A vezetéknév kitöltése kötelező!
             </mat-error>
 
             <mat-error *ngIf="userFormControls.lastname.hasError('maxlength')">
@@ -87,7 +107,7 @@
             <input formControlName="firstname" matInput #firstname autocomplete="off" required (focus)="onFocus('firstname');" (blur)="onBlur('firstname');">
 
             <mat-error *ngIf="userFormControls.firstname.hasError('required')">
-                A keresztnév kitöltése kötelező.
+                A keresztnév kitöltése kötelező!
             </mat-error>
 
             <mat-error *ngIf="userFormControls.firstname.hasError('maxlength')">
@@ -96,17 +116,6 @@
 
             <mat-hint class="hint-right">{{firstname.value.length}} / 15</mat-hint>
         </mat-form-field>
-
-        <!-- Szerepkör -->
-        <div style="display: flex; flex-direction: column; width: 300px; text-align: left; margin: auto; padding-bottom: 5px;">
-            <span style="font-size: 13px; padding-left: 12px;">Szerepkör</span>
-            <mat-radio-group formControlName="role"
-                             aria-labelledby="role-radio-group-label"
-                             style="padding-left: 12px; padding-top: 5px;">
-                <mat-radio-button value="user">Felhasználó</mat-radio-button>
-                <mat-radio-button value="admin" style="padding-left: 20px;">Admin</mat-radio-button>
-            </mat-radio-group>
-        </div>
         
         <!-- Telefonszám -->
         <mat-form-field appearance="outline" style="width: 300px;">
@@ -139,7 +148,8 @@
     </form>
   </div>
   <div class="modal-footer">
-    <button type="submit" form="userForm" (click)="save();" [disabled]="!userForm.valid" class="btn btn-success" style="outline: none;">Save</button>
-    <button type="button" class="btn btn-secondary" style="outline: none;" (click)="modal.dismiss('Close click')">Close</button>
+    <button type="submit" form="userFormId" [disabled]="!userForm.valid || !this.userForm.dirty" class="btn btn-success" style="outline: none;">Mentés</button>
+    <button type="button" class="btn btn-secondary" style="outline: none;" (click)="modal.dismiss()">Bezárás</button>
   </div>
 </ng-template>
+

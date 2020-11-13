@@ -43,6 +43,9 @@ class MongoService {
                         if(foundErr){
                             client.close(); 
                             reject(foundErr);
+                        } else if(collection.modifiedCount === 0 && collection.upsertedId === null) {
+                            client.close(); 
+                            reject('Nem sikerült módosítás!');
                         } else {
                             client.close(); 
                             resolve();
@@ -99,6 +102,17 @@ class MongoService {
     }
 
     
+
+
+
+
+
+
+
+
+
+
+
 
     replace(collectionName, query, entry) {
         return new Promise((resolve, reject) => {

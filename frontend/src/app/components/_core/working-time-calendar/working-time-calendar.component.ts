@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, ViewChildren, QueryList, ElementRef, HostListener, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ViewChildren, QueryList, ElementRef, HostListener, EventEmitter, Output, OnDestroy } from '@angular/core';
 import { FormattedTimeComponent } from '@app/components/_core/working-time-calendar/formatted-time/formatted-time.component'
 import { SpinnerService } from '@app/_services/spinner.service';
 import { CommentBoxComponent } from '@app/components/_core/working-time-calendar/comment-box/comment-box.component';
@@ -10,6 +10,9 @@ import * as _ from 'lodash-es';
 import { ComboBoxComponent } from '../combo-box/combo-box.component';
 import { User } from '@app/_models/user';
 import { UserService } from '@app/_services/user.service';
+import { GlobalModalsService } from '@app/_services/global-modals.service';
+import { ModalType } from '@app/_models/modals';
+import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'working-time-calendar',
@@ -17,7 +20,7 @@ import { UserService } from '@app/_services/user.service';
   styleUrls: ['./working-time-calendar.component.css'],
 })
 
-export class WorkingTimeCalendarComponent implements OnInit {
+export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
 
   @Input() isEditable: Boolean;
   @Input() user?: User;
@@ -51,6 +54,8 @@ export class WorkingTimeCalendarComponent implements OnInit {
   editingComment: { dayNumber: number, dataIndex: number }
 
 
+  //TODO: gombok szürkék hover-re lesz árnyék + fekete
+  //TODO: első időszak ha nincs senkinek akkor -1 a minperiod az aktuális hónap 
   //TODO: munkaidő millisec-be legyen tárolva
   //TODO: menüváltáskor is zárja a combo-t
   //TODO: ha látszik a spinnek akkor click preventdefault
@@ -59,7 +64,6 @@ export class WorkingTimeCalendarComponent implements OnInit {
 
     //TODO: havi összes munkaidő az utolsó nap után (legalább annyi hely kell , hogy az utolsó nap max magasságos tooltipje kiférjen)
 
-    //TODO: confirm modal sor törléskor
 
     
     
@@ -68,8 +72,8 @@ export class WorkingTimeCalendarComponent implements OnInit {
     //TODO: az első töltésig (bárkié) lehessen visszamenni
     //TODO: képek css-ből legyenek
 
-  constructor(private spinner: SpinnerService, private scrollOffsetService: PageContentScrollOffsetService, 
-    private calendarService: CalendarService, private userService: UserService) { 
+  constructor(private spinner: SpinnerService, private scrollOffsetService: PageContentScrollOffsetService, private calendarService: CalendarService, 
+    private userService: UserService, private globalModalsService: GlobalModalsService) { 
       
       
       this.spinner.show();
@@ -104,6 +108,10 @@ export class WorkingTimeCalendarComponent implements OnInit {
     this.refreshCalendar();
   }
 
+  ngOnDestroy() {
+    this.globalModalsService.closeConfirmModal();
+  }
+
   ngAfterViewInit() {
     setTimeout(() => {
       this.isInitComplete = true;
@@ -119,13 +127,25 @@ export class WorkingTimeCalendarComponent implements OnInit {
   getDaysInMonth() { return new Date(this.chosenPeriod.getFullYear(), this.chosenPeriod.getMonth()+1, 0).getDate(); }
 
   changeMonth(direction: string) {
-    //TODO: ide validáció, hogy ha változott akkor modal kérdezzen, hogy elveti e a módosításait 
-    this.spinner.show();
-    this.chosenPeriod.setMonth(this.chosenPeriod.getMonth() + (direction === 'previous' ? -1 : 1)); 
-    this.calendarViewData = null;
-    this.setPeriod();
-    this.refreshCalendar();
-    this.spinner.hide();
+    if(this.isCalendarDataChanged()){
+      this.globalModalsService.openConfirmModal(ModalType.Discard).then((result => {
+        if(result){
+          this.spinner.show();
+          this.chosenPeriod.setMonth(this.chosenPeriod.getMonth() + (direction === 'previous' ? -1 : 1)); 
+          this.calendarViewData = null;
+          this.setPeriod();
+          this.refreshCalendar();
+          this.spinner.hide();
+        }
+      }));
+    } else {
+      this.spinner.show();
+      this.chosenPeriod.setMonth(this.chosenPeriod.getMonth() + (direction === 'previous' ? -1 : 1)); 
+      this.calendarViewData = null;
+      this.setPeriod();
+      this.refreshCalendar();
+      this.spinner.hide();
+    }
   }
 
   refreshCalendar() {
@@ -185,7 +205,11 @@ export class WorkingTimeCalendarComponent implements OnInit {
   addEmptyRow(dayNumber: number) { this.calendarViewData[dayNumber].push(new CalendarDayData()); }
 
   deleteRow(dayNumber: number, rowIndex: number){ 
-    this.calendarViewData[dayNumber].splice(rowIndex, 1); 
+    this.globalModalsService.openConfirmModal(ModalType.Delete).then((result => {
+      if(result) { 
+        this.calendarViewData[dayNumber].splice(rowIndex, 1); 
+      };
+    }));
   }
 
   //#endregion
@@ -324,15 +348,18 @@ export class WorkingTimeCalendarComponent implements OnInit {
       return;
     }
     
+    this.spinner.show();
     let saveData = this.removeEmptyRows(this.calendarViewData);
     
     this.calendarService.saveWorkingTime(this.chosenPeriod.getTime(), saveData).subscribe((data) => {
       //TODO: toaster
       console.log("sikeres mentés toaster")
       this.updateCalendarViewData();
+      this.spinner.hide();
     }, error => {
-      //TODO: toaster
-      console.log("nem siker toaster")
+      //TODO: modal
+      console.log("nem siker modal")
+      this.spinner.forceHide();
     });
   }
 
