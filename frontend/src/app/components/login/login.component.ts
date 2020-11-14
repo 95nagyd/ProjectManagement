@@ -5,6 +5,7 @@ import { first } from 'rxjs/operators';
 
 import { AuthenticationService } from '@app/_services/authentication.service';
 import { Subscription } from 'rxjs';
+import { GlobalModalsService } from '@app/_services/global-modals.service';
 
 @Component({
   selector: 'login',
@@ -18,12 +19,16 @@ export class LoginComponent implements OnInit, OnDestroy {
   error: any;
   formValueChangeSubscription: Subscription;
 
-  constructor(private formBuilder: FormBuilder, private router: Router, private authenticationService: AuthenticationService) { 
+  constructor(private formBuilder: FormBuilder, private router: Router, private authenticationService: AuthenticationService, private globalModalsService: GlobalModalsService ) { 
     this.loading = false;
     this.submitted = false;
   }
 
   ngOnInit(): void {
+    console.log(this.authenticationService.isLoggedIn())
+    this.globalModalsService.closeConfirmModal();
+    this.globalModalsService.closeInfoModal();
+    this.globalModalsService.closeErrorModal();
     if (this.authenticationService.isLoggedIn()) { 
       this.router.navigate(['']);
     }

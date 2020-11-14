@@ -53,13 +53,13 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
   subtaskList: string[];
   editingComment: { dayNumber: number, dataIndex: number }
 
-
+  
   //TODO: vissza gomb
+  //TODO: style-ok classra cserélése
   //TODO: gombok szürkék hover-re lesz árnyék + fekete
   //TODO: első időszak ha nincs senkinek akkor -1 a minperiod az aktuális hónap 
+  //TODO: az első töltésig (bárkié) lehessen visszamenni
   //TODO: munkaidő millisec-be legyen tárolva
-  //TODO: menüváltáskor is zárja a combo-t
-  //TODO: ha látszik a spinnek akkor click preventdefault
   //TODO: aktuális napra színes keret
   //TODO: naptár szürke színeket kicsit kékebbé
 
@@ -70,11 +70,11 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
     //TODO: subscribe-ok unsubscribe ngondestroyba
 
     //TODO: szabadság, betegszabadság (akkor a sor más szinű) (datpickerrel gombról megnyílik modal)
-    //TODO: az első töltésig (bárkié) lehessen visszamenni
+    
     //TODO: képek css-ből legyenek
 
   constructor(private spinner: SpinnerService, private scrollOffsetService: PageContentScrollOffsetService, private calendarService: CalendarService, 
-    private userService: UserService, private globalModalsService: GlobalModalsService) { 
+    private userService: UserService, private globalModalsService: GlobalModalsService, private comboBoxService: ComboBoxService) { 
       
       
       this.spinner.show();
@@ -110,7 +110,7 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.globalModalsService.closeConfirmModal();
+    this.comboBoxService.externalCloseComboAndHideDropdown();
   }
 
   ngAfterViewInit() {
@@ -129,7 +129,7 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
 
   changeMonth(direction: string) {
     if(this.isCalendarDataChanged()){
-      this.globalModalsService.openConfirmModal(ConfirmModalType.Discard).then((result => {
+      this.globalModalsService.openConfirmModal(ConfirmModalType.Discard).then((result) => {
         if(result){
           this.spinner.show();
           this.chosenPeriod.setMonth(this.chosenPeriod.getMonth() + (direction === 'previous' ? -1 : 1)); 
@@ -138,7 +138,8 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
           this.refreshCalendar();
           this.spinner.hide();
         }
-      }));
+        this.globalModalsService.closeConfirmModal();
+      });
     } else {
       this.spinner.show();
       this.chosenPeriod.setMonth(this.chosenPeriod.getMonth() + (direction === 'previous' ? -1 : 1)); 
@@ -208,11 +209,12 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
   addEmptyRow(dayNumber: number) { this.calendarViewData[dayNumber].push(new CalendarDayData()); }
 
   deleteRow(dayNumber: number, rowIndex: number){ 
-    this.globalModalsService.openConfirmModal(ConfirmModalType.Delete).then((result => {
+    this.globalModalsService.openConfirmModal(ConfirmModalType.Delete).then((result) => {
       if(result) { 
         this.calendarViewData[dayNumber].splice(rowIndex, 1); 
       };
-    }));
+      this.globalModalsService.closeConfirmModal();
+    });
   }
 
   //#endregion

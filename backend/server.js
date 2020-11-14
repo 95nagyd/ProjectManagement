@@ -96,9 +96,9 @@ app.get('/firstPeriod', verifyToken, (req, res) => {
 function verifyToken(req, res, next){
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
-    if(token == null) return res.sendStatus(401);
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-        if(err) return res.sendStatus(403);
+    if(token == null) return res.status(401).json({ message: "Azonosítási hiba. Folytatáshoz jelentkezzen be újra." });
+    return jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+        if(err) return res.status(403).json({ message: "Azonosítási hiba. Folytatáshoz jelentkezzen be újra." });
         req.user = user;
         next();
     });

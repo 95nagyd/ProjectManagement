@@ -87,3 +87,9 @@ html, body {
   width: 325px;
   margin: auto;
 }
+
+.error-modal .modal-dialog {
+  width: 500px;
+  margin: auto;
+  word-break: break-word;
+}

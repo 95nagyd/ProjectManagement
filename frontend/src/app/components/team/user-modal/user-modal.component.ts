@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { Role } from '@app/_models/role';
 import { User } from '@app/_models/user';
 import { SpinnerService } from '@app/_services/spinner.service';
@@ -7,6 +7,8 @@ import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/fo
 import { UserService } from '@app/_services/user.service';
 import { GlobalModalsService } from '@app/_services/global-modals.service';
 import { ConfirmModalType } from '@app/_models/modals';
+import { Observable } from 'rxjs';
+
 
 @Component({
   selector: 'user-modal',
@@ -22,7 +24,8 @@ export class UserModalComponent implements OnInit, OnDestroy {
   userForm: FormGroup;
   hadErrorAfterBlur: Record<string, Boolean>;
   validations: Record<string, any>;
-  openNgbModal: any;
+  openUserModalRef: any;
+
 
   //TODO: jelszó karakterek validáció
   //TODO: inputok felett padding
@@ -33,7 +36,8 @@ export class UserModalComponent implements OnInit, OnDestroy {
   
   
 
-  constructor(private modalService: NgbModal, private globalModalsService: GlobalModalsService, private spinner: SpinnerService, private formBuilder: FormBuilder, private userService: UserService) { 
+  constructor(private modalService: NgbModal, private globalModalsService: GlobalModalsService, private spinner: SpinnerService, private formBuilder: FormBuilder, 
+    private userService: UserService, private _ngZone: NgZone) { 
     this.spinner.show();
     this.onClose = new EventEmitter();
     this.isPassVisible = false;
@@ -64,8 +68,7 @@ export class UserModalComponent implements OnInit, OnDestroy {
   ngOnInit() { }
 
   ngOnDestroy() {
-    this.openNgbModal?.close();
-    this.globalModalsService.closeConfirmModal();
+    this.openUserModalRef?.close();
   }
 
   ngAfterViewInit() {
@@ -100,15 +103,17 @@ export class UserModalComponent implements OnInit, OnDestroy {
       email: [this.user.email, this.validations['email']]
     });
     
-    this.openNgbModal = this.modalService.open(this.modalRef, {ariaLabelledBy: 'modal-add', centered: true, windowClass: 'modal-holder user-modal',
-      beforeDismiss: () => {
-        if(!this.userForm.dirty){ this.onClose.emit(); return true; }
+    this.openUserModalRef = this.modalService.open(this.modalRef, {ariaLabelledBy: 'modal-add', centered: true, windowClass: 'modal-holder user-modal',
+    beforeDismiss: () => {
+      if(!this.userForm.dirty){ this.onClose.emit(); return true; }
 
-        return this.globalModalsService.openConfirmModal(ConfirmModalType.Discard).then((result => {
-          if(result) { this.onClose.emit(); };
-          return result;
-        }));
-      }});
+      return this.globalModalsService.openConfirmModal(ConfirmModalType.Discard).then((result) => {
+        if(result) { this.onClose.emit(); };
+        this.globalModalsService.closeConfirmModal();
+        return result;
+      });
+    }});
+    
   }
 
   get userFormControls() { return this.userForm.controls; }
@@ -138,7 +143,7 @@ export class UserModalComponent implements OnInit, OnDestroy {
       //TODO: sikeres mentés toaster
       console.log("sikeres mentés toaster")
       this.onClose.emit();
-      this.openNgbModal.close();
+      this.openUserModalRef.close();
       this.spinner.hide();
     }, error => {
       if(error.code === 11000){

@@ -74,6 +74,7 @@ export class ComboBoxComponent implements OnInit {
     this.searchResult = [];
     this.arrowIndex = 0;
     this.hasError = !this.isValueValid();
+    this.search?.nativeElement?.blur();
   }
   
 
@@ -163,7 +164,7 @@ export class ComboBoxComponent implements OnInit {
 
   isTooltipRequired(){
     if(!this.search) { return false; }
-    return this.search.nativeElement.offsetWidth < this.search.nativeElement.scrollWidth
+    return this.search.nativeElement.offsetWidth < this.search.nativeElement.scrollWidth;
   }
 
   @HostListener('window:resize')

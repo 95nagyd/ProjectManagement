@@ -35,5 +35,16 @@ export class GlobalModalsService {
     return this.globalModals.isInfoModalOpen();
   }
 
+  openErrorModal(conent: any): Promise<any>{
+    return this.globalModals.openErrorModal(conent);
+  }
+
+  closeErrorModal(){
+    this.globalModals?.closeErrorModal();
+  }
+
+  isErrorModalOpen(){
+    return this.globalModals.isErrorModalOpen();
+  }
 
 }

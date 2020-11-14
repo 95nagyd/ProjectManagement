@@ -7,6 +7,7 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { interval, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { GlobalModalsService } from './_services/global-modals.service';
+import { ComboBoxService } from './_services/combo-box.service';
 
 @Component({
   selector: 'app-root',
@@ -49,14 +50,8 @@ export class AppComponent {
       }))
       .subscribe((isLoggedInActualState) => { 
         if(isLoggedInActualState !== this.isLoggedInPastState){
-          if(isLoggedInActualState) this._ngZone.run(() => {
-            this.router.navigate(['']);
-          });
-          if(!isLoggedInActualState) {
-            this._ngZone.run(() => {
-              this.router.navigate(['/login']);
-            });
-          }
+          if(isLoggedInActualState) this._ngZone.run(() => { this.router.navigate(['']); });
+          if(!isLoggedInActualState) this._ngZone.run(() => { this.router.navigate(['/login']); });
           this.isLoggedInPastState = isLoggedInActualState;
         }
       })

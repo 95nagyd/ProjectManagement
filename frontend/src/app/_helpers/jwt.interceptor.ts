@@ -5,11 +5,12 @@ import { Observable, BehaviorSubject } from 'rxjs';
 import { environment } from '@environments/environment';
 import { AuthenticationService } from '@app/_services/authentication.service';
 import { take } from 'rxjs/operators';
+import { GlobalModalsService } from '@app/_services/global-modals.service';
 
 @Injectable()
 export class JwtInterceptor implements HttpInterceptor {
 
-    constructor(private authenticationService: AuthenticationService) { }
+    constructor(private authenticationService: AuthenticationService, private globalModalsService: GlobalModalsService) { }
 
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 
@@ -21,14 +22,7 @@ export class JwtInterceptor implements HttpInterceptor {
             });
             
             if(!this.authenticationService.isTokenExpired()){ 
-                this.authenticationService.renewAccessToken().pipe(take(1)).subscribe(
-                    () => { },
-                    error => {
-                        //ha error modal nem látszik
-                        alert("Hiba új token generálásakor!");
-                        //TODO: error modal
-                    }
-                );
+                this.authenticationService.renewAccessToken().pipe(take(1)).subscribe();
             }
         }
         return next.handle(request);

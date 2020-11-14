@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA, ErrorHandler } from '@angular/core';
 import { AppRoutingModule, routingComponents } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -38,7 +38,6 @@ import { TwoDigitNumberPipe } from './_custom/two-digit-number.pipe';
 import { UserModalComponent } from './components/team/user-modal/user-modal.component';
 import { ErrorStateMatcher, ShowOnDirtyErrorStateMatcher } from '@angular/material/core';
 import { GlobalModalsComponent } from './components/_core/global-modals/global-modals.component';
-
 
 @NgModule({
   declarations: [

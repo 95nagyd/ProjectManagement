@@ -44,11 +44,7 @@ export class AuthenticationService {
         }))
   }
 
-  logout(isExpired?: Boolean) {
-    if(this.globalModalsService.isInfoModalOpen()) { return; }
-
-    console.log("logout call")
-    
+  logout() {
     const options = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
@@ -59,19 +55,10 @@ export class AuthenticationService {
     };
 
     this.spinner.forceHide();
-    if(isExpired){
-      this.globalModalsService.openInfoModal(InfoModalType.Expired).then((() => {
-        this.router.navigate(['/login']);
-        localStorage.removeItem(this.ACCESS_TOKEN);
-        localStorage.removeItem(this.REFRESH_TOKEN);
-        this.currentUser = null;
-      }));
-    } else {
-      this.router.navigate(['/login']);
-      localStorage.removeItem(this.ACCESS_TOKEN);
-      localStorage.removeItem(this.REFRESH_TOKEN);
-      this.currentUser = null;
-    }
+    this.router.navigate(['/login']);
+    localStorage.removeItem(this.ACCESS_TOKEN);
+    localStorage.removeItem(this.REFRESH_TOKEN);
+    this.currentUser = null;
     
     this.http.delete<any>(`${environment.authApiUrl}/logout`, options).pipe(take(1)).subscribe();
   }

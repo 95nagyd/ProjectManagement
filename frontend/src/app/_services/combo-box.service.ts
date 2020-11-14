@@ -13,6 +13,8 @@ export class ComboBoxService {
     this.comboBoxDropdown = comboBoxDropdown;
   }
 
+  //TODO: kipróbálni promise nélkl működik-e
+
   addComboRef(comboBoxRef: ComboBoxComponent) {
     return new Promise((resolve) => {
       if(this.comboBoxRefList.indexOf(comboBoxRef) === -1){

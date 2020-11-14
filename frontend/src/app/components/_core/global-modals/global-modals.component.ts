@@ -1,6 +1,8 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ConfirmModalType, ConfirmModalData, InfoModalType, InfoModalData } from '@app/_models/modals';
+import { ComboBoxService } from '@app/_services/combo-box.service';
 import { GlobalModalsService } from '@app/_services/global-modals.service';
+import { SpinnerService } from '@app/_services/spinner.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
@@ -20,7 +22,11 @@ export class GlobalModalsComponent implements OnInit {
   infoModalContent: string;
   openInfoModalRef: any;
 
-  constructor(private modalService: NgbModal, private globalModalsService: GlobalModalsService) { 
+  @ViewChild('errorModal') errorModalRef: ElementRef;
+  errorModalContent: any;
+  openErrorModalRef: any;
+
+  constructor(private modalService: NgbModal, private globalModalsService: GlobalModalsService, private comboBoxService: ComboBoxService, private spinner: SpinnerService) { 
     this.globalModalsService.register(this);
 
     this.confirmModalTitle = '';
@@ -30,6 +36,9 @@ export class GlobalModalsComponent implements OnInit {
     this.infoModalTitle = '';
     this.infoModalContent = '';
     this.openInfoModalRef = null;
+
+    this.errorModalContent = '';
+    this.openErrorModalRef = null;
   }
 
   ngOnInit(): void {
@@ -47,10 +56,15 @@ export class GlobalModalsComponent implements OnInit {
     this.openConfirmModalRef = null;
   }
 
+
+
+
+
   openInfoModal(modalType: InfoModalType){
-    console.log(InfoModalData[modalType])
+    this.comboBoxService.externalCloseComboAndHideDropdown();
     this.infoModalTitle = InfoModalData[modalType].title;
     this.infoModalContent = InfoModalData[modalType].content;
+    this.spinner.forceHide();
     this.openInfoModalRef = this.modalService.open(this.infoModalRef, {centered: true, windowClass: 'modal-holder info-modal-' + modalType, backdrop: 'static', keyboard: false});
     return this.openInfoModalRef.result;
   }
@@ -64,5 +78,25 @@ export class GlobalModalsComponent implements OnInit {
     return !!this.openInfoModalRef;
   }
 
+
+
+
+
+  openErrorModal(content: any){
+    this.comboBoxService.externalCloseComboAndHideDropdown();
+    this.errorModalContent = JSON.stringify(content);
+    this.spinner.forceHide();
+    this.openErrorModalRef = this.modalService.open(this.errorModalRef, {centered: true, windowClass: 'modal-holder error-modal', backdrop: 'static', keyboard: false});
+    return this.openErrorModalRef.result;
+  }
+
+  closeErrorModal(){
+    this.openErrorModalRef?.close();
+    this.openErrorModalRef = null;
+  }
+
+  isErrorModalOpen(){
+    return !!this.openErrorModalRef;
+  }
 
 }

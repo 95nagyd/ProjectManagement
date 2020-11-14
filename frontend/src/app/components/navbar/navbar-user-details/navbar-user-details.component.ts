@@ -1,5 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { InfoModalType } from '@app/_models/modals';
 import { AuthenticationService } from '@app/_services/authentication.service';
+import { GlobalModalsService } from '@app/_services/global-modals.service';
 import { UserService } from '@app/_services/user.service';
 import { interval, of } from 'rxjs';
 import { switchMap, takeWhile } from 'rxjs/operators';
@@ -17,7 +19,7 @@ export class NavbarUserDetailsComponent implements OnInit {
   intervalId: any;
   isViewReady: any;
 
-  constructor(private authenticationService: AuthenticationService, private userService: UserService) { 
+  constructor(private authenticationService: AuthenticationService, private userService: UserService, private globalModalsService: GlobalModalsService) { 
     this.initInterval();
   }
 
@@ -35,7 +37,14 @@ export class NavbarUserDetailsComponent implements OnInit {
         return of(false);
       })
     ).subscribe((isExpired) => {
-      if(isExpired) this.authenticationService.logout(isExpired);
+      if(isExpired) {
+        if(!this.globalModalsService.isInfoModalOpen()){
+          this.globalModalsService.openInfoModal(InfoModalType.Expired).then((() => {
+              this.authenticationService.logout();
+              this.globalModalsService.closeInfoModal();
+          }));
+        }
+      }
     })
   }
 

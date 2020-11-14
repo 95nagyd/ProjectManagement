@@ -25,10 +25,10 @@ let refreshTokens = []
 
 app.post('/token', (req, res) => {
     const refreshToken = req.body.refreshToken;
-    if(refreshToken == null) return res.sendStatus(401);
-    if(!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
+    if(refreshToken == null) return res.status(401).json({ message: "Azonosítási hiba. Folytatáshoz jelentkezzen be újra." });
+    if(!refreshTokens.includes(refreshToken)) return res.status(403).json({ message: "Hiba történt az autentikáció frissítésekor. Az időkeret ismételt bejelentkezésig nem fog frissülni." });
     jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-        if(err) return res.sendStatus(403);
+        if(err) return res.status(403).json({ message: "Hiba történt az autentikáció frissítésekor. Az időkeret ismételt bejelentkezésig nem fog frissülni." });
         const accessToken = generateAccessToken(
             _.pick(user, 
                 [
@@ -69,7 +69,7 @@ app.post('/login', (req, res) => {
         res.json({ accessToken: accessToken, refreshToken: refreshToken });
     }, (error) => {
         console.log(error)
-        res.status(401).json({ message: "Adatbázis hiba!" });
+        res.status(500).json({ message: "Adatbázis elérési hiba!" });
     });
 });
 
@@ -85,7 +85,7 @@ function generateAccessToken(user) {
             'role'
         ]), 
         process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: 5 }
+        { expiresIn: 1200 }
     );
 }
 
