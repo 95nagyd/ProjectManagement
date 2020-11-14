@@ -14,3 +14,14 @@ export const ConfirmModalData = {
     content: 'Biztos benne, hogy törli az elemet?'
   }
 }
+
+export enum InfoModalType {
+  Expired = 'expired'
+}
+
+export const InfoModalData = {
+  'expired' : {
+    title: 'Lejárt időkeret',
+    content: 'A rendelkezésre álló időkeret lejárt.\nFolytatáshoz jelentkezzen be újra.'
+  }
+}

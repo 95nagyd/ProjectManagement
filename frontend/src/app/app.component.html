@@ -6,19 +6,12 @@
 </ngx-spinner>
 <navbar *ngIf="isLoggedIn()" (clickOutside)="navbar.collapseIfPossible()"></navbar>
 <div class="route-component">
-    <router-outlet *ngIf="!isLoggedIn()"></router-outlet>
 
-    <div *ngIf="isLoggedIn()" class="container-fluid h-max" (scroll)="onScroll();" #page>
-        <div class="h-100 row justify-content-center">
-            <div class="col-12 p-0 pt-1">
-                <div class="component-content-container card mx-2 mb-2">
-                    <div class="card-body h-100" >
-                        <global-modals></global-modals>
-                        <combo-box-dropdown></combo-box-dropdown>
-                        <router-outlet></router-outlet>
-                    </div>
-                </div>
-            </div>
+    <div [ngClass]="{ 'w-100 h-max row mx-auto pt-1': isLoggedIn() }" (scroll)="onScroll();" #page>
+        <div [ngClass]="{ 'col component-content-container card card-body mx-2 mb-2': isLoggedIn() }">
+            <global-modals></global-modals>
+            <combo-box-dropdown></combo-box-dropdown>
+            <router-outlet></router-outlet>
         </div>
     </div>
 </div>

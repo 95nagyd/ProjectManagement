@@ -9,7 +9,7 @@ import { User } from '@app/_models/user';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
 import { GlobalModalsService } from './global-modals.service';
-import { ConfirmModalType } from '@app/_models/modals';
+import { ConfirmModalType, InfoModalType } from '@app/_models/modals';
 
 @Injectable({
   providedIn: 'root',
@@ -45,8 +45,10 @@ export class AuthenticationService {
   }
 
   logout(isExpired?: Boolean) {
-    //ha az expired modal nincs megnyitva
+    if(this.globalModalsService.isInfoModalOpen()) { return; }
+
     console.log("logout call")
+    
     const options = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
@@ -58,8 +60,7 @@ export class AuthenticationService {
 
     this.spinner.forceHide();
     if(isExpired){
-      //TODO: expired info modal
-      this.globalModalsService.openConfirmModal(ConfirmModalType.Delete).then((() => {
+      this.globalModalsService.openInfoModal(InfoModalType.Expired).then((() => {
         this.router.navigate(['/login']);
         localStorage.removeItem(this.ACCESS_TOKEN);
         localStorage.removeItem(this.REFRESH_TOKEN);

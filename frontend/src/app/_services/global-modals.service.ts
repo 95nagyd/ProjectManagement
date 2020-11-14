@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { GlobalModalsComponent } from '@app/components/_core/global-modals/global-modals.component';
-import { ConfirmModalType } from '@app/_models/modals';
+import { ConfirmModalType, InfoModalType } from '@app/_models/modals';
 
 @Injectable({
   providedIn: 'root'
@@ -22,5 +22,18 @@ export class GlobalModalsService {
   closeConfirmModal(){
     this.globalModals?.closeConfirmModal();
   }
+
+  openInfoModal(modalType: InfoModalType): Promise<any>{
+    return this.globalModals.openInfoModal(modalType);
+  }
+
+  closeInfoModal(){
+    this.globalModals?.closeInfoModal();
+  }
+
+  isInfoModalOpen(){
+    return this.globalModals.isInfoModalOpen();
+  }
+
 
 }

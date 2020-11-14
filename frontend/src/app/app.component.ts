@@ -6,6 +6,7 @@ import { SpinnerService } from './_services/spinner.service';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { interval, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import { GlobalModalsService } from './_services/global-modals.service';
 
 @Component({
   selector: 'app-root',
@@ -20,8 +21,8 @@ export class AppComponent {
   @ViewChild(NavbarComponent) navbar: NavbarComponent;
   @ViewChild('page') page: ElementRef;
 
-  constructor(private authenticationService: AuthenticationService, private router: Router, 
-                private _ngZone: NgZone, private spinner: SpinnerService, private scrollOffsetService: PageContentScrollOffsetService) { 
+  constructor(private authenticationService: AuthenticationService, private router: Router, private _ngZone: NgZone, private spinner: SpinnerService, 
+    private scrollOffsetService: PageContentScrollOffsetService,  private globalModalsService: GlobalModalsService) { 
                   
 
     this.scrollOffsetService.register(this);
@@ -30,7 +31,9 @@ export class AppComponent {
                   
     if (this.isLoggedInPastState) this.router.navigate(['']);
 
-    this.initInterval();
+    this._ngZone.runOutsideAngular(() => {
+      this.initInterval();
+    });
   }
 
 
@@ -46,8 +49,14 @@ export class AppComponent {
       }))
       .subscribe((isLoggedInActualState) => { 
         if(isLoggedInActualState !== this.isLoggedInPastState){
-          if(isLoggedInActualState) this._ngZone.run(() => this.router.navigate(['']) );
-          if(!isLoggedInActualState) this._ngZone.run(() => this.router.navigate(['/login']) );
+          if(isLoggedInActualState) this._ngZone.run(() => {
+            this.router.navigate(['']);
+          });
+          if(!isLoggedInActualState) {
+            this._ngZone.run(() => {
+              this.router.navigate(['/login']);
+            });
+          }
           this.isLoggedInPastState = isLoggedInActualState;
         }
       })

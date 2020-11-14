@@ -67,7 +67,7 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
 
 
     
-    
+    //TODO: subscribe-ok unsubscribe ngondestroyba
 
     //TODO: szabadság, betegszabadság (akkor a sor más szinű) (datpickerrel gombról megnyílik modal)
     //TODO: az első töltésig (bárkié) lehessen visszamenni

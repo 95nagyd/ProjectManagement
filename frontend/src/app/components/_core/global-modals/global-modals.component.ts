@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ConfirmModalType, ConfirmModalData } from '@app/_models/modals';
+import { ConfirmModalType, ConfirmModalData, InfoModalType, InfoModalData } from '@app/_models/modals';
 import { GlobalModalsService } from '@app/_services/global-modals.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -15,10 +15,21 @@ export class GlobalModalsComponent implements OnInit {
   confirmModalContent: string;
   openConfirmModalRef: any;
 
+  @ViewChild('infoModal') infoModalRef: ElementRef;
+  infoModalTitle: string;
+  infoModalContent: string;
+  openInfoModalRef: any;
+
   constructor(private modalService: NgbModal, private globalModalsService: GlobalModalsService) { 
     this.globalModalsService.register(this);
+
     this.confirmModalTitle = '';
     this.confirmModalContent = '';
+    this.openConfirmModalRef = null;
+
+    this.infoModalTitle = '';
+    this.infoModalContent = '';
+    this.openInfoModalRef = null;
   }
 
   ngOnInit(): void {
@@ -33,8 +44,25 @@ export class GlobalModalsComponent implements OnInit {
 
   closeConfirmModal(){
     this.openConfirmModalRef?.close();
+    this.openConfirmModalRef = null;
   }
 
+  openInfoModal(modalType: InfoModalType){
+    console.log(InfoModalData[modalType])
+    this.infoModalTitle = InfoModalData[modalType].title;
+    this.infoModalContent = InfoModalData[modalType].content;
+    this.openInfoModalRef = this.modalService.open(this.infoModalRef, {centered: true, windowClass: 'modal-holder info-modal-' + modalType, backdrop: 'static', keyboard: false});
+    return this.openInfoModalRef.result;
+  }
+
+  closeInfoModal(){
+    this.openInfoModalRef?.close();
+    this.openInfoModalRef = null;
+  }
+
+  isInfoModalOpen(){
+    return !!this.openInfoModalRef;
+  }
 
 
 }

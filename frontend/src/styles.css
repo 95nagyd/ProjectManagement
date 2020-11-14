@@ -11,7 +11,6 @@ html, body {
 
 .component-content-container {
     height: calc(100% - 0.5rem);
-    display: relative;
 }
 
 .modal-holder{
@@ -81,5 +80,10 @@ html, body {
 
 .confirm-modal-delete .modal-dialog {
   width: 320px;
+  margin: auto;
+}
+
+.info-modal-expired .modal-dialog {
+  width: 325px;
   margin: auto;
 }

@@ -85,7 +85,7 @@ function generateAccessToken(user) {
             'role'
         ]), 
         process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: 20 }
+        { expiresIn: 5 }
     );
 }
 
