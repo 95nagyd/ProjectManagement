@@ -65,9 +65,14 @@ export class AuthenticationService {
 
 
   renewAccessToken(){
-    return this.http.post<any>(`${environment.authApiUrl}/token`, { refreshToken: this.getRefreshToken() }).pipe(take(1)).subscribe((res) => {
-      localStorage.setItem(this.ACCESS_TOKEN, res.accessToken);
-    });
+    return new Promise((resolve, reject) => {
+      this.http.post<any>(`${environment.authApiUrl}/token`, { refreshToken: this.getRefreshToken() }).pipe(take(1)).subscribe((res) => {
+        localStorage.setItem(this.ACCESS_TOKEN, res.accessToken);
+        resolve();
+      }, (err) => {
+        reject(err);
+      });
+    })
   }
 
   getCurrentUser(): User { return this.currentUser; }

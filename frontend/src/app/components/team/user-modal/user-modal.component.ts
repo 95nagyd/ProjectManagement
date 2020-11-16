@@ -149,7 +149,11 @@ export class UserModalComponent implements OnInit, OnDestroy {
       if(error.code === 11000){
         this.userFormControls.username.setErrors({notUnique: true});
       } else {
-        //TODO: error modal
+        if(!this.globalModalsService.isErrorModalOpen()){
+          this.globalModalsService.openErrorModal(error).then(() => {
+          this.globalModalsService.closeErrorModal();
+        });
+      }
       }
       this.spinner.forceHide();
     });

@@ -26,7 +26,7 @@ export class TeamComponent implements OnInit {
 
   //TODO: alert-ek toasterbe
   //TODO: telefonszám automata space töltés
-  //TODO: gombok szürkék hover-re lesz árnyék + fekete
+  //TODO: scroll nem jó helyen van
 
   ngOnInit(): void {
     this.currentUser = this.authenticationService.getCurrentUser();

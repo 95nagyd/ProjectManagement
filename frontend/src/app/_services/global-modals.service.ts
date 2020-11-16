@@ -27,6 +27,10 @@ export class GlobalModalsService {
     return this.globalModals.openInfoModal(modalType, additionalContent);
   }
 
+  openCustomInfoModal(title: string, content: string): Promise<any>{
+    return this.globalModals.openCustomInfoModal(title, content);
+  }
+
   closeInfoModal(){
     this.globalModals?.closeInfoModal();
   }

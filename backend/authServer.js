@@ -22,19 +22,20 @@ app.use(function (req, res, next) {
     next();
 });
 
+//TODO: ezt lehet db-be kellene tárolni
 let refreshTokens = []
 
 app.post('/token', (req, res) => {
     const refreshToken = req.body.refreshToken;
     if(!refreshToken || !jwt.decode(refreshToken).username) return res.status(401).json({ message: "Azonosítási hiba. Folytatáshoz jelentkezzen be újra." });
-    const username = jwt.decode(refreshToken).username
+    const username = jwt.decode(refreshToken).username;
+    const role = jwt.decode(refreshToken).role;
     return userService.getUsers({ username: username }).then(async (users) => {
         if(users.length !== 1) return res.status(401).json({ message: "Azonosítási hiba. Folytatáshoz jelentkezzen be újra." });
-        
-        const refreshSecret = process.env.REFRESH_TOKEN_SECRET + users[0].password;
+        const refreshSecret = process.env.REFRESH_TOKEN_SECRET + users[0].password + users[0].role;
         return jwt.verify(refreshToken, refreshSecret, (err, user) => {
-            if(err) return res.status(401).json({ message: "Azonosítási hiba. Folytatáshoz jelentkezzen be újra." });
-            if(!refreshTokens.includes(refreshToken)) return res.status(403).json({ message: "Hiba történt az autentikáció frissítésekor. Az időkeret ismételt bejelentkezésig nem fog frissülni." });
+            if(err) return res.status(406).json({ message: "A felhasználójához tartozó szerepkört, vagy jelszót módosították. Folytatáshoz jelentkezzen be újra." });
+            if(!refreshTokens.includes(refreshToken)) return res.status(403).json({ message: "Hiba történt az autentikáció frissítésekor. Folytatáshoz jelentkezzen be újra." });
             const accessToken = generateAccessToken(user);
             return res.status(200).json({ accessToken: accessToken });
         });
@@ -81,7 +82,7 @@ app.post('/login', (req, res) => {
 
                 if(!isVerified) return res.status(401).json({ message: "Hibás felhasználónév vagy jelszó!" });
 
-                const refreshSecret = process.env.REFRESH_TOKEN_SECRET + users[0].password;
+                const refreshSecret = process.env.REFRESH_TOKEN_SECRET + users[0].password + users[0].role;
 
                 delete users[0].salt;
                 delete users[0].password;

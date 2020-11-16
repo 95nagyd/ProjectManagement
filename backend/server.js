@@ -30,12 +30,10 @@ app.use(function (req, res, next) {
 
 app.get('/users', verifyToken, (req, res) => {
     userService.getUsers({}).then((users) => {
-        console.log(users)
         users.forEach((user) => {
             delete user.salt;
             delete user.password;
         });
-        console.log(users)
         res.status(200).json(users);
     }, (error) => {
         res.status(400).json({ message: error });
@@ -44,7 +42,6 @@ app.get('/users', verifyToken, (req, res) => {
 
 app.post('/saveUser', verifyToken, (req, res) => {
     console.log(req.body.user)
-    //TODO ha van jelszó akkor hashelni
     if(req.body.user._id === '-1'){
         userService.addUser(req.body.user).then(() => {
             res.status(201).send();

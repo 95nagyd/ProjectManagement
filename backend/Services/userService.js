@@ -10,6 +10,7 @@ async function getUsers(query) {
 }
 
 async function saveUser(user){
+    console.log("save call")
     let saveData = _.pick(user, 
         [
             'password',
@@ -29,8 +30,8 @@ async function saveUser(user){
         const newHashedPassword = await argon2.hash(saveData.password + newRandomSalt);
         saveData.password = newHashedPassword;
         saveData.salt = newRandomSalt;
-        return await mongoService.update('users', {_id: new ObjectId(user._id)}, { $set: saveData });
     }
+    return await mongoService.update('users', {_id: new ObjectId(user._id)}, { $set: saveData });
 }
 
 async function addUser(user){

@@ -36,6 +36,7 @@ export class GlobalModalsComponent implements OnInit {
 
     this.infoModalTitle = '';
     this.infoModalContent = '';
+    this.infoModalAdditionalContent = '';
     this.openInfoModalRef = null;
 
     this.errorModalContent = '';
@@ -71,9 +72,19 @@ export class GlobalModalsComponent implements OnInit {
     return this.openInfoModalRef.result;
   }
 
+  openCustomInfoModal(title: string, content: string){
+    this.comboBoxService.externalCloseComboAndHideDropdown();
+    this.infoModalTitle = title;
+    this.infoModalContent = content;
+    this.spinner.forceHide();
+    this.openInfoModalRef = this.modalService.open(this.infoModalRef, {centered: true, windowClass: 'modal-holder info-modal', backdrop: 'static', keyboard: false});
+    return this.openInfoModalRef.result;
+  }
+
   closeInfoModal(){
     this.openInfoModalRef?.close();
     this.openInfoModalRef = null;
+    this.infoModalAdditionalContent = '';
   }
 
   isInfoModalOpen(){
@@ -86,7 +97,7 @@ export class GlobalModalsComponent implements OnInit {
 
   openErrorModal(content: any){
     this.comboBoxService.externalCloseComboAndHideDropdown();
-    this.errorModalContent = JSON.stringify(content);
+    this.errorModalContent = content.toString();
     this.spinner.forceHide();
     this.openErrorModalRef = this.modalService.open(this.errorModalRef, {centered: true, windowClass: 'modal-holder error-modal', backdrop: 'static', keyboard: false});
     return this.openErrorModalRef.result;

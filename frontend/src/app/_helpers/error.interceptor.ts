@@ -25,51 +25,52 @@ export class ErrorInterceptor implements HttpInterceptor {
                             this.globalModalsService.closeInfoModal();
                         }));
                     }
-                    return EMPTY;
                 }
 
                 if(request.url.startsWith(environment.authApiUrl) && this.authenticationService.isLoggedIn()){
-                    if(err.status === 403){
-                        if(!this.globalModalsService.isErrorModalOpen()){
-                            this.globalModalsService.openErrorModal(err.error.message || err).then(() => {
-                                this.globalModalsService.closeErrorModal();
-                            });
-                        }
-                        return EMPTY;
-                    }
-
-                    if(err.status === 401){
-                        this.authenticationService.logout().then(() => {
-                            setTimeout(() => {
-                                if(!this.globalModalsService.isErrorModalOpen()){
-                                    this.globalModalsService.openErrorModal(err.error.message || err).then(() => {
-                                        this.globalModalsService.closeErrorModal();
-                                    });
-                                }
-                            }, 0);
-                        });
-                        
-                        return EMPTY;
-                    }
+                    this.authenticationService.logout().then(() => {
+                        setTimeout(() => {
+                            if(!this.globalModalsService.isErrorModalOpen()){
+                                this.globalModalsService.openErrorModal(err.error.message || err).then(() => {
+                                    this.globalModalsService.closeErrorModal();
+                                });
+                            }
+                        }, 0);
+                    });
                 }
+
             }
 
             
             if (err instanceof HttpErrorResponse && (err.status === 0)) {
 
+                
                 this.spinner.forceHide();
-                err.error.message = "Az autentikációs szerver nem válaszol.";
+                err.error.message = (request.url.startsWith(environment.authApiUrl) ? "Az autentikációs szerver nem válaszol." : "Az szerver nem válaszol.") +" Kérem próbálja meg később."
 
                 if(this.authenticationService.isLoggedIn()){
                     if(!this.globalModalsService.isErrorModalOpen()){
-                        this.globalModalsService.openErrorModal(err.error.message || err).then(() => {
+                        this.globalModalsService.openErrorModal(err.error.message).then(() => {
                             this.globalModalsService.closeErrorModal();
                         });
                     }
-                    return EMPTY;
                 }
 
             }
+
+
+            if(err instanceof HttpErrorResponse && (err.status === 406)){
+                this.authenticationService.logout().then(() => {
+                    setTimeout(() => {
+                        if(!this.globalModalsService.isInfoModalOpen()){
+                            this.globalModalsService.openCustomInfoModal('Változás', err.error.message || err).then((() => {
+                                this.globalModalsService.closeInfoModal();
+                            }));
+                        }
+                    }, 0);
+                });
+            }
+
             
 
 

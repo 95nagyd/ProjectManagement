@@ -22,7 +22,7 @@
 .modal-body #global-modal-content{
   font-size: 18px; 
   font-weight: 600;
-  white-space: pre-wrap;
+  white-space: pre-line;
   word-break: break-word;
 }
 
@@ -65,8 +65,7 @@
 
 /*--- Error modal ---*/
 .error-modal .modal-dialog {
-  width: 500px;
-  word-break: break-word;
+  width: fit-content;
 }
 
 [class*="error-modal"] .modal-header {
