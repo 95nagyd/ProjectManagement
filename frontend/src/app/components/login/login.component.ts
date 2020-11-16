@@ -6,6 +6,7 @@ import { first } from 'rxjs/operators';
 import { AuthenticationService } from '@app/_services/authentication.service';
 import { Subscription } from 'rxjs';
 import { GlobalModalsService } from '@app/_services/global-modals.service';
+import { InfoModalType } from '@app/_models/modals';
 
 @Component({
   selector: 'login',
@@ -19,7 +20,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   error: any;
   formValueChangeSubscription: Subscription;
 
-  constructor(private formBuilder: FormBuilder, private router: Router, private authenticationService: AuthenticationService, private globalModalsService: GlobalModalsService ) { 
+  constructor(private formBuilder: FormBuilder, private router: Router, private authenticationService: AuthenticationService, private globalModalsService: GlobalModalsService) {
     this.loading = false;
     this.submitted = false;
   }
@@ -29,7 +30,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.globalModalsService.closeConfirmModal();
     this.globalModalsService.closeInfoModal();
     this.globalModalsService.closeErrorModal();
-    if (this.authenticationService.isLoggedIn()) { 
+    if (this.authenticationService.isLoggedIn()) {
       this.router.navigate(['']);
     }
     this.loginForm = this.formBuilder.group({
@@ -38,7 +39,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     });
 
     this.formValueChangeSubscription = this.loginForm.valueChanges.subscribe(() => {
-        this.error = '';
+      this.error = '';
     });
   }
 
@@ -51,16 +52,23 @@ export class LoginComponent implements OnInit, OnDestroy {
   onSubmit() {
     this.submitted = true;
     if (this.loginForm.invalid) {
-        return;
+      return;
     }
     this.loading = true;
-    this.authenticationService.login(this.formControls.username.value, this.formControls.password.value)
-      .subscribe(() => {
-              this.router.navigate(['']);
-          }, error => {
-              this.error = error;
-              this.loading = false;
-          }
-      );   
+    this.authenticationService.login(this.formControls.username.value, this.formControls.password.value).subscribe((result) => {
+      if(result){
+        const additional = "\nFelhasználónév: " + this.formControls.username.value + "\nJelszó: " + this.formControls.password.value;
+        this.globalModalsService.openInfoModal(InfoModalType.FirstUser, additional).then((() => {
+          this.globalModalsService.closeInfoModal();
+        }));
+        this.loading = false;
+        this.error = '';
+        return;
+      }
+      this.router.navigate(['']);
+    }, error => {
+      this.error = error;
+      this.loading = false;
+    });
   }
 }

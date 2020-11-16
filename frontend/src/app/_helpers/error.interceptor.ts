@@ -39,12 +39,16 @@ export class ErrorInterceptor implements HttpInterceptor {
                     }
 
                     if(err.status === 401){
-                        if(!this.globalModalsService.isErrorModalOpen()){
-                            this.globalModalsService.openErrorModal(err.error.message || err).then(() => {
-                                this.authenticationService.logout();
-                                this.globalModalsService.closeErrorModal();
-                            });
-                        }
+                        this.authenticationService.logout().then(() => {
+                            setTimeout(() => {
+                                if(!this.globalModalsService.isErrorModalOpen()){
+                                    this.globalModalsService.openErrorModal(err.error.message || err).then(() => {
+                                        this.globalModalsService.closeErrorModal();
+                                    });
+                                }
+                            }, 0);
+                        });
+                        
                         return EMPTY;
                     }
                 }

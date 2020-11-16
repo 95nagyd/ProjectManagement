@@ -23,8 +23,8 @@ export class GlobalModalsService {
     this.globalModals?.closeConfirmModal();
   }
 
-  openInfoModal(modalType: InfoModalType): Promise<any>{
-    return this.globalModals.openInfoModal(modalType);
+  openInfoModal(modalType: InfoModalType, additionalContent?: string): Promise<any>{
+    return this.globalModals.openInfoModal(modalType, additionalContent);
   }
 
   closeInfoModal(){

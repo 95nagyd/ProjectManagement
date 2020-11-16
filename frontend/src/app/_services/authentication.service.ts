@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { map, take } from 'rxjs/operators';
+import { catchError, map, take } from 'rxjs/operators';
 import { JwtHelperService } from '@auth0/angular-jwt';
 
 import { environment } from '@environments/environment';
 import { SpinnerService } from '@app/_services/spinner.service';
 import { User } from '@app/_models/user';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { Router } from '@angular/router';
 import { GlobalModalsService } from './global-modals.service';
 import { ConfirmModalType, InfoModalType } from '@app/_models/modals';
@@ -22,6 +22,7 @@ export class AuthenticationService {
   private jwtHelper: JwtHelperService;
   private currentUser: User;
 
+
   constructor(private http: HttpClient, private spinner: SpinnerService, private router: Router, private globalModalsService: GlobalModalsService) {
     this.jwtHelper = new JwtHelperService();
   }
@@ -36,12 +37,13 @@ export class AuthenticationService {
   login(username: string, password: string): Observable<any> {
     return this.http.post<any>(`${environment.authApiUrl}/login`, { username, password })
         .pipe(map(res => {
+            if(res.username){ return res; }
             if (res.accessToken && res.refreshToken) {
               localStorage.setItem(this.ACCESS_TOKEN, res.accessToken);
               localStorage.setItem(this.REFRESH_TOKEN, res.refreshToken);
               this.currentUser = new User(this.getAccessTokenPayload());
             }
-        }))
+        }));
   }
 
   logout() {
@@ -53,21 +55,19 @@ export class AuthenticationService {
         refreshToken: this.getRefreshToken()
       }
     };
-
     this.spinner.forceHide();
-    this.router.navigate(['/login']);
     localStorage.removeItem(this.ACCESS_TOKEN);
     localStorage.removeItem(this.REFRESH_TOKEN);
     this.currentUser = null;
-    
     this.http.delete<any>(`${environment.authApiUrl}/logout`, options).pipe(take(1)).subscribe();
+    return this.router.navigate(['/login']);
   }
 
-  renewAccessToken(): Observable<any> {
-    return this.http.post<any>(`${environment.authApiUrl}/token`, { refreshToken: this.getRefreshToken() })
-        .pipe(map(res => {
-          localStorage.setItem(this.ACCESS_TOKEN, res.accessToken);
-        }));
+
+  renewAccessToken(){
+    return this.http.post<any>(`${environment.authApiUrl}/token`, { refreshToken: this.getRefreshToken() }).pipe(take(1)).subscribe((res) => {
+      localStorage.setItem(this.ACCESS_TOKEN, res.accessToken);
+    });
   }
 
   getCurrentUser(): User { return this.currentUser; }

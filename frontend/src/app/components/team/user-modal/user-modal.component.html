@@ -1,18 +1,18 @@
 <ng-template #modal let-modal >
     
-  <div class="modal-header" style="background-color: rgb(66, 164, 255);">
+  <div class="modal-header">
 
-    <div class="modal-title" id="modal-add" style="display: flex; flex-direction: row;">
-        <i [ngClass]="state === 'add' ? 'fa fa-user-plus' : 'fa fa-pencil-square-o'" aria-hidden="true" style="font-weight: bold; align-self: center; padding-right: 10px; font-size: 24px;"></i>
-        <span class="modal-title" style="font-weight: bold; font-size: 18px;">{{state === 'add' ? 'Új felhasználó hozzáadása' : 'Felhasználó szerkesztése' }}</span>
+    <div class="modal-title d-flex flex-row" id="modal-user">
+        <i [ngClass]="state === 'add' ? 'fa fa-user-plus' : 'fa fa-pencil-square-o'" aria-hidden="true"></i>
+        <span>{{state === 'add' ? 'Új felhasználó hozzáadása' : 'Felhasználó szerkesztése' }}</span>
     </div>
 
   </div>
 
   <div class="modal-body">
-    <form id="userFormId" [formGroup]="userForm" (ngSubmit)="userForm.valid && this.userForm.dirty && save();" class="w-100" style="text-align: center;" ngbAutofocus>
+    <form id="userFormId" [formGroup]="userForm" (ngSubmit)="userForm.valid && this.userForm.dirty && save();" class="w-100 text-center" ngbAutofocus>
         <!-- Felhasználónév -->
-        <mat-form-field appearance="outline" style="width: 300px;">
+        <mat-form-field appearance="outline">
             <mat-label>Felhasználónév</mat-label>
             <input formControlName="username" matInput #username autocomplete="off" required (focus)="onFocus('username');" (blur)="onBlur('username');">
 
@@ -32,11 +32,11 @@
         </mat-form-field>
 
         <!-- Jelszó -->
-        <mat-form-field appearance="outline" style="width: 300px;">
+        <mat-form-field appearance="outline">
             <mat-label>{{state === 'add' ? 'Jelszó' : 'Új jelszó' }}</mat-label>
             <input formControlName="password" matInput #password="matInput" autocomplete="off" [type]="isPassVisible ? 'text' : 'password'" [required]="this.state !== 'edit'" (focus)="onFocus('password');" (blur)="onBlur('password');">
             <span matSuffix>
-                <i [ngClass]="isPassVisible ? 'fa fa-eye' : 'fa fa-eye-slash'" (click)="isPassVisible = !isPassVisible;" style="font-size: 16px; color: rgb(224, 224, 224); cursor: pointer;" [ngStyle]="{'color': password.focused ? 'rgb(0, 0, 0)' : 'rgb(224, 224, 224)'}" aria-hidden="true"></i>
+                <i id="pass-eye" [ngClass]="isPassVisible ? 'fa fa-eye' : 'fa fa-eye-slash'" (click)="isPassVisible = !isPassVisible;" [ngStyle]="{'color': password.focused ? 'rgb(0, 0, 0)' : 'rgb(224, 224, 224)'}" aria-hidden="true"></i>
             </span>
 
             <mat-error *ngIf="userFormControls.password.hasError('required')">
@@ -51,18 +51,17 @@
         </mat-form-field>
 
         <!-- Szerepkör -->
-        <div style="display: flex; flex-direction: column; width: 300px; text-align: left; margin: auto; padding-bottom: 5px;">
-            <span style="font-size: 13px; padding-left: 12px;">Szerepkör</span>
+        <div id="role-form-field" class="d-flex flex-column text-left mx-auto">
+            <span>Szerepkör</span>
             <mat-radio-group formControlName="role"
-                             aria-labelledby="role-radio-group-label"
-                             style="padding-left: 12px; padding-top: 5px;">
+                             aria-labelledby="role-radio-group-label">
                 <mat-radio-button value="user">Felhasználó</mat-radio-button>
-                <mat-radio-button value="admin" style="padding-left: 20px;">Admin</mat-radio-button>
+                <mat-radio-button value="admin">Admin</mat-radio-button>
             </mat-radio-group>
         </div>
 
         <!-- Titulus -->
-        <mat-form-field appearance="outline" style="width: 300px;">
+        <mat-form-field appearance="outline">
             <mat-label>Titulus</mat-label>
             <input formControlName="title" matInput #title autocomplete="off" (focus)="onFocus('title');" (blur)="onBlur('title');">
 
@@ -74,7 +73,7 @@
         </mat-form-field>
 
         <!-- Vezetéknév -->
-        <mat-form-field appearance="outline" style="width: 300px;">
+        <mat-form-field appearance="outline">
             <mat-label>Vezetéknév</mat-label>
             <input formControlName="lastname" matInput #lastname autocomplete="off" required (focus)="onFocus('lastname');" (blur)="onBlur('lastname');">
 
@@ -90,7 +89,7 @@
         </mat-form-field>
 
         <!-- Középső név -->
-        <mat-form-field appearance="outline" style="width: 300px;">
+        <mat-form-field appearance="outline">
             <mat-label>Középső név</mat-label>
             <input formControlName="middlename" matInput #middlename autocomplete="off" (focus)="onFocus('middlename');" (blur)="onBlur('middlename');">
 
@@ -102,7 +101,7 @@
         </mat-form-field>
 
         <!-- Keresztnév -->
-        <mat-form-field appearance="outline" style="width: 300px;">
+        <mat-form-field appearance="outline">
             <mat-label>Keresztnév</mat-label>
             <input formControlName="firstname" matInput #firstname autocomplete="off" required (focus)="onFocus('firstname');" (blur)="onBlur('firstname');">
 
@@ -118,7 +117,7 @@
         </mat-form-field>
         
         <!-- Telefonszám -->
-        <mat-form-field appearance="outline" style="width: 300px;">
+        <mat-form-field appearance="outline">
             <mat-label>Telefonszám</mat-label>
             <input formControlName="telephone" matInput #telephone autocomplete="off" type="tel" (focus)="onFocus('telephone');" (blur)="onBlur('telephone');">
 
@@ -132,7 +131,7 @@
         </mat-form-field>
 
         <!-- E-mail -->
-        <mat-form-field appearance="outline" style="width: 300px;">
+        <mat-form-field appearance="outline">
             <mat-label>E-mail cím</mat-label>
             <input formControlName="email" matInput #email autocomplete="off" type="email" (focus)="onFocus('email');" (blur)="onBlur('email');">
 
@@ -148,8 +147,8 @@
     </form>
   </div>
   <div class="modal-footer">
-    <button type="submit" form="userFormId" [disabled]="!userForm.valid || !this.userForm.dirty" class="btn btn-success" style="outline: none;">Mentés</button>
-    <button type="button" class="btn btn-secondary" style="outline: none;" (click)="modal.dismiss()">Bezárás</button>
+    <button type="submit" form="userFormId" [disabled]="!userForm.valid || !this.userForm.dirty" class="btn btn-success">Mentés</button>
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Bezárás</button>
   </div>
 </ng-template>
 

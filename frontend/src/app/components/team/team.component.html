@@ -1,5 +1,6 @@
 <user-modal *ngIf="users && !selectedUser && isAdmin"
-            (onClose)="refreshUserList();"></user-modal>
+            (onClose)="refreshUserList();">
+</user-modal>
 
 <div *ngIf="users && !selectedUser" 
      class="list-container">
@@ -64,5 +65,6 @@
 
 <working-time-calendar  *ngIf="users && selectedUser"
                         [isEditable]="false" 
-                        [user]="selectedUser">
+                        [user]="selectedUser"
+                        (backFunction)="selectUser();">
 </working-time-calendar>

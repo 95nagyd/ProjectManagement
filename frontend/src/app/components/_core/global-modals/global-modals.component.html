@@ -1,57 +1,58 @@
 <ng-template #confirmModal let-modal>
-    <div class="modal-header" style="background-color: rgb(129, 194, 255);">
+    <div class="modal-header">
 
-        <div class="modal-title" id="modal-add" style="display: flex; flex-direction: row;">
-            <i class="fa fa-question-circle-o" aria-hidden="true" style="font-weight: bold; align-self: center; padding-right: 10px; font-size: 24px;"></i>
-            <span class="modal-title" style="font-weight: bold; font-size: 18px;">{{confirmModalTitle}}</span>
+        <div class="modal-title d-flex flex-row" id="modal-confirm">
+            <i class="fa fa-question-circle-o" aria-hidden="true"></i>
+            <span>{{confirmModalTitle}}</span>
         </div>
 
     </div>
 
     <div class="modal-body" ngbAutofocus>
-        <div style="font-size: 18px; font-weight: 600;">{{confirmModalContent}}</div>
+        <div id="global-modal-content">{{confirmModalContent}}</div>
     </div>
 
     <div class="modal-footer">
-        <button type="button" class="btn btn-primary" style="outline: none;" (click)="modal.close(true)">Igen</button>
-        <button type="button" class="btn btn-primary" style="outline: none;" (click)="modal.close(false)">Nem</button>
+        <button type="button" class="btn btn-primary" (click)="modal.close(true)">Igen</button>
+        <button type="button" class="btn btn-primary" (click)="modal.close(false)">Nem</button>
     </div>
 </ng-template>
 
 <ng-template #infoModal let-modal>
-    <div class="modal-header" style="background-color: rgb(129, 194, 255);">
+    <div class="modal-header">
 
-        <div class="modal-title" id="modal-add" style="display: flex; flex-direction: row;">
-            <i class="fa fa-info-circle" aria-hidden="true" style="font-weight: bold; align-self: center; padding-right: 10px; font-size: 24px;"></i>
-            <span class="modal-title" style="font-weight: bold; font-size: 18px;">{{infoModalTitle}}</span>
+        <div class="modal-title d-flex flex-row" id="modal-info">
+            <i class="fa fa-info-circle" aria-hidden="true"></i>
+            <span>{{infoModalTitle}}</span>
         </div>
 
     </div>
 
     <div class="modal-body" ngbAutofocus>
-        <div style="font-size: 18px; font-weight: 600;">{{infoModalContent}}</div>
+        <div id="global-modal-content">{{infoModalContent}}</div>
+        <div *ngIf="infoModalAdditionalContent" id="global-modal-content">{{infoModalAdditionalContent}}</div>
     </div>
 
     <div class="modal-footer">
-        <button type="button" class="btn btn-primary" style="outline: none;" (click)="modal.close()">Oké</button>
+        <button type="button" class="btn btn-primary" (click)="modal.close()">Oké</button>
     </div>
 </ng-template>
 
 <ng-template #errorModal let-modal>
-    <div class="modal-header" style="background-color: rgb(233, 54, 34);">
+    <div class="modal-header">
 
-        <div class="modal-title" id="modal-add" style="display: flex; flex-direction: row; color: rgb(232, 232, 232);">
-            <i class="fa fa-exclamation-circle" aria-hidden="true" style="font-weight: bold; align-self: center; padding-right: 10px; font-size: 24px;"></i>
-            <span class="modal-title" style="font-weight: bold; font-size: 18px;">Hiba</span>
+        <div class="modal-title d-flex flex-row" id="modal-error">
+            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+            <span>Hiba</span>
         </div>
 
     </div>
 
     <div class="modal-body" ngbAutofocus>
-        <div style="font-size: 18px; font-weight: 600;">{{errorModalContent}}</div>
+        <div id="global-modal-content">{{errorModalContent}}</div>
     </div>
 
     <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" style="outline: none;" (click)="modal.close()">Oké</button>
+        <button type="button" class="btn btn-secondary" (click)="modal.close()">Oké</button>
     </div>
 </ng-template>

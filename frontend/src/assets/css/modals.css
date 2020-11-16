@@ -1,0 +1,168 @@
+.modal-holder{
+  animation-name: open;
+  animation-duration: 0.3s;
+}
+
+.modal-dialog{
+  margin: auto;
+}
+
+.modal-title i {
+  font-weight: bold; 
+  align-self: center; 
+  padding-right: 10px; 
+  font-size: 24px;
+}
+
+.modal-title span {
+  font-weight: bold; 
+  font-size: 18px;
+}
+
+.modal-body #global-modal-content{
+  font-size: 18px; 
+  font-weight: 600;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+
+@keyframes open {
+  0%   {transform: scale(0.5)}
+  100% {transform: scale(1)}
+}
+
+/*--- Confirm modal ---*/
+.confirm-modal-discard .modal-dialog {
+  width: 445px;
+}
+
+.confirm-modal-delete .modal-dialog {
+  width: 320px;
+}
+
+[class*="confirm-modal"] .modal-header {
+  background-color: rgb(129, 194, 255);
+}
+
+
+
+
+
+
+
+
+/*--- Info modal ---*/
+.info-modal .modal-dialog {
+  width: 325px;
+}
+
+[class*="info-modal"] .modal-header {
+  background-color: rgb(129, 194, 255);
+}
+
+
+
+/*--- Error modal ---*/
+.error-modal .modal-dialog {
+  width: 500px;
+  word-break: break-word;
+}
+
+[class*="error-modal"] .modal-header {
+  background-color: rgb(233, 54, 34);
+}
+
+[class*="error-modal"] .modal-title {
+  color: rgb(232, 232, 232);
+}
+
+
+
+
+
+
+
+
+/*--- User modal ---*/
+.user-modal .modal-dialog {
+  width: 350px;
+}
+
+.user-modal .modal-header {
+  background-color: rgb(66, 164, 255);
+}
+
+.user-modal #userFormId mat-form-field{
+  width: 300px;
+}
+
+.user-modal #pass-eye {
+  font-size: 16px; 
+  color: rgb(224, 224, 224); 
+  cursor: pointer;
+}
+
+.user-modal #userFormId #role-form-field{
+  width: 300px; 
+  padding-bottom: 5px;
+}
+
+.user-modal #userFormId #role-form-field span{
+  font-size: 13px; 
+  padding-left: 12px;
+}
+
+.user-modal #userFormId #role-form-field mat-radio-group{
+  padding-left: 12px; 
+  padding-top: 5px;
+}
+
+.user-modal #userFormId #role-form-field mat-radio-group mat-radio-button:not(:first-of-type){
+  padding-left: 20px;
+}
+
+
+.user-modal .mat-form-field-hint-spacer {
+  display: none;
+}
+
+.user-modal .mat-form-field-flex > .mat-form-field-infix { 
+  padding: 0.4em 0px !important;
+}
+
+.user-modal .mat-form-field-flex > .mat-form-field-suffix { 
+  padding: 0.3em 0px !important;
+}
+
+.user-modal .mat-form-field-appearance-outline .mat-form-field-suffix {
+  top: -0.25em !important;
+}
+
+.user-modal .mat-form-field-label-wrapper { 
+  top: -1.5em; 
+}
+
+.user-modal .mat-form-field-appearance-outline.mat-form-field-can-float.mat-form-field-should-float .mat-form-field-label {
+  transform: translateY(-1.1em) scale(.75);
+  width: 133.33333%;
+}
+
+.user-modal .mat-form-field-flex:hover i {
+  color: rgb(0, 0, 0) !important;
+}
+
+.user-modal .mat-radio-button.mat-accent.mat-radio-checked .mat-radio-outer-circle {
+  border-color:rgb(66, 134, 244); 
+}
+
+.user-modal .mat-radio-button.mat-accent .mat-radio-inner-circle{
+  color:rgb(66, 134, 244);
+  background-color:rgb(66, 134, 244);
+}
+
+.user-modal .mat-radio-button.mat-accent .mat-radio-ripple .mat-ripple-element {
+  background-color:rgba(39, 0, 148, 0.747);
+}
+
+

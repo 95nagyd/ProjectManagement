@@ -55,8 +55,11 @@ export class TeamComponent implements OnInit {
     return this.userService.getFullName(user);
   }
 
-  selectUser(user: User){
-    this.selectedUser = user;
+  selectUser(user?: User){
+    this.selectedUser = user || null;
+    if(!user){
+      this.refreshUserList();
+    }
   }
 
   openUserModal(modifyUser?: User){

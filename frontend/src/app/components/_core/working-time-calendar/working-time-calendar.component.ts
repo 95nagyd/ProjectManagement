@@ -24,6 +24,7 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
 
   @Input() isEditable: Boolean;
   @Input() user?: User;
+  @Output() backFunction?: EventEmitter<void>;
 
   userFullName: string;
 
@@ -53,10 +54,11 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
   subtaskList: string[];
   editingComment: { dayNumber: number, dataIndex: number }
 
-  
-  //TODO: vissza gomb
-  //TODO: style-ok classra cserélése
-  //TODO: gombok szürkék hover-re lesz árnyék + fekete
+
+  //TODO: hiba modalok, 
+
+  //TODO: elnavigáláskor elvatés modál (menupontnál)
+
   //TODO: első időszak ha nincs senkinek akkor -1 a minperiod az aktuális hónap 
   //TODO: az első töltésig (bárkié) lehessen visszamenni
   //TODO: munkaidő millisec-be legyen tárolva
@@ -78,6 +80,7 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
       
       
       this.spinner.show();
+      this.backFunction = new EventEmitter();
       this.calendarService.getFirstSavedPeriod().subscribe((firstPeriod) => {
         console.log("firstPeriod:"+ firstPeriod)
         this.spinner.hide();
@@ -204,6 +207,10 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
         this.spinner.forceHide();
       });
     }
+  }
+
+  back(){
+    this.backFunction.emit();
   }
 
   addEmptyRow(dayNumber: number) { this.calendarViewData[dayNumber].push(new CalendarDayData()); }
@@ -363,6 +370,8 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
       this.spinner.hide();
     }, error => {
       //TODO: modal
+      //TODO: IDE ha nincs combo elem akkor be kell pirosozni azt a kombót
+      //TODO: mentéskor ellenőrizni, hogy megvan-e még a mentendő combo elem
       console.log("nem siker modal")
       this.spinner.forceHide();
     });

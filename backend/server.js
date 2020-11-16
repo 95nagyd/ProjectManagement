@@ -30,6 +30,12 @@ app.use(function (req, res, next) {
 
 app.get('/users', verifyToken, (req, res) => {
     userService.getUsers({}).then((users) => {
+        console.log(users)
+        users.forEach((user) => {
+            delete user.salt;
+            delete user.password;
+        });
+        console.log(users)
         res.status(200).json(users);
     }, (error) => {
         res.status(400).json({ message: error });
@@ -38,16 +44,16 @@ app.get('/users', verifyToken, (req, res) => {
 
 app.post('/saveUser', verifyToken, (req, res) => {
     console.log(req.body.user)
+    //TODO ha van jelszó akkor hashelni
     if(req.body.user._id === '-1'){
         userService.addUser(req.body.user).then(() => {
-            res.status(200).send();
+            res.status(201).send();
         }, (error) => {
-
             res.status(422).send({ message: error });
         });
     } else {
         userService.saveUser(req.body.user).then(() => {
-            res.status(200).send();
+            res.status(201).send();
         }, (error) => {
             res.status(422).send({ message: error });
         });
@@ -75,7 +81,7 @@ app.get('/workingTime/:userId/:period', verifyToken, (req, res) => {
 
 app.post('/workingTime/save/:period', verifyToken, (req, res) => {
     workingTimeService.saveCurrentUserWorkingTimeByGivenPeriod(req.user._id, req.params.period, req.body.workingTime).then(() => {
-        res.status(200).send();
+        res.status(201).send();
     }, (error) => {
         res.status(422).send({ message: error });
     });
@@ -98,9 +104,14 @@ function verifyToken(req, res, next){
     const token = authHeader && authHeader.split(' ')[1];
     if(token == null) return res.status(401).json({ message: "Azonosítási hiba. Folytatáshoz jelentkezzen be újra." });
     return jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-        if(err) return res.status(403).json({ message: "Azonosítási hiba. Folytatáshoz jelentkezzen be újra." });
-        req.user = user;
-        next();
+        if(err) return res.status(401).json({ message: "Azonosítási hiba. Folytatáshoz jelentkezzen be újra." });
+        return userService.getUsers({ username: user.username }).then(async (users) => {
+            if(users.length !== 1) return res.status(401).json({ message: "Azonosítási hiba. Folytatáshoz jelentkezzen be újra." });
+            req.user = user;
+            return next();
+        }, (error) => {
+            return res.status(500).json({ message: "Adatbázis elérési hiba!" });
+        });
     });
 }
 

@@ -16,12 +16,17 @@ export const ConfirmModalData = {
 }
 
 export enum InfoModalType {
-  Expired = 'expired'
+  Expired = 'expired',
+  FirstUser = 'firstuser'
 }
 
 export const InfoModalData = {
   'expired' : {
     title: 'Lejárt időkeret',
     content: 'A rendelkezésre álló időkeret lejárt.\nFolytatáshoz jelentkezzen be újra.'
+  },
+  'firstuser' : {
+    title: 'Első felhasználó',
+    content: 'Az első felhasználó automatikusan hozzáadsra került.'
   }
 }

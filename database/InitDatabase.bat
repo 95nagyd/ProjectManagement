@@ -1,0 +1,3 @@
+@echo off
+echo Setting initial data and options database...
+mongo localhost/appDB ./appDB/init.js

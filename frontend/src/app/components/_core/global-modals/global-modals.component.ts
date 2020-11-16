@@ -20,6 +20,7 @@ export class GlobalModalsComponent implements OnInit {
   @ViewChild('infoModal') infoModalRef: ElementRef;
   infoModalTitle: string;
   infoModalContent: string;
+  infoModalAdditionalContent: string;
   openInfoModalRef: any;
 
   @ViewChild('errorModal') errorModalRef: ElementRef;
@@ -60,12 +61,13 @@ export class GlobalModalsComponent implements OnInit {
 
 
 
-  openInfoModal(modalType: InfoModalType){
+  openInfoModal(modalType: InfoModalType, additionalContent?: string){
     this.comboBoxService.externalCloseComboAndHideDropdown();
     this.infoModalTitle = InfoModalData[modalType].title;
     this.infoModalContent = InfoModalData[modalType].content;
+    this.infoModalAdditionalContent = additionalContent;
     this.spinner.forceHide();
-    this.openInfoModalRef = this.modalService.open(this.infoModalRef, {centered: true, windowClass: 'modal-holder info-modal-' + modalType, backdrop: 'static', keyboard: false});
+    this.openInfoModalRef = this.modalService.open(this.infoModalRef, {centered: true, windowClass: 'modal-holder info-modal', backdrop: 'static', keyboard: false});
     return this.openInfoModalRef.result;
   }
 

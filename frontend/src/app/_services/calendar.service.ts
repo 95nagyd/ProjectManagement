@@ -33,11 +33,7 @@ export class CalendarService {
   }
 
   getFirstSavedPeriod(): Observable<any> {
-    return this.http.get<any>(`${environment.apiUrl}/firstPeriod`).pipe(
-      map(data => {
-        return data;
-      })
-    );
+    return this.http.get<any>(`${environment.apiUrl}/firstPeriod`);
   }
 
 }
