@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ComboBoxDropdownComponent } from '@app/components/_core/combo-box/combo-box-dropdown/combo-box-dropdown.component';
 import { ComboBoxComponent } from '@app/components/_core/combo-box/combo-box.component';
+import { BasicElement } from '@app/_models/basic-data';
 
 @Injectable({
   providedIn: 'root'
@@ -69,10 +70,9 @@ export class ComboBoxService {
     this.comboBoxDropdown.hide();
   }
 
-  updateDropdown(choices: string[], chosen?: string){
+  updateDropdown(choices: Array<BasicElement>, chosenName?: string){
     this.comboBoxDropdown.choices = choices;
-    
-    if(chosen) this.comboBoxDropdown.chosen = chosen;
+    if(chosenName) this.comboBoxDropdown.chosenName = chosenName;
   }
 
   isLastClickOutOfDropdown(){

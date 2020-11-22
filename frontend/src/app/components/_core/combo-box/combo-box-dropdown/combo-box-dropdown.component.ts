@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { BasicElement } from '@app/_models/basic-data';
 import { ComboBoxService } from '@app/_services/combo-box.service';
 import { PageContentScrollOffsetService } from '@app/_services/page-content-scroll-offset.service';
 import { ComboBoxComponent } from '../combo-box.component';
@@ -12,8 +13,8 @@ export class ComboBoxDropdownComponent implements OnInit {
 
   isVisible: Boolean;
   styleData: any;
-  chosen: string;
-  choices: string[];
+  chosenName: string;
+  choices: Array<BasicElement>;
   isClickOutside: Boolean;
 
 
@@ -24,8 +25,8 @@ export class ComboBoxDropdownComponent implements OnInit {
 
     this.isVisible = false;
     this.styleData = {x: -2000, y:-2000, minWidth: 0};
-    this.chosen = '';
-    this.choices = [];
+    this.chosenName = '';
+    this.choices = new Array<BasicElement>();
     this.isClickOutside = false;
   }
 
@@ -33,12 +34,12 @@ export class ComboBoxDropdownComponent implements OnInit {
   }
 
   isExactMatch(){
-    return this.choices.includes(this.chosen)
+    return !!this.choices.find((choice) => choice.name === this.chosenName)
   }
 
   show(){
     this.comboBoxService.getComboRefList().then((comboBoxRefList: ComboBoxComponent[]) => {
-      this.chosen = comboBoxRefList[0].searchValue;
+      this.chosenName = comboBoxRefList[0].searchValue;
       this.choices = comboBoxRefList[0].searchResult;
       this.setPosition();
     });

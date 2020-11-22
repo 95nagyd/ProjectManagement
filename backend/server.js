@@ -9,6 +9,7 @@ const app = express();
 
 const userService = require('./Services/userService');
 const workingTimeService = require('./Services/workingTimeService');
+const basicDataService = require('./Services/basicDataService');
 
 
 app.use(bodyParser.json());
@@ -16,6 +17,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.options('*', cors());
 
 //TODO: lekezelni a promise reject-eket
+//TODO: returnonli az osszes res-t
 
 app.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
@@ -92,6 +94,48 @@ app.get('/firstPeriod', verifyToken, (req, res) => {
         res.status(400).json({ message: error });
     });
 });
+
+app.get('/basicData/all', verifyToken, (req, res) => {
+    basicDataService.getBasicData().then((projects) => {
+        res.status(200).json(projects);
+    }, (error) => {
+        console.log(error)
+        res.status(400).json({ message: error });
+    });
+});
+
+app.get('/basicData/projects', verifyToken, (req, res) => {
+    basicDataService.getProjects({}).then((projects) => {
+        res.status(200).json(projects);
+    }, (error) => {
+        res.status(400).json({ message: error });
+    });
+});
+
+app.get('/basicData/designPhases', verifyToken, (req, res) => {
+    basicDataService.getDesignPhases({}).then((projects) => {
+        res.status(200).json(projects);
+    }, (error) => {
+        res.status(400).json({ message: error });
+    });
+});
+
+app.get('/basicData/structuralElements', verifyToken, (req, res) => {
+    basicDataService.getStructuralElements({}).then((projects) => {
+        res.status(200).json(projects);
+    }, (error) => {
+        res.status(400).json({ message: error });
+    });
+});
+
+app.get('/basicData/subtasks', verifyToken, (req, res) => {
+    basicDataService.getSubtasks({}).then((projects) => {
+        res.status(200).json(projects);
+    }, (error) => {
+        res.status(400).json({ message: error });
+    });
+});
+
 
 
 

@@ -5,6 +5,8 @@ import { Router } from '@angular/router';
 import { AuthenticationService } from '@app/_services/authentication.service';
 import { User } from '@app/_models/user';
 import { Role } from '@app/_models/role';
+import { GlobalModalsService } from '@app/_services/global-modals.service';
+import { ConfirmModalType } from '@app/_models/modals';
 
 @Component({
   selector: 'navbar',
@@ -32,9 +34,7 @@ export class NavbarComponent implements OnInit {
   isAnimationDisabled: boolean;
 
 
-  constructor(
-    private authenticationService: AuthenticationService
-  ) { 
+  constructor(private authenticationService: AuthenticationService) { 
     this.isNavbarCollapsed = this.isExpandable()
     this.isAnimationDisabled = false;
   }

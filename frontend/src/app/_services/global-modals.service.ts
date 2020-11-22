@@ -9,10 +9,21 @@ export class GlobalModalsService {
 
   private globalModals: GlobalModalsComponent;
 
-  constructor() { }
+  hasChanges: Boolean;
+
+  constructor() { 
+    this.hasChanges = false;
+  }
 
   register(globalModals: GlobalModalsComponent){
     this.globalModals = globalModals;
+  }
+
+  closeAllModal(){
+    this.hasChanges = false;
+    this.globalModals?.closeConfirmModal();
+    this.globalModals?.closeInfoModal();
+    this.globalModals?.closeErrorModal();
   }
 
   openConfirmModal(modalType: ConfirmModalType): Promise<any>{
@@ -20,6 +31,7 @@ export class GlobalModalsService {
   }
 
   closeConfirmModal(){
+    console.log("close")
     this.globalModals?.closeConfirmModal();
   }
 

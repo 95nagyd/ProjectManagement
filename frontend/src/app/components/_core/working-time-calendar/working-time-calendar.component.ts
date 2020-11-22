@@ -13,6 +13,8 @@ import { UserService } from '@app/_services/user.service';
 import { GlobalModalsService } from '@app/_services/global-modals.service';
 import { ConfirmModalType } from '@app/_models/modals';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { BasicDataService } from '@app/_services/basic-data.service';
+import { BasicElement } from '@app/_models/basic-data';
 
 @Component({
   selector: 'working-time-calendar',
@@ -48,11 +50,16 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
   calendarViewData: CalendarData;
   calendarOldData: CalendarData;
 
-  projectList: string[];
-  designPhaseList: string[];
-  structuralElementList: string[];
-  subtaskList: string[];
+  projectList: Array<BasicElement>;
+  designPhaseList: Array<BasicElement>;
+  structuralElementList: Array<BasicElement>;
+  subtaskList: Array<BasicElement>;
+
   editingComment: { dayNumber: number, dataIndex: number }
+
+//TODO: calendarViewData-ba az elemek azok basicelement-ek
+//TODO: combobox chosen choices basicelement
+//TODO: updateCombo-ba ,megfelelően a basicelement-nek
 
 
   //TODO: hiba modalok, 
@@ -67,7 +74,7 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
 
     //TODO: havi összes munkaidő az utolsó nap után (legalább annyi hely kell , hogy az utolsó nap max magasságos tooltipje kiférjen)
 
-
+//TODO: kötelező oszlopok címébe *
     
     //TODO: subscribe-ok unsubscribe ngondestroyba
 
@@ -76,7 +83,8 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
     //TODO: képek css-ből legyenek
 
   constructor(private spinner: SpinnerService, private scrollOffsetService: PageContentScrollOffsetService, private calendarService: CalendarService, 
-    private userService: UserService, private globalModalsService: GlobalModalsService, private comboBoxService: ComboBoxService) { 
+    private userService: UserService, private globalModalsService: GlobalModalsService, private comboBoxService: ComboBoxService, 
+    private basicDataService: BasicDataService) { 
       
       
       this.spinner.show();
@@ -85,16 +93,25 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
         console.log("firstPeriod:"+ firstPeriod)
         this.spinner.hide();
       }, (error) => {
+        //TODO: hiba modal
         alert("nem sikerült lekérdezni az első mentett időszakot")
         this.spinner.forceHide();
       });
 
-      //TODO: ezek majd api hívások az adminservice-ből
-      this.projectList = ['Project1', 'Project2', 'Project3', 'Project11'];
-      this.designPhaseList = ['DesignPhase1', 'DesignPhase2', 'DesignPhase3'];
-      this.structuralElementList = ['StructuralElement1', 'StructuralElement2', 'StructuralElement3', 'StructuralElement4'];
-      this.subtaskList = ['Subtask1', 'Subtask2', 'Subtask3', 'Subtask4', 'Subtask5'];
-
+      this.spinner.show();
+      this.basicDataService.getAllBasicElements().subscribe((result) => {
+        console.log(result)
+        this.projectList = result.projects;
+        this.designPhaseList = result.designPhases;
+        this.structuralElementList = result.structuralElements;
+        this.subtaskList = result.subtasks;
+        this.spinner.hide();
+      }, (reject) => {
+        //TODO: hiba modal
+        console.log(reject)
+        this.spinner.forceHide();
+      });
+      
       this.chosenPeriod = new Date();
       this.chosenPeriod.setHours(0,0,0,0);
       this.chosenPeriod.setDate(1);
@@ -132,14 +149,16 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
 
   changeMonth(direction: string) {
     if(this.isCalendarDataChanged()){
-      this.globalModalsService.openConfirmModal(ConfirmModalType.Discard).then((result) => {
-        if(result){
+      this.globalModalsService.hasChanges = true;
+      this.globalModalsService.openConfirmModal(ConfirmModalType.Discard).then((isDiscardRequired) => {
+        if(isDiscardRequired){
           this.spinner.show();
           this.chosenPeriod.setMonth(this.chosenPeriod.getMonth() + (direction === 'previous' ? -1 : 1)); 
           this.calendarViewData = null;
           this.setPeriod();
           this.refreshCalendar();
           this.spinner.hide();
+          this.globalModalsService.hasChanges = false;
         }
         this.globalModalsService.closeConfirmModal();
       });
@@ -216,8 +235,9 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
   addEmptyRow(dayNumber: number) { this.calendarViewData[dayNumber].push(new CalendarDayData()); }
 
   deleteRow(dayNumber: number, rowIndex: number){ 
-    this.globalModalsService.openConfirmModal(ConfirmModalType.Delete).then((result) => {
-      if(result) { 
+    this.globalModalsService.openConfirmModal(ConfirmModalType.Delete).then((isDeleteRequired) => {
+      if(isDeleteRequired) {
+        this.globalModalsService.hasChanges = true;
         this.calendarViewData[dayNumber].splice(rowIndex, 1); 
       };
       this.globalModalsService.closeConfirmModal();
@@ -232,22 +252,22 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
     this.calendarViewData[dayNumber][dataIndex].workingTime = value;
   }
 
-  updateCombo(combo: string, chosen: string, dayNumber: number, dataIndex: number){
+  updateCombo(combo: string, chosenId: string, dayNumber: number, dataIndex: number){
     switch(combo) { 
       case 'project': { 
-        this.calendarViewData[dayNumber][dataIndex].project = chosen;
+        this.calendarViewData[dayNumber][dataIndex].projectId = chosenId;
          break; 
       } 
       case 'designPhase': { 
-        this.calendarViewData[dayNumber][dataIndex].designPhase = chosen;
+        this.calendarViewData[dayNumber][dataIndex].designPhaseId = chosenId;
          break; 
       } 
       case 'structuralElement': { 
-        this.calendarViewData[dayNumber][dataIndex].structuralElement = chosen;
+        this.calendarViewData[dayNumber][dataIndex].structuralElementId = chosenId;
          break; 
       } 
       case 'subtask': { 
-        this.calendarViewData[dayNumber][dataIndex].subtask = chosen;
+        this.calendarViewData[dayNumber][dataIndex].subtaskId = chosenId;
          break; 
       }
     }
@@ -313,7 +333,7 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
   }
 
   isDataRowEmpty(dataRow: CalendarDayData){
-    return (dataRow.workingTime === '00:00' && !dataRow.project && !dataRow.designPhase && !dataRow.structuralElement && !dataRow.subtask && !dataRow.comment);
+    return (dataRow.workingTime === '00:00' && !dataRow.projectId && !dataRow.designPhaseId && !dataRow.structuralElementId && !dataRow.subtaskId && !dataRow.comment);
   }
   
   validateCalendar(){
@@ -322,17 +342,17 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
     let isCalValid = true;
     for (const [dayKey, data] of Object.entries(temp)) {
       data?.forEach((dataRow: CalendarDayData, index: number) => {
-        if(dataRow.workingTime !== '00:00' || dataRow.project || dataRow.designPhase || dataRow.structuralElement || dataRow.subtask || dataRow.comment){
+        if(dataRow.workingTime !== '00:00' || dataRow.projectId || dataRow.designPhaseId || dataRow.structuralElementId || dataRow.subtaskId || dataRow.comment){
           const dayNumber = parseInt(dayKey)+1
           const dayText = (dayNumber < 10 ? '0' + dayNumber.toString() : dayNumber.toString()) + '.';
-          if(!dataRow.project){
+          if(!dataRow.projectId){
             isCalValid = false;
             this.projectComboList.filter(projectCombo => 
               projectCombo.elementRef.nativeElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.firstChild.firstChild.firstChild.textContent 
                 === dayText
             )[index].hasError = true;
           }
-          if(!dataRow.designPhase){
+          if(!dataRow.designPhaseId){
             isCalValid = false;
             this.designPhaseComboList.filter(designPhaseCombo => 
               designPhaseCombo.elementRef.nativeElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.firstChild.firstChild.firstChild.textContent 
@@ -364,14 +384,15 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
     let saveData = this.removeEmptyRows(this.calendarViewData);
     
     this.calendarService.saveWorkingTime(this.chosenPeriod.getTime(), saveData).subscribe((data) => {
+      this.globalModalsService.hasChanges = false;
       //TODO: toaster
       console.log("sikeres mentés toaster")
       this.updateCalendarViewData();
       this.spinner.hide();
     }, error => {
-      //TODO: modal
+      //TODO: hiba modal
       //TODO: IDE ha nincs combo elem akkor be kell pirosozni azt a kombót
-      //TODO: mentéskor ellenőrizni, hogy megvan-e még a mentendő combo elem
+      //TODO: mentéskor ellenőrizni, hogy megvan-e még a mentendő combo elem, ha nincs akkor haserror
       console.log("nem siker modal")
       this.spinner.forceHide();
     });

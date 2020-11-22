@@ -6,7 +6,7 @@ import { AuthenticationService } from '@app/_services/authentication.service';
 
 
 @Component({
-  selector: 'app-working-time',
+  selector: 'working-time',
   templateUrl: './working-time.component.html',
   styleUrls: ['./working-time.component.css']
 })

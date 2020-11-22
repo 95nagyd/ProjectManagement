@@ -11,10 +11,11 @@
 
   <div class="modal-body">
     <form id="userFormId" [formGroup]="userForm" (ngSubmit)="userForm.valid && this.userForm.dirty && save();" class="w-100 text-center" ngbAutofocus>
+
         <!-- Felhasználónév -->
-        <mat-form-field appearance="outline">
+        <mat-form-field appearance="outline" [ngStyle]="{'padding-bottom': calcPadding('username') }">
             <mat-label>Felhasználónév</mat-label>
-            <input formControlName="username" matInput #username autocomplete="off" required (focus)="onFocus('username');" (blur)="onBlur('username');">
+            <input formControlName="username" matInput #username autocomplete="off" required (keypress)="onKeyPress($event, 'username');">
 
             <mat-error *ngIf="userFormControls.username.hasError('required')">
                 A felhasználónév kitöltése kötelező!
@@ -27,14 +28,18 @@
             <mat-error *ngIf="userFormControls.username.hasError('notUnique')">
                 A felhasználónév foglalt!
             </mat-error>
+
+            <mat-error *ngIf="userFormControls.username.hasError('pattern')">
+                A felhasználónév csak ékezet nélküli betűket és számokat tartalmazhat!
+            </mat-error>
             
             <mat-hint class="hint-right">{{username.value.length}} / 20</mat-hint>
         </mat-form-field>
 
         <!-- Jelszó -->
-        <mat-form-field appearance="outline">
+        <mat-form-field appearance="outline" [ngStyle]="{'padding-bottom': calcPadding('password') }">
             <mat-label>{{state === 'add' ? 'Jelszó' : 'Új jelszó' }}</mat-label>
-            <input formControlName="password" matInput #password="matInput" autocomplete="off" [type]="isPassVisible ? 'text' : 'password'" [required]="this.state !== 'edit'" (focus)="onFocus('password');" (blur)="onBlur('password');">
+            <input formControlName="password" matInput #password="matInput" autocomplete="off" [type]="isPassVisible ? 'text' : 'password'" [required]="this.state !== 'edit'" (keypress)="onKeyPress($event, 'password');">
             <span matSuffix>
                 <i id="pass-eye" [ngClass]="isPassVisible ? 'fa fa-eye' : 'fa fa-eye-slash'" (click)="isPassVisible = !isPassVisible;" [ngStyle]="{'color': password.focused ? 'rgb(0, 0, 0)' : 'rgb(224, 224, 224)'}" aria-hidden="true"></i>
             </span>
@@ -45,6 +50,10 @@
 
             <mat-error *ngIf="userFormControls.password.hasError('minlength') || userFormControls.password.hasError('maxlength')">
                 A jelszó 6-20 karakter között kell legyen!
+            </mat-error>
+
+            <mat-error *ngIf="userFormControls.password.hasError('pattern')">
+                A jelszó csak betűket, számokat és @$!%*#?&]+$ karaktereket tartalmazhat!
             </mat-error>
 
             <mat-hint class="hint-right">{{password.value.length}} / 20</mat-hint>
@@ -61,21 +70,25 @@
         </div>
 
         <!-- Titulus -->
-        <mat-form-field appearance="outline">
+        <mat-form-field appearance="outline" [ngStyle]="{'padding-bottom': calcPadding('title') }">
             <mat-label>Titulus</mat-label>
-            <input formControlName="title" matInput #title autocomplete="off" (focus)="onFocus('title');" (blur)="onBlur('title');">
+            <input formControlName="title" matInput #title autocomplete="off" (keypress)="onKeyPress($event, 'title');">
 
             <mat-error *ngIf="userFormControls.title.hasError('maxlength')">
                 A titulus maximum 20 karakter lehet!
+            </mat-error>
+
+            <mat-error *ngIf="userFormControls.title.hasError('pattern')">
+                A titulus csak betűket, szóközt és .- karaktereket tartalmazhat!
             </mat-error>
 
             <mat-hint class="hint-right">{{title.value.length}} / 20</mat-hint>
         </mat-form-field>
 
         <!-- Vezetéknév -->
-        <mat-form-field appearance="outline">
+        <mat-form-field appearance="outline" [ngStyle]="{'padding-bottom': calcPadding('lastname') }">
             <mat-label>Vezetéknév</mat-label>
-            <input formControlName="lastname" matInput #lastname autocomplete="off" required (focus)="onFocus('lastname');" (blur)="onBlur('lastname');">
+            <input formControlName="lastname" matInput #lastname autocomplete="off" required (keypress)="onKeyPress($event, 'lastname');">
 
             <mat-error *ngIf="userFormControls.lastname.hasError('required')">
                 A vezetéknév kitöltése kötelező!
@@ -85,25 +98,33 @@
                 A vezetéknév maximum 20 karakter lehet!
             </mat-error>
 
+            <mat-error *ngIf="userFormControls.lastname.hasError('pattern')">
+                A vezetéknév csak betűket, szóközt és .- karaktereket tartalmazhat!
+            </mat-error>
+
             <mat-hint class="hint-right">{{lastname.value.length}} / 20</mat-hint>
         </mat-form-field>
 
         <!-- Középső név -->
-        <mat-form-field appearance="outline">
+        <mat-form-field appearance="outline" [ngStyle]="{'padding-bottom': calcPadding('middlename') }">
             <mat-label>Középső név</mat-label>
-            <input formControlName="middlename" matInput #middlename autocomplete="off" (focus)="onFocus('middlename');" (blur)="onBlur('middlename');">
+            <input formControlName="middlename" matInput #middlename autocomplete="off" (keypress)="onKeyPress($event, 'middlename');">
 
             <mat-error *ngIf="userFormControls.middlename.hasError('maxlength')">
                 A középső név maximum 15 karakter lehet!
+            </mat-error>
+
+            <mat-error *ngIf="userFormControls.middlename.hasError('pattern')">
+                A középső név csak betűket, szóközt és .- karaktereket tartalmazhat!
             </mat-error>
 
             <mat-hint class="hint-right">{{middlename.value.length}} / 15</mat-hint>
         </mat-form-field>
 
         <!-- Keresztnév -->
-        <mat-form-field appearance="outline">
+        <mat-form-field appearance="outline" [ngStyle]="{'padding-bottom': calcPadding('firstname') }">
             <mat-label>Keresztnév</mat-label>
-            <input formControlName="firstname" matInput #firstname autocomplete="off" required (focus)="onFocus('firstname');" (blur)="onBlur('firstname');">
+            <input formControlName="firstname" matInput #firstname autocomplete="off" required (keypress)="onKeyPress($event, 'firstname');">
 
             <mat-error *ngIf="userFormControls.firstname.hasError('required')">
                 A keresztnév kitöltése kötelező!
@@ -113,13 +134,17 @@
                 A keresztnév maximum 15 karakter lehet!
             </mat-error>
 
+            <mat-error *ngIf="userFormControls.firstname.hasError('pattern')">
+                A keresztnév csak betűket, szóközt és .- karaktereket tartalmazhat!
+            </mat-error>
+
             <mat-hint class="hint-right">{{firstname.value.length}} / 15</mat-hint>
         </mat-form-field>
         
         <!-- Telefonszám -->
-        <mat-form-field appearance="outline">
+        <mat-form-field appearance="outline" [ngStyle]="{'padding-bottom': calcPadding('telephone') }">
             <mat-label>Telefonszám</mat-label>
-            <input formControlName="telephone" matInput #telephone autocomplete="off" type="tel" (focus)="onFocus('telephone');" (blur)="onBlur('telephone');">
+            <input formControlName="telephone" matInput #telephone placeholder="+36 70 123 4567" autocomplete="off" type="tel" (keypress)="onTelKeyPress($event);">
 
             <mat-error *ngIf="userFormControls.telephone.hasError('pattern')">
                 A telefonszám formátuma nem megfelelő!
@@ -131,9 +156,9 @@
         </mat-form-field>
 
         <!-- E-mail -->
-        <mat-form-field appearance="outline">
+        <mat-form-field appearance="outline" [ngStyle]="{'padding-bottom': calcPadding('email') }">
             <mat-label>E-mail cím</mat-label>
-            <input formControlName="email" matInput #email autocomplete="off" type="email" (focus)="onFocus('email');" (blur)="onBlur('email');">
+            <input formControlName="email" matInput #email placeholder="email@example.com" autocomplete="off" type="email" (keypress)="onKeyPress($event);">
 
             <mat-error *ngIf="userFormControls.email.hasError('pattern')">
                 Az e-mail formátuma nem megfelelő!
@@ -143,7 +168,6 @@
                 <i class="fa fa-info-circle" aria-hidden="true" placement="top" ngbTooltip="Pl.: email@example.com" container="body"></i>
             </mat-hint>
         </mat-form-field>
-
     </form>
   </div>
   <div class="modal-footer">

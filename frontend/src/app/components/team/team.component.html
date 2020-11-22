@@ -18,7 +18,7 @@
         </div>
         <div class="col-title"
              [ngStyle]="{'width': isAdmin ? 'calc(calc(100% - 50px) * 0.33)' : 'calc(calc(100% - 100px) * 0.33)'}">
-            E-mail&nbsp;cím
+            E-mail cím
         </div>
         <div class="add-user"
             *ngIf="isAdmin">
@@ -51,7 +51,7 @@
                     {{user.telephone || '&mdash;'}}
             </div>
             <div class="cell"
-                 [ngStyle]="{'width': isAdmin ? 'calc(calc(100% - 50px) * 0.33)' : 'calc(calc(100% - 100px) * 0.33)', 'padding-left': user.telephone ? '10px' : '50px' }">
+                 [ngStyle]="{'width': isAdmin ? 'calc(calc(100% - 50px) * 0.33)' : 'calc(calc(100% - 100px) * 0.33)', 'padding-left': user.email ? '10px' : '45px' }">
                     {{user.email || '&mdash;'}}
             </div>
             <div class="modify-user"

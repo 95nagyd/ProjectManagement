@@ -6,8 +6,8 @@
     <p *ngFor="let item of choices; index as choiceIndex; first as isFirst;"
         class="choices-item"
         (click)="choose(choiceIndex);"
-        [ngClass]="{ 'selected': item===chosen || (isFirst && !isExactMatch()) }">  
-            {{item}}
+        [ngClass]="{ 'selected': item.name === chosenName || (isFirst && !isExactMatch()) }">  
+            {{item.name}}
     </p>
     <p *ngIf="choices.length == 0"
         class="not-found">

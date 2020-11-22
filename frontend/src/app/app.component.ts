@@ -1,13 +1,14 @@
 import { Component, NgZone, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { AuthenticationService } from '@app/_services/authentication.service';
 import { PageContentScrollOffsetService } from '@app/_services/page-content-scroll-offset.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SpinnerService } from './_services/spinner.service';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { interval, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { GlobalModalsService } from './_services/global-modals.service';
 import { ComboBoxService } from './_services/combo-box.service';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-root',
@@ -23,14 +24,13 @@ export class AppComponent {
   @ViewChild('page') page: ElementRef;
 
   constructor(private authenticationService: AuthenticationService, private router: Router, private _ngZone: NgZone, private spinner: SpinnerService, 
-    private scrollOffsetService: PageContentScrollOffsetService,  private globalModalsService: GlobalModalsService) { 
-                  
+    private scrollOffsetService: PageContentScrollOffsetService, private location: Location) { 
 
     this.scrollOffsetService.register(this);
 
     this.isLoggedInPastState = this.isLoggedIn();
-                  
-    if (this.isLoggedInPastState) this.router.navigate(['']);
+          
+    if (this.isLoggedInPastState) this.router.navigate([this.location.path()]);
 
     this._ngZone.runOutsideAngular(() => {
       this.initInterval();

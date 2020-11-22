@@ -54,7 +54,7 @@
             Tervfázis
         </div>
         <div [ngStyle]="{'width': comboColWidth+'px'}">
-            Szerkezeti&nbsp;elem
+            Szerkezeti elem
         </div>
         <div [ngStyle]="{'width': comboColWidth+'px'}">
             Részfeladat
@@ -110,7 +110,7 @@
                                         <combo-box  #projectComboList
                                                     [comboWidth]="comboColWidth*0.95"
                                                     [isDisabled]="!isEditable"
-                                                    [chosen]="cellData.project"
+                                                    [chosenId]="cellData.projectId"
                                                     [choices]="projectList"
                                                     [isRequired]="false"
                                                     (update)="updateCombo('project', $event, dayData.number, dataRowIndex);"></combo-box>
@@ -128,7 +128,7 @@
                                         <combo-box  #designPhaseComboList
                                                     [comboWidth]="comboColWidth*0.95"
                                                     [isDisabled]="!isEditable"
-                                                    [chosen]="cellData.designPhase"
+                                                    [chosenId]="cellData.designPhaseId"
                                                     [choices]="designPhaseList"
                                                     [isRequired]="false"
                                                     (update)="updateCombo('designPhase', $event, dayData.number, dataRowIndex);"></combo-box>
@@ -145,7 +145,7 @@
                                     <div>
                                         <combo-box  [comboWidth]="comboColWidth*0.95"
                                                     [isDisabled]="!isEditable"
-                                                    [chosen]="cellData.structuralElement"
+                                                    [chosenId]="cellData.structuralElementId"
                                                     [choices]="structuralElementList"
                                                     [isRequired]="false"
                                                     (update)="updateCombo('structuralElement', $event, dayData.number, dataRowIndex);"></combo-box>
@@ -162,7 +162,7 @@
                                     <div>
                                         <combo-box  [comboWidth]="comboColWidth*0.95"
                                                     [isDisabled]="!isEditable"
-                                                    [chosen]="cellData.subtask"
+                                                    [chosenId]="cellData.subtaskId"
                                                     [choices]="subtaskList"
                                                     [isRequired]="false"
                                                     (update)="updateCombo('subtask', $event, dayData.number, dataRowIndex);"></combo-box>
@@ -202,8 +202,8 @@
                                 <td>
                                     <div class="modify">
                                         <div class="m-auto modify-add cursor-pointer" 
-                                                [ngClass]="!isEditable || !isLastRow || (cellData.workingTime === '00:00' && !cellData.project && !cellData.designPhase && !cellData.structuralElement && !cellData.subtask && !cellData.comment) || rowCount === 10 ? 'modify-disabled' : ''"
-                                                (click)="!isEditable || !isLastRow || (cellData.workingTime === '00:00' && !cellData.project && !cellData.designPhase && !cellData.structuralElement && !cellData.subtask && !cellData.comment) || rowCount === 10 ? null : addEmptyRow(dayData.number);">
+                                                [ngClass]="!isEditable || !isLastRow || (cellData.workingTime === '00:00' && !cellData.projectId && !cellData.designPhaseId && !cellData.structuralElementId && !cellData.subtaskId && !cellData.comment) || rowCount === 10 ? 'modify-disabled' : ''"
+                                                (click)="!isEditable || !isLastRow || (cellData.workingTime === '00:00' && !cellData.projectId && !cellData.designPhaseId && !cellData.structuralElementId && !cellData.subtaskId && !cellData.comment) || rowCount === 10 ? null : addEmptyRow(dayData.number);">
                                             <i class="fa fa-plus-square-o" aria-hidden="true"></i>
                                         </div>
                                         <div class="m-auto modify-delete cursor-pointer"

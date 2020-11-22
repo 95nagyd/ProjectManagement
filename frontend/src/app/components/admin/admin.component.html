@@ -1,8 +1,48 @@
-<ul *ngIf="users">
-    <span>Összes felhasználó:</span>
-    <li *ngFor="let user of users">
-        <span>Vezetéknév: {{user.lastName}}</span>
-        <br>
-        <span>Keresztnév: {{user.firstName}}</span>
-    </li>
-</ul>
+<div class="tab-switch-container">
+    <!-- bezárás kinyitás összecsúszással legyen, színváltás egyből, magasság megnő -->
+    <div (click)="switchToTab(basicDataTab.PROJECT)" class="tab" [ngClass]="{'active-tab': selectedTab === basicDataTab.PROJECT}" [ngbTooltip]="selectedTab !== basicDataTab.PROJECT ? 'Projektek' : ''">
+        <span>
+            <mat-icon placement="top" [ngClass]="selectedTab === basicDataTab.PROJECT ? 'active-icon' : 'icon'">home</mat-icon>
+        </span>
+        <span *ngIf="selectedTab === basicDataTab.PROJECT">
+            Projektek
+        </span>
+    </div>
+    <div (click)="switchToTab(basicDataTab.DESIGN_PHASE)" class="tab" [ngClass]="{'active-tab': selectedTab === basicDataTab.DESIGN_PHASE}" [ngbTooltip]="selectedTab !== basicDataTab.DESIGN_PHASE ? 'Tervfázisok' : ''">
+        <span>
+            <mat-icon placement="top" [ngClass]="selectedTab === basicDataTab.DESIGN_PHASE ? 'active-icon' : 'icon'">home</mat-icon>
+        </span>
+        <span *ngIf="selectedTab === basicDataTab.DESIGN_PHASE">
+            Tervfázisok
+        </span>
+    </div>
+    <div (click)="switchToTab(basicDataTab.STRUCTURAL_ELEMENT)" class="tab" [ngClass]="{'active-tab': selectedTab === basicDataTab.STRUCTURAL_ELEMENT}" [ngbTooltip]="selectedTab !== basicDataTab.STRUCTURAL_ELEMENT ? 'Szerkezeti elemek' : ''">
+        <span>
+            <mat-icon placement="top" [ngClass]="selectedTab === basicDataTab.STRUCTURAL_ELEMENT ? 'active-icon' : 'icon'">home</mat-icon>
+        </span>
+        <span *ngIf="selectedTab === basicDataTab.STRUCTURAL_ELEMENT">
+            Szerkezeti elemek
+        </span>
+    </div>
+    <div (click)="switchToTab(basicDataTab.SUBTASK)" class="tab" [ngClass]="{'active-tab': selectedTab === basicDataTab.SUBTASK}" [ngbTooltip]="selectedTab !== basicDataTab.SUBTASK ? 'Részfeladatok' : ''">
+        <span>
+            <mat-icon placement="top" [ngClass]="selectedTab === basicDataTab.SUBTASK ? 'active-icon' : 'icon'">home</mat-icon>
+        </span>
+        <span *ngIf="selectedTab === basicDataTab.SUBTASK"y>
+            Részfeladatok
+        </span>
+    </div>
+</div>
+<div class="chip-container">
+    <div class="p-3 d-flex flex-row align-content-start flex-wrap">
+        <div class="d-inline-block" *ngFor="let chip of chipList;">
+            <chip   [chipData]="chip"
+                    (validate)="validateChips();"
+                    (remove)="deleteChip($event);">
+            </chip>
+        </div>
+        <span *ngIf="isAddVisible" class="add-chip" (mouseup)="addChip();">
+            <i class="fa fa-plus" aria-hidden="true"></i>
+        </span>
+    </div>
+</div>

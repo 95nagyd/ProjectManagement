@@ -26,6 +26,7 @@
     "@ng-bootstrap/ng-bootstrap": "^6.0.2",
     "bootstrap": "^4.4.1",
     "font-awesome": "^4.7.0",
+    "guid-typescript": "^1.0.9",
     "install": "^0.13.0",
     "jquery": "^3.5.0",
     "jwt-decode": "^2.2.0",

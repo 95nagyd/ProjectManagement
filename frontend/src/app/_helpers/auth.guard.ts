@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Router, CanActivate, ActivatedRouteSnapshot } from '@angular/router';
+import { ConfirmModalType } from '@app/_models/modals';
 import { AuthenticationService } from '@app/_services/authentication.service';
+import { GlobalModalsService } from '@app/_services/global-modals.service';
 
 
 @Injectable({
@@ -8,9 +10,20 @@ import { AuthenticationService } from '@app/_services/authentication.service';
 })
 export class AuthGuard implements CanActivate {
 
-  constructor(private authenticationService: AuthenticationService, private router: Router) { }
+  constructor(private authenticationService: AuthenticationService, private router: Router, private globalModalsService: GlobalModalsService) { }
 
   canActivate(route: ActivatedRouteSnapshot) {
+    //changes
+    console.log("has changes: " + this.globalModalsService?.hasChanges)
+    if(this.globalModalsService?.hasChanges){
+      return this.globalModalsService.openConfirmModal(ConfirmModalType.Discard).then((isDiscardRequired) => {
+        this.globalModalsService.hasChanges = !isDiscardRequired;
+        this.globalModalsService.closeConfirmModal();
+        return isDiscardRequired;
+      });
+    }
+
+    //role
     if (this.authenticationService.isLoggedIn()) {
         if (route.data.expectedRole && (route.data.expectedRole !== this.authenticationService.getCurrentUser().role)) {
           this.router.navigate(['']);
@@ -18,6 +31,7 @@ export class AuthGuard implements CanActivate {
         }
         return true;
     }
+
     this.router.navigate(['login']);
     return false;
   }

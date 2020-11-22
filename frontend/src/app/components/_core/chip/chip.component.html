@@ -1,0 +1,17 @@
+<div class="chip-container">
+    <span class="chip" (clickOutside)="isEditing && toggleEditing();" [ngStyle]="{'background-color': isEditing ? 'rgb(111, 185, 216)' : isEmpty || isAlreadyExist ? 'rgb(255, 157, 157)' : null}">
+        <span #name [attr.contenteditable]="isEditing" (keypress)="onKeypress($event);" (paste)="onPaste($event);" class="mr-2 name">
+            {{chipData.name}}</span>
+        <i class="fa fa-pencil" aria-hidden="true" (click)="toggleEditing();" [ngStyle]="{'color': isEditing ? 'rgb(0, 0, 0)' : null}"></i>
+        <i class="fa fa-times" aria-hidden="true" (click)="delete();"></i>
+    </span>
+    <div class="invalid" *ngIf="isEmpty" [@fadeInOut]>
+        Az elem nem lehet üres!
+    </div>
+    <div class="invalid" *ngIf="isAlreadyExist" [@fadeInOut]>
+        Ez az elem már létezik!
+    </div>
+    <div class="invalid" *ngIf="isInUse" [@fadeInOut]>
+        Ez az elem használatban van!
+    </div>  
+</div>

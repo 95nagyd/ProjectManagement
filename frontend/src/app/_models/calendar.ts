@@ -1,3 +1,5 @@
+import { BasicElement } from './basic-data';
+
 export interface CalendarDayDetails {
   number: number;
   name: string;
@@ -12,20 +14,20 @@ export interface CalendarData {
 
 export class CalendarDayData {
   workingTime: string;
-  project: string;
-  designPhase: string;
-  structuralElement: string;
-  subtask: string;
+  projectId: string;
+  designPhaseId: string;
+  structuralElementId: string;
+  subtaskId: string;
   comment: string;
 
   constructor(data?: CalendarDayData) {
     data = data || <CalendarDayData>{};
 
     this.workingTime = data.workingTime || '00:00';
-    this.project = data.project || '';
-    this.designPhase = data.designPhase || '';
-    this.structuralElement = data.structuralElement || '';
-    this.subtask = data.subtask || '';
+    this.projectId = data.projectId || '';
+    this.designPhaseId = data.designPhaseId || '';
+    this.structuralElementId = data.structuralElementId || '';
+    this.subtaskId = data.subtaskId || '';
     this.comment = data.comment || '';
   }
 }

@@ -1,9 +1,9 @@
-import { Component, ElementRef, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { Role } from '@app/_models/role';
 import { User } from '@app/_models/user';
 import { SpinnerService } from '@app/_services/spinner.service';
 import { NgbModal, ModalDismissReasons, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { UserService } from '@app/_services/user.service';
 import { GlobalModalsService } from '@app/_services/global-modals.service';
 import { ConfirmModalType } from '@app/_models/modals';
@@ -22,17 +22,14 @@ export class UserModalComponent implements OnInit, OnDestroy {
   user?: User;
   state: string;
   userForm: FormGroup;
-  hadErrorAfterBlur: Record<string, Boolean>;
   validations: Record<string, any>;
   openUserModalRef: any;
 
 
-  //TODO: jelszó karakterek validáció
-  //TODO: inputok felett padding
-  //TODO: enterre lose focus
-
   isPassVisible: Boolean;
   role: Role;
+
+  patterns: Record<string, RegExp>;
   
   
 
@@ -42,26 +39,27 @@ export class UserModalComponent implements OnInit, OnDestroy {
     this.onClose = new EventEmitter();
     this.isPassVisible = false;
     this.role = Role.User;
-    this.hadErrorAfterBlur = {
-      'username' : false,
-      'password' : false,
-      'title' : false,
-      'lastname' : false,
-      'middlename' : false,
-      'firstname' : false,
-      'telephone' : false,
-      'email' : false
+    
+    this.patterns = {
+      'username' : new RegExp('^[a-zA-Z0-9]*$'),
+      'password' : new RegExp('^[a-zA-Z0-9áéíóöőúüűÁÉÍÓÖŐUÚÜŰ@$!%*#?&]*$'),
+      'title' : new RegExp('^[a-zA-ZáéíóöőúüűÁÉÍÓÖŐUÚÜŰ .-]*$'),
+      'lastname' : new RegExp('^[a-zA-ZáéíóöőúüűÁÉÍÓÖŐUÚÜŰ .-]*$'),
+      'middlename' : new RegExp('^[a-zA-ZáéíóöőúüűÁÉÍÓÖŐUÚÜŰ .-]*$'),
+      'firstname' : new RegExp('^[a-zA-ZáéíóöőúüűÁÉÍÓÖŐUÚÜŰ .-]*$'),
+      'telephone' : new RegExp('^(?=.{14,15}$)\\+36 (\\d{2}) (\\d{3}) (\\d{3,4})$'),
+      'email' : new RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$')
     };
     this.validations = {
-      'username' : [Validators.required, Validators.minLength(6), Validators.maxLength(20)],
-      'password-edit' : [Validators.minLength(6), Validators.maxLength(20)],
-      'password' : [Validators.required, Validators.minLength(6), Validators.maxLength(20)],
-      'title' : [Validators.maxLength(20)],
-      'lastname' : [Validators.required, Validators.maxLength(20)],
-      'middlename' : [Validators.maxLength(15)],
-      'firstname' : [Validators.required, Validators.maxLength(15)],
-      'telephone' : [Validators.pattern('^\\+36 [(]{1}(\\d{1,2})[)]{1} (\\d{3}) (\\d{4})\\s*|\\+36 (\\d{1,2}) (\\d{3}) (\\d{4})\\s*$')],
-      'email' : [Validators.pattern('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$')]
+      'username' : [Validators.required, Validators.minLength(6), Validators.maxLength(20), Validators.pattern(this.patterns['username'])],
+      'password-edit' : [Validators.minLength(6), Validators.maxLength(20), Validators.pattern(this.patterns['password'])],
+      'password' : [Validators.required, Validators.minLength(6), Validators.maxLength(20), Validators.pattern(this.patterns['password'])],
+      'title' : [Validators.maxLength(20), Validators.pattern(this.patterns['title'])],
+      'lastname' : [Validators.required, Validators.maxLength(20), Validators.pattern(this.patterns['lastname'])],
+      'middlename' : [Validators.maxLength(15), Validators.pattern(this.patterns['middlename'])],
+      'firstname' : [Validators.required, Validators.maxLength(15), Validators.pattern(this.patterns['firstname'])],
+      'telephone' : [Validators.pattern(this.patterns['telephone'])],
+      'email' : [Validators.pattern(this.patterns['email'])]
     }
   }
 
@@ -77,17 +75,7 @@ export class UserModalComponent implements OnInit, OnDestroy {
 
   open(editUser?: User) {
     this.isPassVisible = false;
-    this.hadErrorAfterBlur = {
-      'username' : false,
-      'password' : false,
-      'title' : false,
-      'lastname' : false,
-      'middlename' : false,
-      'firstname' : false,
-      'telephone' : false,
-      'email' : false
-    };
-    console.log("open")
+
     this.state = editUser ? 'edit' : 'add';
     this.user = editUser ? editUser : new User();
 
@@ -107,10 +95,12 @@ export class UserModalComponent implements OnInit, OnDestroy {
     beforeDismiss: () => {
       if(!this.userForm.dirty){ this.onClose.emit(); return true; }
 
-      return this.globalModalsService.openConfirmModal(ConfirmModalType.Discard).then((result) => {
-        if(result) { this.onClose.emit(); };
+      return this.globalModalsService.openConfirmModal(ConfirmModalType.Discard).then((isDiscardRequired) => {
+        if(isDiscardRequired) { 
+          this.onClose.emit(); 
+        };
         this.globalModalsService.closeConfirmModal();
-        return result;
+        return isDiscardRequired;
       });
     }});
     
@@ -120,8 +110,6 @@ export class UserModalComponent implements OnInit, OnDestroy {
 
   
   save() {
-    //TODO: HA kivan töltve a kötelező és az utolsóba kattintok akkor ne legyen elérhető a save
-
     console.log("save")
     this.spinner.show();
 
@@ -150,30 +138,56 @@ export class UserModalComponent implements OnInit, OnDestroy {
         this.userFormControls.username.setErrors({notUnique: true});
       } else {
         if(!this.globalModalsService.isErrorModalOpen()){
-          this.globalModalsService.openErrorModal(error).then(() => {
-          this.globalModalsService.closeErrorModal();
-        });
-      }
+            this.globalModalsService.openErrorModal(error).then(() => {
+            this.globalModalsService.closeErrorModal();
+          });
+        }
       }
       this.spinner.forceHide();
     });
   }
 
 
-  onFocus(controlName: string){
-    if(!this.hadErrorAfterBlur[controlName]){
-      this.userFormControls[controlName].clearValidators();
-      this.userFormControls[controlName].updateValueAndValidity();
+  onKeyPress(event: any, controlName?: string){
+    if(event.key === 'Enter') event.target.blur();
+
+    if (controlName && !this.patterns[controlName].test(event.key)) { event.preventDefault(); }
+
+  }
+
+  onTelKeyPress(event: any){
+
+    if(event.key === 'Enter') event.target.blur();
+
+    const value = this.userFormControls.telephone.value;
+
+    const isValidStartAndNotSpace = value.startsWith('+') && event.keyCode !== 32
+
+    if(value.length === 3 && isValidStartAndNotSpace){
+      this.userFormControls.telephone.setValue(value + ' ');
+      return;
+    }
+
+    if(value.length === 6 && isValidStartAndNotSpace){
+      this.userFormControls.telephone.setValue(value + ' ');
+      return;
+    }
+
+    if(value.length === 10 && isValidStartAndNotSpace){
+      this.userFormControls.telephone.setValue(value + ' ');
+      return;
     }
   }
 
-  onBlur(controlName: string){
-    const validationField = controlName === 'password' ? (this.state === 'edit' ? (controlName + '-edit') : controlName) : controlName;
 
-    this.userFormControls[controlName].setValidators(this.validations[validationField]);
-    this.userFormControls[controlName].updateValueAndValidity();
-    this.hadErrorAfterBlur[controlName] = this.userFormControls[controlName].dirty || !!this.userFormControls[controlName].errors;
+  calcPadding(controlName: string){
+    const patternPadding = this.userFormControls[controlName].hasError('pattern') ? 13 : 0;
+
+    const errorCount = this.userFormControls[controlName].errors && Object.keys(this.userFormControls[controlName].errors).length || 0;
+
+    if(errorCount === 1 ) { return (patternPadding === 13 ? patternPadding : 0) + 'px'; }
+
+    return (((errorCount * 12.4) - 12.2) + patternPadding) + 'px';
   }
-
 
 }

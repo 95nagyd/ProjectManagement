@@ -107,6 +107,61 @@ class MongoService {
 
 
 
+    /* speciális */
+    getBasicData() {
+        return new Promise((resolve, reject) => {
+            MongoClient.connect(this.url, { useUnifiedTopology: true }, (err, client) => {
+                if(err) {
+                    console.log('DB Connection Error: ' + err );
+                    reject(err);
+                } else {
+                    var db = client.db(this.dbName);
+
+                    var basicData = {};
+                    
+                    db.collection('projects').find({}, {}).toArray((foundErr, projects) => {
+                        if(foundErr){
+                            client.close(); 
+                            reject(foundErr);
+                        } else {
+                            basicData.projects = projects;
+                            db.collection('designPhases').find({}, {}).toArray((foundErr, designPhases) => {
+                                if(foundErr){
+                                    client.close(); 
+                                    reject(foundErr);
+                                } else {
+                                    basicData.designPhases = designPhases;
+                                    db.collection('structuralElements').find({}, {}).toArray((foundErr, structuralElements) => {
+                                        if(foundErr){
+                                            client.close(); 
+                                            reject(foundErr);
+                                        } else {
+                                            basicData.structuralElements = structuralElements;
+                                            db.collection('subtasks').find({}, {}).toArray((foundErr, subtasks) => {
+                                                if(foundErr){
+                                                    client.close(); 
+                                                    reject(foundErr);
+                                                } else {
+                                                    basicData.subtasks = subtasks;
+                                                    client.close(); 
+                                                    resolve(basicData);
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        });
+    }
+
+
+
+
+
 
 
 

@@ -15,8 +15,8 @@ export class UserService {
 
   getAll(): Observable<User[]> {
     return this.http.get<any>(`${environment.apiUrl}/users`).pipe(
-      map(data => {
-        data.map((user: any) => new User(user))
+      map(res => {
+        const data = res.map((user: any) => new User(user))
         return data;
       })
     );

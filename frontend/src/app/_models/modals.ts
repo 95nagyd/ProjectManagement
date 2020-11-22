@@ -1,3 +1,5 @@
+//TODO: enumok nagybetűvel
+
 export enum ConfirmModalType {
   Discard = 'discard',
   Delete = 'delete'

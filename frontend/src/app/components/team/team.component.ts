@@ -7,7 +7,7 @@ import { UserService } from '@app/_services/user.service';
 import { UserModalComponent } from './user-modal/user-modal.component';
 
 @Component({
-  selector: 'app-team',
+  selector: 'team',
   templateUrl: './team.component.html',
   styleUrls: ['./team.component.css']
 })
@@ -25,8 +25,7 @@ export class TeamComponent implements OnInit {
   }
 
   //TODO: alert-ek toasterbe
-  //TODO: telefonszám automata space töltés
-  //TODO: scroll nem jó helyen van
+  //TODO: hosszú név hogy fér ki a név mezőbe
 
   ngOnInit(): void {
     this.currentUser = this.authenticationService.getCurrentUser();
@@ -41,11 +40,13 @@ export class TeamComponent implements OnInit {
 
   refreshUserList(){
     this.spinner.show();
-    this.users = [];
     this.userService.getAll().subscribe(users => {
-      users.map(user => { if(this.currentUser._id !== user._id) this.users.push(new User(user)) });
+      let tempUsers = [];
+      users.map(user => { if(this.currentUser._id !== user._id) tempUsers.push(new User(user)) });
+      this.users = tempUsers;
       this.spinner.hide();
     }, error => {
+      //TODO: hiba modal
       alert("Hiba a felhasználók lekérdezésekor!")
       this.spinner.forceHide();
     });

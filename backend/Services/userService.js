@@ -10,7 +10,6 @@ async function getUsers(query) {
 }
 
 async function saveUser(user){
-    console.log("save call")
     let saveData = _.pick(user, 
         [
             'password',

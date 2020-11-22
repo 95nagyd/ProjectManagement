@@ -27,7 +27,6 @@ import { MinuteSecondsPipe } from '@app/_custom/minute-seconds.pipe'
 import { NgxSpinnerModule } from "ngx-spinner";
 import { ClickOutsideDirective } from './_custom/click-outside.directive';
 import { TeamComponent } from './components/team/team.component';
-import { StatsComponent } from './components/stats/stats.component';
 import { WorkingTimeCalendarComponent } from './components/_core/working-time-calendar/working-time-calendar.component';
 import { FormattedTimeComponent } from './components/_core/working-time-calendar/formatted-time/formatted-time.component';
 import { CommentBoxComponent } from './components/_core/working-time-calendar/comment-box/comment-box.component';
@@ -38,6 +37,8 @@ import { TwoDigitNumberPipe } from './_custom/two-digit-number.pipe';
 import { UserModalComponent } from './components/team/user-modal/user-modal.component';
 import { ErrorStateMatcher, ShowOnDirtyErrorStateMatcher } from '@angular/material/core';
 import { GlobalModalsComponent } from './components/_core/global-modals/global-modals.component';
+import { ChipComponent } from './components/_core/chip/chip.component';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   declarations: [
@@ -51,7 +52,6 @@ import { GlobalModalsComponent } from './components/_core/global-modals/global-m
     MinuteSecondsPipe,
     ClickOutsideDirective,
     TeamComponent,
-    StatsComponent,
     WorkingTimeCalendarComponent,
     FormattedTimeComponent,
     CommentBoxComponent,
@@ -60,7 +60,8 @@ import { GlobalModalsComponent } from './components/_core/global-modals/global-m
     ClickInsideDirective,
     TwoDigitNumberPipe,
     UserModalComponent,
-    GlobalModalsComponent
+    GlobalModalsComponent,
+    ChipComponent
   ],
   imports: [
     BrowserModule,
@@ -73,7 +74,8 @@ import { GlobalModalsComponent } from './components/_core/global-modals/global-m
     NgxSpinnerModule,
     MatInputModule,
     MatFormFieldModule,
-    MatRadioModule
+    MatRadioModule,
+    MatIconModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   providers: [

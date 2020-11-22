@@ -1,0 +1,116 @@
+
+.tab-switch-container{
+    display: flex;
+    flex-direction: row;
+    margin-left: 10px;
+    align-items: flex-end;
+    height: 50px;
+}
+
+
+.active-icon {
+    vertical-align: -5px;
+    font-size: 32px;
+    margin-right: 10px;
+}
+
+
+.tab-switch-container div{
+    white-space: nowrap;
+}
+
+.tab {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background-color: rgb(146, 146, 146);
+    padding-top: 4px;
+    padding-left: 3px; 
+    padding-right: 3px; 
+    border: 1px solid rgb(55, 55, 55);
+    border-bottom: none;
+    cursor: pointer;
+    height: 30px;
+
+    transition: all 0.3s ease;
+}
+
+
+.tab:first-of-type{
+    border-top-left-radius: 3px;
+}
+
+.tab:last-of-type{
+    border-top-right-radius: 3px;
+}
+
+.active-tab {
+    background-color: rgb(116, 135, 148);
+    cursor: default;
+    height: 50px;
+    padding-top: 0px;
+    border-top-left-radius: 10px !important;
+    border-top-right-radius: 10px !important;
+    padding-right: 5px;
+    font-size: 32px;
+    font-weight: 600;
+}
+
+
+.chip-container{
+    min-width: 410px;
+    height: calc(100vh - 180px); 
+    overflow: auto; 
+    border-radius: 10px;
+    border: 1px solid rgb(55, 55, 55);
+    background-color: rgb(192, 218, 237);
+}
+
+
+
+
+.add-chip{
+    display: inline-block;
+    vertical-align: top;
+    height: 50px;
+    background-color:  rgb(58, 119, 199);
+    padding: 0 15px;
+    font-size: 28px;
+    font-weight: 600;
+    margin: 7px 7px;
+    color: rgb(235, 235, 235);
+    border-radius: 25px;
+    cursor: pointer;
+}
+
+.add-chip:hover{
+    background-color:  rgb(48, 92, 150);
+}
+
+.add-chip i {
+    vertical-align: middle;
+}
+
+
+
+
+::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+ 
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+    border-radius: 10px;
+}
+ 
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+}
+
+::-webkit-scrollbar-corner{
+    display: none;
+}

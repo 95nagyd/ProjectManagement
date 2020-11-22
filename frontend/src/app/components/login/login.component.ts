@@ -25,11 +25,11 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.submitted = false;
   }
 
+//TODO: username, password regex hibaüzenetekkel
+
   ngOnInit(): void {
     console.log(this.authenticationService.isLoggedIn())
-    this.globalModalsService.closeConfirmModal();
-    this.globalModalsService.closeInfoModal();
-    this.globalModalsService.closeErrorModal();
+    this.globalModalsService.closeAllModal();
     if (this.authenticationService.isLoggedIn()) {
       this.router.navigate(['']);
     }

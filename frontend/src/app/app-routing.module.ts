@@ -6,7 +6,6 @@ import { LoginComponent } from './components/login/login.component';
 import { WorkingTimeComponent } from './components/working-time/working-time.component';
 import { AdminComponent } from './components/admin/admin.component';
 import { TeamComponent } from './components/team/team.component';
-import { StatsComponent } from './components/stats/stats.component';
 
 
 const routes: Routes = [
@@ -15,7 +14,6 @@ const routes: Routes = [
   { path: 'workingTime', component: WorkingTimeComponent, canActivate: [AuthGuard] },
   { path: 'administration', component: AdminComponent, canActivate: [AuthGuard], data: { expectedRole: Role.Admin } },
   { path: 'team', component: TeamComponent, canActivate: [AuthGuard] },
-  { path: 'stats', component: StatsComponent, canActivate: [AuthGuard] },
   { path: '**', redirectTo: 'workingTime'}
 ];
 
