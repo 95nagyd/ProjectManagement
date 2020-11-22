@@ -1,4 +1,4 @@
-<div [ngStyle]="{'min-width': styleData.minWidth + 'px', 'left':  styleData.x + 'px', 'top': styleData.y + 'px', 'visibility': isVisible ? 'initial' : 'hidden'}"
+<div *ngIf="isVisible" [ngStyle]="{'min-width': styleData.minWidth + 'px', 'left':  styleData.x + 'px', 'top': styleData.y + 'px'}"
      class="choices-container"
      (clickOutside)="isVisible ? onClickInOutEvent(true) : ''"
      (clickInside)="isVisible ? onClickInOutEvent(false) : ''">

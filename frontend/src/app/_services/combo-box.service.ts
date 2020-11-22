@@ -8,55 +8,36 @@ import { BasicElement } from '@app/_models/basic-data';
 })
 export class ComboBoxService {
   private comboBoxDropdown: ComboBoxDropdownComponent;
-  comboBoxRefList: ComboBoxComponent[] = [];
+  private comboBoxRef: ComboBoxComponent;
 
   registerDropdown(comboBoxDropdown: ComboBoxDropdownComponent){
     this.comboBoxDropdown = comboBoxDropdown;
   }
 
-  addComboRef(comboBoxRef: ComboBoxComponent) {
-    if(this.comboBoxRefList.indexOf(comboBoxRef) === -1){
-      this.comboBoxRefList.push(comboBoxRef);
-    }
-  }
-
-  removeAndCloseOldComboRef(actualComboBoxRef: ComboBoxComponent){
-    this.comboBoxRefList.forEach((comboBoxRef) => {
-      if((comboBoxRef.elementRef.nativeElement !== actualComboBoxRef.elementRef.nativeElement)){
-        this.removeAndCloseGivenComboRef(comboBoxRef);
-      }
-    });
-  }
-
-  removeAndCloseGivenComboRef(actualComboBoxRef: ComboBoxComponent){
-    const indexOfActual = this.comboBoxRefList.indexOf(actualComboBoxRef);
-    if(indexOfActual !== -1){
-      actualComboBoxRef.closeComboBox();
-      this.comboBoxRefList.splice(indexOfActual, 1);
-    }
-  }
-
   externalCloseComboAndHideDropdown(){
-    if(this.comboBoxDropdown) { this.comboBoxDropdown.hide(); }
-    if(this.comboBoxRefList.length > 0){
-      this.comboBoxRefList[0].closeComboBox();
-    }
+    this.comboBoxDropdown?.hide();
+    this.comboBoxRef?.closeComboBox();
   }
 
-  getComboRefList() {
-    return this.comboBoxRefList;
-  }
 
-  showDropdown() {
+  showDropdown(comboBoxRef) {
+    this.comboBoxRef?.closeComboBox();
+
+    this.comboBoxRef = comboBoxRef;
     this.comboBoxDropdown.show();
   }
   hideDropdown() {
+    this.comboBoxRef = null;
     this.comboBoxDropdown.hide();
   }
 
   updateDropdown(choices: Array<BasicElement>, chosenName?: string){
     this.comboBoxDropdown.choices = choices;
     if(chosenName) this.comboBoxDropdown.chosenName = chosenName;
+  }
+
+  getComboRef(){
+    return this.comboBoxRef;
   }
 
   isLastClickOutOfDropdown(){

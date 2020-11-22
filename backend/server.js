@@ -36,9 +36,9 @@ app.get('/users', verifyToken, (req, res) => {
             delete user.salt;
             delete user.password;
         });
-        res.status(200).json(users);
+        return res.status(200).json(users);
     }, (error) => {
-        res.status(400).json({ message: error });
+        return res.status(400).json({ message: error });
     });
 });
 
@@ -46,15 +46,15 @@ app.post('/saveUser', verifyToken, (req, res) => {
     console.log(req.body.user)
     if(req.body.user._id === '-1'){
         userService.addUser(req.body.user).then(() => {
-            res.status(201).send();
+            return res.status(201).send();
         }, (error) => {
-            res.status(422).send({ message: error });
+            return res.status(422).send({ message: error });
         });
     } else {
         userService.saveUser(req.body.user).then(() => {
-            res.status(201).send();
+            return res.status(201).send();
         }, (error) => {
-            res.status(422).send({ message: error });
+            return res.status(422).send({ message: error });
         });
     }
 });
@@ -63,76 +63,79 @@ app.post('/saveUser', verifyToken, (req, res) => {
 app.get('/workingTime/:period', verifyToken, (req, res) => {
     workingTimeService.getWorkingTimeByGivenUserIdAndPeriod(req.user._id, req.params.period).then((result) => {
         var workingTime = result[0] === undefined ? [] : result[0].workingTime;
-        res.status(200).json(workingTime);
+        return res.status(200).json(workingTime);
     }, (error) => {
-        res.status(400).json({ message: error });
+        return res.status(400).json({ message: error });
     });
 });
 
 app.get('/workingTime/:userId/:period', verifyToken, (req, res) => {
     workingTimeService.getWorkingTimeByGivenUserIdAndPeriod(req.params.userId, req.params.period).then((result) => {
         var workingTime = result[0] === undefined ? [] : result[0].workingTime;
-        res.status(200).json(workingTime);
+        return res.status(200).json(workingTime);
     }, (error) => {
-        res.status(400).json({ message: error });
+        return res.status(400).json({ message: error });
     });
 });
 
 app.post('/workingTime/save/:period', verifyToken, (req, res) => {
     workingTimeService.saveCurrentUserWorkingTimeByGivenPeriod(req.user._id, req.params.period, req.body.workingTime).then(() => {
-        res.status(201).send();
+        return res.status(201).send();
     }, (error) => {
-        res.status(422).send({ message: error });
+        if(error === 400){
+            return res.status(400).send({ message: "A a mentésre kerülő elemek közül időközben néhányat töröltek.\nMentés előtt javítsa a hibás mezőket!" })
+        }
+        return res.status(422).send({ message: error });
     });
 });
 
 app.get('/firstPeriod', verifyToken, (req, res) => {
     workingTimeService.getFirstSavedPeriod().then((result) => {
         var firstPeriod = result.length > 0 && result[0].firstPeriod ? result[0].firstPeriod : -1;
-        res.status(200).json(firstPeriod);
+        return res.status(200).json(firstPeriod);
     }, (error) => {
-        res.status(400).json({ message: error });
+        return res.status(400).json({ message: error });
     });
 });
 
 app.get('/basicData/all', verifyToken, (req, res) => {
     basicDataService.getBasicData().then((projects) => {
-        res.status(200).json(projects);
+        return res.status(200).json(projects);
     }, (error) => {
         console.log(error)
-        res.status(400).json({ message: error });
+        return res.status(400).json({ message: error });
     });
 });
 
 app.get('/basicData/projects', verifyToken, (req, res) => {
     basicDataService.getProjects({}).then((projects) => {
-        res.status(200).json(projects);
+        return res.status(200).json(projects);
     }, (error) => {
-        res.status(400).json({ message: error });
+        return res.status(400).json({ message: error });
     });
 });
 
 app.get('/basicData/designPhases', verifyToken, (req, res) => {
     basicDataService.getDesignPhases({}).then((projects) => {
-        res.status(200).json(projects);
+        return res.status(200).json(projects);
     }, (error) => {
-        res.status(400).json({ message: error });
+        return res.status(400).json({ message: error });
     });
 });
 
 app.get('/basicData/structuralElements', verifyToken, (req, res) => {
     basicDataService.getStructuralElements({}).then((projects) => {
-        res.status(200).json(projects);
+        return res.status(200).json(projects);
     }, (error) => {
-        res.status(400).json({ message: error });
+        return res.status(400).json({ message: error });
     });
 });
 
 app.get('/basicData/subtasks', verifyToken, (req, res) => {
     basicDataService.getSubtasks({}).then((projects) => {
-        res.status(200).json(projects);
+        return res.status(200).json(projects);
     }, (error) => {
-        res.status(400).json({ message: error });
+        return res.status(400).json({ message: error });
     });
 });
 

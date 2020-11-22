@@ -24,6 +24,7 @@ export class GlobalModalsService {
     this.globalModals?.closeConfirmModal();
     this.globalModals?.closeInfoModal();
     this.globalModals?.closeErrorModal();
+    this.globalModals?.closeWarningModal();
   }
 
   openConfirmModal(modalType: ConfirmModalType): Promise<any>{
@@ -61,6 +62,18 @@ export class GlobalModalsService {
 
   isErrorModalOpen(){
     return this.globalModals.isErrorModalOpen();
+  }
+
+  openWarningModal(conent: any): Promise<any>{
+    return this.globalModals.openWarningModal(conent);
+  }
+
+  closeWarningModal(){
+    this.globalModals?.closeWarningModal();
+  }
+
+  isWarningModalOpen(){
+    return this.globalModals.isWarningModalOpen();
   }
 
 }

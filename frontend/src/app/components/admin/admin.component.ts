@@ -20,7 +20,7 @@ import { take } from 'lodash-es';
 })
 export class AdminComponent implements OnInit {
 
-  //TODO: lekezelni, hogy ha egy módosítandó elem lastmodified nem annyi mint ami itt van akkor infoba, hogy valamki más módosította, kérem próbálja újra
+  //TODO: lekezelni, hogy ha egy módosítandó elem lastmodified nem annyi mint ami itt van akkor infoba, hogy valamki más módosította, kérem próbálja újra és újra lekérni a listát
   selectedTab: BasicDataType;
   chipList: Array<BasicElement>;
   @ViewChildren(ChipComponent) chipRefList!: QueryList<ChipComponent>;
@@ -50,8 +50,9 @@ export class AdminComponent implements OnInit {
       this.chipList = result;
       console.log(this.chipList)
       this.spinner.hide();
-    }, (reject) => {
+    }, (error) => {
       this.chipList = [];
+      //TODO: hiba modal
       console.log("nem siker")
       this.spinner.forceHide();
     });

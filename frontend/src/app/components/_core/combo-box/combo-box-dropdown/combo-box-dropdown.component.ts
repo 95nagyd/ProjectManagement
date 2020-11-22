@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { BasicElement } from '@app/_models/basic-data';
 import { ComboBoxService } from '@app/_services/combo-box.service';
 import { PageContentScrollOffsetService } from '@app/_services/page-content-scroll-offset.service';
@@ -38,19 +38,18 @@ export class ComboBoxDropdownComponent implements OnInit {
   }
 
   show(){
-    const firstComboRef = this.comboBoxService.getComboRefList()[0];
+    const comboRef = this.comboBoxService.getComboRef();
 
     // a megjelölendő elem szövege
-    this.chosenName = firstComboRef.searchValue;
+    this.chosenName = comboRef.searchValue;
 
     // megjelenítéskor a teljes elemlista látszik
-    this.choices = firstComboRef.searchResult;
+    this.choices = comboRef.searchResult;
     this.setPosition();
   }
 
   setPosition(){
-    const firstComboRef = this.comboBoxService.getComboRefList()[0];
-    let dropdownControl = firstComboRef.elementRef.nativeElement.firstElementChild.firstElementChild;
+    let dropdownControl =  this.comboBoxService.getComboRef().elementRef.nativeElement.firstElementChild.firstElementChild;
     let position = { 
       x: dropdownControl.getBoundingClientRect().x,  
       y: dropdownControl.getBoundingClientRect().y + this.scrollOffsetService.getOffsetY(),
@@ -74,7 +73,7 @@ export class ComboBoxDropdownComponent implements OnInit {
   }
 
   choose(choiceIndex: any){
-    this.comboBoxService.getComboRefList()[0].updateValue(choiceIndex);
+    this.comboBoxService.getComboRef().updateValue(choiceIndex);
   }
 
 }

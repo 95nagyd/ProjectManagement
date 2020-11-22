@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Role } from '@app/_models/role';
 import { User } from '@app/_models/user';
 import { AuthenticationService } from '@app/_services/authentication.service';
+import { GlobalModalsService } from '@app/_services/global-modals.service';
 import { SpinnerService } from '@app/_services/spinner.service';
 import { UserService } from '@app/_services/user.service';
 import { UserModalComponent } from './user-modal/user-modal.component';
@@ -20,7 +21,7 @@ export class TeamComponent implements OnInit {
 
   @ViewChild(UserModalComponent) userModal : UserModalComponent;
 
-  constructor(public authenticationService: AuthenticationService, private spinner: SpinnerService, private userService: UserService) { 
+  constructor(public authenticationService: AuthenticationService, private spinner: SpinnerService, private userService: UserService, private globalModalsService: GlobalModalsService) { 
     this.spinner.show();
   }
 
@@ -46,8 +47,11 @@ export class TeamComponent implements OnInit {
       this.users = tempUsers;
       this.spinner.hide();
     }, error => {
-      //TODO: hiba modal
-      alert("Hiba a felhasználók lekérdezésekor!")
+      if(!this.globalModalsService.isErrorModalOpen()){
+        this.globalModalsService.openErrorModal(error.message).then(() => {
+          this.globalModalsService.closeErrorModal();
+        });
+      }
       this.spinner.forceHide();
     });
   }

@@ -58,3 +58,5 @@
 i {
     color: rgb(255, 166, 0);
 }
+
+.ng-leave { display:none; }

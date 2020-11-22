@@ -8,7 +8,8 @@ async function getWorkingTimeByGivenUserIdAndPeriod(userId, period) {
 }
 
 async function saveCurrentUserWorkingTimeByGivenPeriod(userId, period, workingTime) {
-    return await mongoService.update('workingTimes', {userId: new ObjectId(userId), period:period}, { $set: {workingTime: workingTime} }, {upsert: true} );
+    //return await mongoService.update('workingTimes', {userId: new ObjectId(userId), period:period}, { $set: {workingTime: workingTime} }, {upsert: true} );
+    return await mongoService.saveWorkingTime(userId, period, workingTime);
 }
 
 async function getFirstSavedPeriod(){

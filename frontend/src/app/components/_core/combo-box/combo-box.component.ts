@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, Input, NgZone, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, Input, NgZone, OnChanges, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { ComboBoxService } from '@app/_services/combo-box.service';
 import { EventEmitter } from '@angular/core'
 import { ChangeDetectionStrategy } from '@angular/compiler/src/core';
@@ -11,7 +11,7 @@ import { BasicElement } from '@app/_models/basic-data';
   styleUrls: ['./combo-box.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ComboBoxComponent implements OnInit {
+export class ComboBoxComponent implements OnInit, OnChanges {
 
 
   hasError: Boolean;
@@ -36,7 +36,7 @@ export class ComboBoxComponent implements OnInit {
   @Input() isRequired: Boolean;
   @Output() update: EventEmitter<string>;
 
-  constructor(private comboBoxService: ComboBoxService, public elementRef: ElementRef, private spinner: SpinnerService, private _ngZone: NgZone) { 
+  constructor(private comboBoxService: ComboBoxService, public elementRef: ElementRef, private spinner: SpinnerService, private cdRef: ChangeDetectorRef) { 
     this.hasError = false;
     this.hasValue = false;
     this.isActive = false;
@@ -47,13 +47,24 @@ export class ComboBoxComponent implements OnInit {
 
   ngOnInit(): void {
     this.hasValue = !(!this.chosenId || this.chosenId.length === 0);
+    
 
     //kezdetben a szúrés értéke (a megjelenített név) a mentett id-hez tartozó név vagy üres string
-    this.searchValue = this.getNameById(this.chosenId);
+    this.searchValue = this.getChosenName();
   }
 
-  getNameById(id: string){
-    return this.choices?.find(choice => choice._id === id)?.name || '';
+  ngOnChanges() {
+    if(this.chosenId && !this.getChosenName()) {
+      setTimeout(() => {
+        this.hasError = true;
+        this.clearValue();
+        this.cdRef.detectChanges();
+      }, 0);
+    }
+  }
+
+  getChosenName(){
+    return this.choices?.find(choice => choice._id === this.chosenId)?.name || '';
   }
 
   indexOfElementByName(name: string){
@@ -70,17 +81,15 @@ export class ComboBoxComponent implements OnInit {
       return;
     } 
     this.comboBoxService.hideDropdown();
-    this.comboBoxService.removeAndCloseGivenComboRef(this);
+    this.closeComboBox();
   }
 
   openComboBox(){
-    this.comboBoxService.removeAndCloseOldComboRef(this);
-    this.comboBoxService.addComboRef(this);
     this.isActive = true;
     //minden megnyitáskor a teljes elem lista látszik
     this.searchResult = this.choices;
     this.arrowIndex = (this.choices && this.indexOfElementByName(this.searchValue) != -1) ? this.indexOfElementByName(this.searchValue) : 0;
-    this.comboBoxService.showDropdown();
+    this.comboBoxService.showDropdown(this);
   }
 
   closeComboBox(){
@@ -90,16 +99,18 @@ export class ComboBoxComponent implements OnInit {
     this.arrowIndex = 0;
     this.hasError = !this.isValueValid();
     this.search?.nativeElement?.blur();
+
   }
   
 
   clickedOutside(){
+    console.log("close call")
     if(this.comboBoxService.isLastClickOutOfDropdown() && this.mouseEventCounter === 0){
-      const chosenName = this.getNameById(this.chosenId);
+      const chosenName = this.getChosenName();
       //ha a szűrés nem egyezik a korábban kiválasztott értékkel akkor a kiválasztott név marad
       if(this.searchValue != chosenName) { this.searchValue = chosenName; }
       this.comboBoxService.hideDropdown();
-      this.comboBoxService.removeAndCloseGivenComboRef(this);
+      this.closeComboBox();
     }
   }
 
@@ -130,7 +141,7 @@ export class ComboBoxComponent implements OnInit {
     }
     this.hasError = !this.isValueValid();
     this.comboBoxService.hideDropdown();
-    this.comboBoxService.removeAndCloseGivenComboRef(this);
+    this.closeComboBox();
     
   }
 
@@ -152,7 +163,7 @@ export class ComboBoxComponent implements OnInit {
   onKeyDown(event: any){
     if(event.code === 'Tab') { 
       this.comboBoxService.hideDropdown();
-      this.comboBoxService.removeAndCloseGivenComboRef(this);
+      this.closeComboBox();
       return; 
     }
     if (event.code === 'ArrowUp') { 
@@ -193,7 +204,7 @@ export class ComboBoxComponent implements OnInit {
   @HostListener('window:resize')
   onResize() {
     this.comboBoxService.hideDropdown();
-    this.comboBoxService.removeAndCloseGivenComboRef(this);
+    this.closeComboBox();
   }
 
 }

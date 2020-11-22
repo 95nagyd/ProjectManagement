@@ -27,6 +27,10 @@ export class GlobalModalsComponent implements OnInit {
   errorModalContent: any;
   openErrorModalRef: any;
 
+  @ViewChild('warningModal') warningModalRef: ElementRef;
+  warningModalContent: any;
+  openWarningModalRef: any;
+
   constructor(private modalService: NgbModal, private globalModalsService: GlobalModalsService, private comboBoxService: ComboBoxService, private spinner: SpinnerService) { 
     this.globalModalsService.register(this);
 
@@ -41,6 +45,9 @@ export class GlobalModalsComponent implements OnInit {
 
     this.errorModalContent = '';
     this.openErrorModalRef = null;
+
+    this.warningModalContent = '';
+    this.openWarningModalRef = null;
   }
 
   ngOnInit(): void {
@@ -97,7 +104,7 @@ export class GlobalModalsComponent implements OnInit {
 
   openErrorModal(content: any){
     this.comboBoxService.externalCloseComboAndHideDropdown();
-    this.errorModalContent = content.toString();
+    this.errorModalContent = content.toString() === "[object Object]" ? JSON.stringify(content) : content.toString();
     this.spinner.forceHide();
     this.openErrorModalRef = this.modalService.open(this.errorModalRef, {centered: true, windowClass: 'modal-holder error-modal', backdrop: 'static', keyboard: false});
     return this.openErrorModalRef.result;
@@ -111,5 +118,24 @@ export class GlobalModalsComponent implements OnInit {
   isErrorModalOpen(){
     return !!this.openErrorModalRef;
   }
+
+
+  openWarningModal(content: any){
+    this.comboBoxService.externalCloseComboAndHideDropdown();
+    this.warningModalContent = content.toString() === "[object Object]" ? JSON.stringify(content) : content.toString();
+    this.spinner.forceHide();
+    this.openWarningModalRef = this.modalService.open(this.warningModalRef, {centered: true, windowClass: 'modal-holder warning-modal', backdrop: 'static', keyboard: false});
+    return this.openWarningModalRef.result;
+  }
+
+  closeWarningModal(){
+    this.openWarningModalRef?.close();
+    this.openWarningModalRef = null;
+  }
+
+  isWarningModalOpen(){
+    return !!this.openWarningModalRef;
+  }
+
 
 }

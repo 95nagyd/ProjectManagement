@@ -67,6 +67,8 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
 
   //TODO: első időszak ha nincs senkinek akkor -1 a minperiod az aktuális hónap 
   //TODO: az első töltésig (bárkié) lehessen visszamenni
+
+  //TODO: alul kiférjen a legnagyobb message, ahhoz a mérethez beállítani a max dropdown height-t
   //TODO: munkaidő millisec-be legyen tárolva
   //TODO: aktuális napra színes keret
   //TODO: naptár szürke színeket kicsit kékebbé
@@ -138,9 +140,9 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
       this.subtaskList = result.subtasks;
       this.isComboReady = true;
       this.spinner.hide();
-    }, (reject) => {
+    }, (error) => {
       //TODO: hiba modal
-      console.log(reject)
+      console.log(error)
       this.spinner.forceHide();
     });
   }
@@ -156,24 +158,24 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
       this.globalModalsService.hasChanges = true;
       this.globalModalsService.openConfirmModal(ConfirmModalType.Discard).then((isDiscardRequired) => {
         if(isDiscardRequired){
-          this.spinner.show();
-          this.chosenPeriod.setMonth(this.chosenPeriod.getMonth() + (direction === 'previous' ? -1 : 1)); 
-          this.calendarViewData = null;
-          this.setPeriod();
-          this.refreshCalendar();
-          this.spinner.hide();
+          
+          this.doChange(direction);
           this.globalModalsService.hasChanges = false;
         }
         this.globalModalsService.closeConfirmModal();
       });
     } else {
-      this.spinner.show();
-      this.chosenPeriod.setMonth(this.chosenPeriod.getMonth() + (direction === 'previous' ? -1 : 1)); 
-      this.calendarViewData = null;
-      this.setPeriod();
-      this.refreshCalendar();
-      this.spinner.hide();
+      this.doChange(direction);
     }
+  }
+  private doChange(direction: string){
+    this.spinner.show();
+    this.getComboElements();
+    this.chosenPeriod.setMonth(this.chosenPeriod.getMonth() + (direction === 'previous' ? -1 : 1)); 
+    this.calendarViewData = null;
+    this.setPeriod();
+    this.refreshCalendar();
+    this.spinner.hide();
   }
 
   refreshCalendar() {
@@ -199,6 +201,7 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
     this.spinner.show();
     if(this.user){
       this.calendarService.getUserWorkingTimeByGivenPeriod(this.chosenPeriod.getTime(), this.user._id).subscribe((workingTime) => {
+
         this.calendarViewData = workingTime;
         this.calendarOldData = _.cloneDeep<CalendarData>(this.calendarViewData);
         this.daysOfMonth.forEach(dayData => {
@@ -391,13 +394,26 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
       this.globalModalsService.hasChanges = false;
       //TODO: toaster
       console.log("sikeres mentés toaster")
+      this.getComboElements();
       this.updateCalendarViewData();
       this.spinner.hide();
     }, error => {
-      //TODO: hiba modal
-      //TODO: IDE ha nincs combo elem akkor be kell pirosozni azt a kombót
-      //TODO: mentéskor ellenőrizni, hogy megvan-e még a mentendő combo elem, ha nincs akkor haserror
-      console.log("nem siker modal")
+      console.log(error.code === 400)
+      console.log(error)
+      if(error.code === 400){
+        if(!this.globalModalsService.isWarningModalOpen()){
+          this.globalModalsService.openWarningModal(error.message).then(() => {
+              this.getComboElements();
+              this.globalModalsService.closeWarningModal();
+          });
+        }
+      } else {
+        if(!this.globalModalsService.isErrorModalOpen()){
+          this.globalModalsService.openErrorModal(error.message).then(() => {
+              this.globalModalsService.closeErrorModal();
+          });
+        }
+      }
       this.spinner.forceHide();
     });
   }
