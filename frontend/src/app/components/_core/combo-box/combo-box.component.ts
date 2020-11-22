@@ -74,17 +74,13 @@ export class ComboBoxComponent implements OnInit {
   }
 
   openComboBox(){
-    console.log("removed")
     this.comboBoxService.removeAndCloseOldComboRef(this);
-    console.log("add comboref")
-    this.comboBoxService.addComboRef(this).then(() => {
-      this.isActive = true;
-
-      //minden megnyitáskor a teljes elem lista látszik
-      this.searchResult = this.choices;
-      this.arrowIndex = (this.choices && this.indexOfElementByName(this.searchValue) != -1) ? this.indexOfElementByName(this.searchValue) : 0;
-      this.comboBoxService.showDropdown();
-    });
+    this.comboBoxService.addComboRef(this);
+    this.isActive = true;
+    //minden megnyitáskor a teljes elem lista látszik
+    this.searchResult = this.choices;
+    this.arrowIndex = (this.choices && this.indexOfElementByName(this.searchValue) != -1) ? this.indexOfElementByName(this.searchValue) : 0;
+    this.comboBoxService.showDropdown();
   }
 
   closeComboBox(){

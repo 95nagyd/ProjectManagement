@@ -38,31 +38,30 @@ export class ComboBoxDropdownComponent implements OnInit {
   }
 
   show(){
-    this.comboBoxService.getComboRefList().then((comboBoxRefList: ComboBoxComponent[]) => {
-      // a megjelölendő elem szövege
-      this.chosenName = comboBoxRefList[0].searchValue;
+    const firstComboRef = this.comboBoxService.getComboRefList()[0];
 
-      // megjelenítéskor a teljes elemlista látszik
-      this.choices = comboBoxRefList[0].searchResult;
-      this.setPosition();
-    });
+    // a megjelölendő elem szövege
+    this.chosenName = firstComboRef.searchValue;
+
+    // megjelenítéskor a teljes elemlista látszik
+    this.choices = firstComboRef.searchResult;
+    this.setPosition();
   }
 
   setPosition(){
-    this.comboBoxService.getComboRefList().then((comboBoxRefList: ComboBoxComponent[]) => {
-      let dropdownControl = comboBoxRefList[0].elementRef.nativeElement.firstElementChild.firstElementChild;
-      let position = { 
-        x: dropdownControl.getBoundingClientRect().x,  
-        y: dropdownControl.getBoundingClientRect().y + this.scrollOffsetService.getOffsetY(),
-        minWidth: dropdownControl.getBoundingClientRect().width
-      };
-      position.x -= 9;
-      position.y -= 56;
-      this.styleData = position;
-      this.isVisible = true;
-      dropdownControl.firstElementChild.focus();
-      dropdownControl.firstElementChild.select();
-    });
+    const firstComboRef = this.comboBoxService.getComboRefList()[0];
+    let dropdownControl = firstComboRef.elementRef.nativeElement.firstElementChild.firstElementChild;
+    let position = { 
+      x: dropdownControl.getBoundingClientRect().x,  
+      y: dropdownControl.getBoundingClientRect().y + this.scrollOffsetService.getOffsetY(),
+      minWidth: dropdownControl.getBoundingClientRect().width
+    };
+    position.x -= 9;
+    position.y -= 56;
+    this.styleData = position;
+    this.isVisible = true;
+    dropdownControl.firstElementChild.focus();
+    dropdownControl.firstElementChild.select();
   }
 
   hide(){
@@ -75,9 +74,7 @@ export class ComboBoxDropdownComponent implements OnInit {
   }
 
   choose(choiceIndex: any){
-    this.comboBoxService.getComboRefList().then((comboBoxRefList: ComboBoxComponent[]) => {
-      comboBoxRefList[0].updateValue(choiceIndex);
-    });
+    this.comboBoxService.getComboRefList()[0].updateValue(choiceIndex);
   }
 
 }

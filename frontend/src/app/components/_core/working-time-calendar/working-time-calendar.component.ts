@@ -54,12 +54,11 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
   designPhaseList: Array<BasicElement>;
   structuralElementList: Array<BasicElement>;
   subtaskList: Array<BasicElement>;
+  isComboReady: boolean;
 
   editingComment: { dayNumber: number, dataIndex: number }
 
-//TODO: calendarViewData-ba az elemek azok basicelement-ek
-//TODO: combobox chosen choices basicelement
-//TODO: updateCombo-ba ,megfelelően a basicelement-nek
+//TODO: spinne show-hide párok
 
 
   //TODO: hiba modalok, 
@@ -97,21 +96,9 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
         alert("nem sikerült lekérdezni az első mentett időszakot")
         this.spinner.forceHide();
       });
+      this.isComboReady = false;
+      this.getComboElements();
 
-      this.spinner.show();
-      this.basicDataService.getAllBasicElements().subscribe((result) => {
-        console.log(result)
-        this.projectList = result.projects;
-        this.designPhaseList = result.designPhases;
-        this.structuralElementList = result.structuralElements;
-        this.subtaskList = result.subtasks;
-        this.spinner.hide();
-      }, (reject) => {
-        //TODO: hiba modal
-        console.log(reject)
-        this.spinner.forceHide();
-      });
-      
       this.chosenPeriod = new Date();
       this.chosenPeriod.setHours(0,0,0,0);
       this.chosenPeriod.setDate(1);
@@ -139,6 +126,23 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
       this.comboColWidth = (this.header.nativeElement.getBoundingClientRect().width - 445) * 0.25;
     }, 0);
     this.spinner.hide();
+  }
+
+  getComboElements(){
+    this.spinner.show();
+    this.basicDataService.getAllBasicElements().subscribe((result) => {
+      console.log(result)
+      this.projectList = result.projects;
+      this.designPhaseList = result.designPhases;
+      this.structuralElementList = result.structuralElements;
+      this.subtaskList = result.subtasks;
+      this.isComboReady = true;
+      this.spinner.hide();
+    }, (reject) => {
+      //TODO: hiba modal
+      console.log(reject)
+      this.spinner.forceHide();
+    });
   }
 
   //#region calendar control

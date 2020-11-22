@@ -14,27 +14,10 @@ export class ComboBoxService {
     this.comboBoxDropdown = comboBoxDropdown;
   }
 
-  //TODO: kipróbálni promise nélkl működik-e
-
   addComboRef(comboBoxRef: ComboBoxComponent) {
-    return new Promise((resolve) => {
-      if(this.comboBoxRefList.indexOf(comboBoxRef) === -1){
-        this.comboBoxRefList.push(comboBoxRef);
-      }
-      resolve();
-    });
-  }
-
-  removeAndCloseOldComboRef_(actualComboBoxRef: ComboBoxComponent){
-    return new Promise((resolve) => {
-      this.comboBoxRefList.forEach((comboBoxRef) => {
-        if((comboBoxRef.elementRef.nativeElement !== actualComboBoxRef.elementRef.nativeElement)){
-          this.removeAndCloseGivenComboRef(comboBoxRef);
-        }
-      });
-      console.log("removed complete")
-      resolve();
-    });
+    if(this.comboBoxRefList.indexOf(comboBoxRef) === -1){
+      this.comboBoxRefList.push(comboBoxRef);
+    }
   }
 
   removeAndCloseOldComboRef(actualComboBoxRef: ComboBoxComponent){
@@ -43,34 +26,25 @@ export class ComboBoxService {
         this.removeAndCloseGivenComboRef(comboBoxRef);
       }
     });
-    console.log("removed complete")
   }
 
   removeAndCloseGivenComboRef(actualComboBoxRef: ComboBoxComponent){
-    return new Promise((resolve) => {
-      const indexOfActual = this.comboBoxRefList.indexOf(actualComboBoxRef);
-      if(indexOfActual !== -1){
-        actualComboBoxRef.closeComboBox();
-        this.comboBoxRefList.splice(indexOfActual, 1);
-      }
-      resolve();
-    });
+    const indexOfActual = this.comboBoxRefList.indexOf(actualComboBoxRef);
+    if(indexOfActual !== -1){
+      actualComboBoxRef.closeComboBox();
+      this.comboBoxRefList.splice(indexOfActual, 1);
+    }
   }
 
   externalCloseComboAndHideDropdown(){
-    return new Promise((resolve) => {
-      if(this.comboBoxDropdown) { this.comboBoxDropdown.hide(); }
-      if(this.comboBoxRefList.length > 0){
-        this.comboBoxRefList[0].closeComboBox();
-      }
-      resolve();
-    });
+    if(this.comboBoxDropdown) { this.comboBoxDropdown.hide(); }
+    if(this.comboBoxRefList.length > 0){
+      this.comboBoxRefList[0].closeComboBox();
+    }
   }
 
   getComboRefList() {
-    return new Promise((resolve) => {
-      resolve(this.comboBoxRefList)
-    });
+    return this.comboBoxRefList;
   }
 
   showDropdown() {

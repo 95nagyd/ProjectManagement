@@ -68,7 +68,7 @@
     </div>
     <div class="calendar-content">
         <table cellspacing="0" cellpadding="0" >
-            <tbody *ngIf="calendarViewData">
+            <tbody *ngIf="calendarViewData && isComboReady">
                 <tr *ngFor="let dayData of daysOfMonth; last as isLast;" 
                     [ngStyle]="{'background-color': dayData.backgroundColor}">
                     <!-- Dátum cella -->
