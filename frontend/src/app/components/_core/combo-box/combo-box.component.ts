@@ -17,8 +17,14 @@ export class ComboBoxComponent implements OnInit {
   hasError: Boolean;
   hasValue: Boolean;
   isActive: Boolean;
+
+  //a szűrés listája
   searchResult: Array<BasicElement>;
+
+  //a szűrő értéke
   searchValue: string;
+
+
   arrowIndex: number;
   mouseEventCounter: number;
 
@@ -41,7 +47,8 @@ export class ComboBoxComponent implements OnInit {
 
   ngOnInit(): void {
     this.hasValue = !(!this.chosenId || this.chosenId.length === 0);
-    this.searchResult = this.choices;
+
+    //kezdetben a szúrés értéke (a megjelenített név) a mentett id-hez tartozó név vagy üres string
     this.searchValue = this.getNameById(this.chosenId);
   }
 
@@ -67,19 +74,22 @@ export class ComboBoxComponent implements OnInit {
   }
 
   openComboBox(){
-    //TODO: itt kipróbálni, hogy promise nelkul is sorba megy e
-    this.comboBoxService.removeAndCloseOldComboRef(this).then(() => {
-      this.comboBoxService.addComboRef(this).then(() => {
-        this.isActive = true;
-        this.searchResult = this.choices;
-        this.arrowIndex = (this.choices && this.indexOfElementByName(this.searchValue) != -1) ? this.indexOfElementByName(this.searchValue) : 0;
-        this.comboBoxService.showDropdown();
-      });
+    console.log("removed")
+    this.comboBoxService.removeAndCloseOldComboRef(this);
+    console.log("add comboref")
+    this.comboBoxService.addComboRef(this).then(() => {
+      this.isActive = true;
+
+      //minden megnyitáskor a teljes elem lista látszik
+      this.searchResult = this.choices;
+      this.arrowIndex = (this.choices && this.indexOfElementByName(this.searchValue) != -1) ? this.indexOfElementByName(this.searchValue) : 0;
+      this.comboBoxService.showDropdown();
     });
   }
 
   closeComboBox(){
     this.isActive = false;
+    // szűrés lista kiürítése
     this.searchResult = [];
     this.arrowIndex = 0;
     this.hasError = !this.isValueValid();
@@ -90,6 +100,7 @@ export class ComboBoxComponent implements OnInit {
   clickedOutside(){
     if(this.comboBoxService.isLastClickOutOfDropdown() && this.mouseEventCounter === 0){
       const chosenName = this.getNameById(this.chosenId);
+      //ha a szűrés nem egyezik a korábban kiválasztott értékkel akkor a kiválasztott név marad
       if(this.searchValue != chosenName) { this.searchValue = chosenName; }
       this.comboBoxService.hideDropdown();
       this.comboBoxService.removeAndCloseGivenComboRef(this);
@@ -117,7 +128,6 @@ export class ComboBoxComponent implements OnInit {
     this.arrowIndex = choiceIndex === undefined ? this.arrowIndex : choiceIndex;
     if(this.searchResult.length > 0) {
       this.searchValue = this.searchResult[this.arrowIndex].name;
-      this.comboBoxService.updateDropdown(this.searchResult, this.searchValue);
       this.chosenId = this.choices.find(choice => choice.name === this.searchValue)?._id || '';
       this.hasValue = !(!this.chosenId || this.chosenId.length === 0);
       this.update.emit(this.chosenId);
@@ -157,19 +167,25 @@ export class ComboBoxComponent implements OnInit {
       this.arrowIndex = this.arrowIndex === this.searchResult.length-1 ? this.arrowIndex : this.arrowIndex+1;
       event.preventDefault(); 
     }
+
+    // dropdown frissítése a szűrt listára, és a megjelölendő névre
     this.comboBoxService.updateDropdown(this.searchResult, this.searchResult[this.arrowIndex]?.name || '');
   }
 
   filter(value: any) {
     this.arrowIndex = 0;
+    //szűrés kiürítése
     this.searchResult = [];
     if(value.length > 0){
       for(let index = 0; index < this.choices.length; index++){
+        //szűrt lista a választható elemek neveiben való előfordulás alapján
         if(this.choices[index].name.toLowerCase().includes(value.toLowerCase())) this.searchResult.push(this.choices[index]);
       }
     } else {
-      this.searchResult = this.choices
+      //ha a szűrő üres, akkor a teljes lista látszik
+      this.searchResult = this.choices;
     }
+    // dropdown frissítése a szűrt listára, és a megjelölendő névre
     this.comboBoxService.updateDropdown(this.searchResult, this.searchResult[0]?.name || '');
   }
 

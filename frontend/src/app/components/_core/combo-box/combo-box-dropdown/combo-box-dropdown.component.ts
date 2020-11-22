@@ -39,7 +39,10 @@ export class ComboBoxDropdownComponent implements OnInit {
 
   show(){
     this.comboBoxService.getComboRefList().then((comboBoxRefList: ComboBoxComponent[]) => {
+      // a megjelölendő elem szövege
       this.chosenName = comboBoxRefList[0].searchValue;
+
+      // megjelenítéskor a teljes elemlista látszik
       this.choices = comboBoxRefList[0].searchResult;
       this.setPosition();
     });

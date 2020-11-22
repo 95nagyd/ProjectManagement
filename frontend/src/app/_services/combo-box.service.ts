@@ -25,15 +25,25 @@ export class ComboBoxService {
     });
   }
 
-  removeAndCloseOldComboRef(actualComboBoxRef: ComboBoxComponent){
+  removeAndCloseOldComboRef_(actualComboBoxRef: ComboBoxComponent){
     return new Promise((resolve) => {
       this.comboBoxRefList.forEach((comboBoxRef) => {
         if((comboBoxRef.elementRef.nativeElement !== actualComboBoxRef.elementRef.nativeElement)){
           this.removeAndCloseGivenComboRef(comboBoxRef);
         }
       });
+      console.log("removed complete")
       resolve();
     });
+  }
+
+  removeAndCloseOldComboRef(actualComboBoxRef: ComboBoxComponent){
+    this.comboBoxRefList.forEach((comboBoxRef) => {
+      if((comboBoxRef.elementRef.nativeElement !== actualComboBoxRef.elementRef.nativeElement)){
+        this.removeAndCloseGivenComboRef(comboBoxRef);
+      }
+    });
+    console.log("removed complete")
   }
 
   removeAndCloseGivenComboRef(actualComboBoxRef: ComboBoxComponent){
