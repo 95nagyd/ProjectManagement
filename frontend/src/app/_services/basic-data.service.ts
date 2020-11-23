@@ -40,4 +40,8 @@ export class BasicDataService {
     return this.http.post<any>(`${environment.apiUrl}/basicData/${type}/save`, { basicElement: basicElement });
   }
 
+  deleteBasicElement(basicElementId: string, type: BasicDataType){
+    return this.http.delete<any>(`${environment.apiUrl}/basicData/${type}/delete/${basicElementId}`);
+  }
+
 }

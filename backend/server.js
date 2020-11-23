@@ -55,7 +55,7 @@ app.post('/saveUser', verifyToken, (req, res) => {
             return res.status(200).send();
         }, (error) => {
             if(error === 404){
-                return res.status(404).send({ message: "Sikertelen módosítás.\nA módosítandó dolgozó felhasználóját időközben törölték." })
+                return res.status(404).send({ message: "Sikertelen módosítás.\nA módosítandó dolgozó felhasználóját időközben törölték." });
             }
             return res.status(422).send({ message: error });
         });
@@ -86,7 +86,7 @@ app.post('/workingTime/save/:period', verifyToken, (req, res) => {
         return res.status(201).send();
     }, (error) => {
         if(error === 404){
-            return res.status(404).send({ message: "A mentésre kerülő elemek közül időközben néhányat töröltek.\nMentés előtt javítsa a hibás mezőket!" })
+            return res.status(404).send({ message: "A mentésre kerülő elemek közül időközben néhányat töröltek.\nMentés előtt javítsa a hibás mezőket!" });
         }
         return res.status(422).send({ message: error });
     });
@@ -110,61 +110,47 @@ app.get('/basicData/all', verifyToken, (req, res) => {
     });
 });
 
-app.get('/basicData/projects', verifyToken, (req, res) => {
-    basicDataService.getBasicElementsByType('projects').then((projects) => {
-        return res.status(200).json(projects);
+app.get('/basicData/:type', verifyToken, (req, res) => {
+    basicDataService.getBasicElementsByType(req.params.type).then((elementList) => {
+        return res.status(200).json(elementList);
     }, (error) => {
         return res.status(400).json({ message: error });
     });
 });
 
-app.get('/basicData/designPhases', verifyToken, (req, res) => {
-    basicDataService.getBasicElementsByType('designPhases').then((designPhases) => {
-        return res.status(200).json(designPhases);
-    }, (error) => {
-        return res.status(400).json({ message: error });
-    });
-});
-
-app.get('/basicData/structuralElements', verifyToken, (req, res) => {
-    basicDataService.getBasicElementsByType('structuralElements').then((structuralElements) => {
-        return res.status(200).json(structuralElements);
-    }, (error) => {
-        return res.status(400).json({ message: error });
-    });
-});
-
-app.get('/basicData/subtasks', verifyToken, (req, res) => {
-    basicDataService.getBasicElementsByType('subtasks').then((subtasks) => {
-        return res.status(200).json(subtasks);
-    }, (error) => {
-        return res.status(400).json({ message: error });
-    });
-});
-
-app.post('/basicData/projects/save', verifyToken, verifyAdminRole, (req, res) => {
-    console.log(req.body.basicElement)
+app.post('/basicData/:type/save', verifyToken, verifyAdminRole, (req, res) => {
     if(req.body.basicElement._id === '-1'){
-        basicDataService.addBasicElementByType(req.body.basicElement, 'projects').then(() => {
+        basicDataService.addBasicElementByType(req.body.basicElement, req.params.type).then(() => {
             return res.status(201).send();
         }, (error) => {
             return res.status(422).send({ message: error });
         });
     } else {
-        basicDataService.saveBasicElementByType(req.body.basicElement, 'projects').then(() => {
+        basicDataService.saveBasicElementByType(req.body.basicElement, req.params.type).then(() => {
             return res.status(200).send();
         }, (error) => {
             if(error === 404){
-                return res.status(404).send({ message: "Sikertelen módosítás.\nA módosítandó elemet időközben törölték." })
+                return res.status(404).send({ message: "Sikertelen módosítás.\nA módosítandó elemet időközben törölték." });
             }
             return res.status(422).send({ message: error });
         });
     }
 });
 
+app.delete('/basicData/:type/delete/:basicElementId', verifyToken, verifyAdminRole, (req, res) => {
+    basicDataService.deleteBasicElementByType(req.params.basicElementId, req.params.type).then(() => {
+        return res.status(201).send();
+    }, (error) => {
+        if(error === 409){
+            return res.status(409).send({ message: "Sikertelen törlés.\nA törölni kívánt elem használatban van." });
+        }
+        return res.status(422).send({ message: error });
+    });
+});
+
 
 function verifyAdminRole(req, res, next){
-    if(req.user.role !== "admin"){ return res.status(406).json({ message: "Nincs jogosultsága a művelet végrehajtásához!\nFolytatáshoz jelentkezzen be újra." }) }
+    if(req.user.role !== "admin"){ return res.status(406).json({ message: "Nincs jogosultsága a művelet végrehajtásához!\nFolytatáshoz jelentkezzen be újra." }); }
     return next();
 }
 

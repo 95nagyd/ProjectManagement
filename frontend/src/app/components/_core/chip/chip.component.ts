@@ -27,7 +27,7 @@ export class ChipComponent implements OnInit {
 
   @Input() chipData: BasicElement;
   @Output() save: EventEmitter<BasicElement>;
-  @Output() remove: EventEmitter<Guid>;
+  @Output() remove: EventEmitter<BasicElement>;
   @ViewChild('name') nameRef: ElementRef;
   isEditing: boolean;
   isNew: boolean;
@@ -92,13 +92,16 @@ export class ChipComponent implements OnInit {
     if(!isForced && this.isNew && this.nameRef.nativeElement.textContent.trim().length === 0) { isForced = true; }
     this.isEditing = false;
     if(isForced){
-      this.remove.emit(this.chipData.tempId);
+      this.remove.emit(this.chipData);
       return;
     }
-
+    if(this.chipData._id === "-1"){
+      this.remove.emit(this.chipData);
+      return;
+    }
     this.globalModalsService.openConfirmModal(ConfirmModalType.Delete).then((isDeleteRequired) => {
       if(isDeleteRequired) {
-        this.remove.emit(this.chipData.tempId);
+        this.remove.emit(this.chipData);
       };
       this.globalModalsService.closeConfirmModal();
     });

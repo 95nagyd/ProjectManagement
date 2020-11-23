@@ -23,7 +23,6 @@ app.use(function (req, res, next) {
     next();
 });
 
-//TODO: ezt lehet db-be kellene tárolni
 let refreshTokens = []
 
 app.post('/token', (req, res) => {
@@ -41,8 +40,7 @@ app.post('/token', (req, res) => {
             return res.status(200).json({ accessToken: accessToken });
         });
     }, (error) => {
-        console.log(error)
-        return res.status(500).json({ message: "Adatbázis elérési hiba!" });
+        return res.status(500).json({ message: error });
     });
 });
 

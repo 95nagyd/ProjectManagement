@@ -58,6 +58,8 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
 
   editingComment: { dayNumber: number, dataIndex: number }
 
+
+  //TODO: menü váltásra ha van changes akkor modal
 //TODO: spinne show-hide párok
 
 //TODO:!!!!!!!! ha mentek egy hónapra adatot utána pedig törlöm és üresen mentem akkor hiba
@@ -72,13 +74,14 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
   //TODO: aktuális napra színes keret
   //TODO: naptár szürke színeket kicsit kékebbé
 
-    //TODO: havi összes munkaidő az utolsó nap után (legalább annyi hely kell , hogy az utolsó nap max magasságos tooltipje kiférjen)
+    //TODO: havi összes munkaidő az utolsó nap után (legalább annyi hely kell , hogy az utolsó nap max magasságos tooltipje kiférjen), frontenden szamolodik 
 
-//TODO: kötelező oszlopok címébe *
     
     //TODO: subscribe-ok unsubscribe ngondestroyba
 
     //TODO: szabadság, betegszabadság (akkor a sor más szinű) (datpickerrel gombról megnyílik modal)
+
+    //TODO: mai nap keret
     
     //TODO: képek css-ből legyenek
 
@@ -414,7 +417,7 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
       this.spinner.hide();
     }, error => {
       this.spinner.forceHide();
-      if(error.code === 404){
+      if(error?.code === 404){
         if(!this.globalModalsService.isWarningModalOpen()){
           this.globalModalsService.openWarningModal(error.message).then(() => {
               this.getComboElements();

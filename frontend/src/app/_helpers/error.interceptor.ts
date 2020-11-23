@@ -37,7 +37,7 @@ export class ErrorInterceptor implements HttpInterceptor {
                                 });
                             }
                         }, 0);
-                    });
+                    }, () => {});
                 }
 
             }
@@ -69,7 +69,7 @@ export class ErrorInterceptor implements HttpInterceptor {
                             }));
                         }
                     }, 0);
-                });
+                }, () => {});
             }
 
             

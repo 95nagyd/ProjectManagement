@@ -21,7 +21,7 @@ import { GlobalModalsService } from '@app/_services/global-modals.service';
 })
 export class AdminComponent implements OnInit {
 
-  //TODO: törlés, lekérni az összes 
+  //TODO: szebb ikonok, kissebb betűk, valahogy szebbé csinálni
   //TODO: ngafterviewinitbe settimeout hide - konstruktor a párja mindenhova
 
   selectedTab: BasicDataType;
@@ -57,9 +57,9 @@ export class AdminComponent implements OnInit {
     }, (error) => {
       this.chipList = [];
       this.spinner.forceHide();
-      if(!this.globalModalsService.isErrorModalOpen()){
+      if (!this.globalModalsService.isErrorModalOpen()) {
         this.globalModalsService.openErrorModal(error.message).then(() => {
-            this.globalModalsService.closeErrorModal();
+          this.globalModalsService.closeErrorModal();
         });
       }
     });
@@ -77,9 +77,9 @@ export class AdminComponent implements OnInit {
 
 
   saveChip(chipData: BasicElement) {
-    this.spinner.show();
     const isValid = this.validateChips();
     if (isValid) {
+      this.spinner.show();
       delete chipData.tempId;
       this.basicDataService.saveBasicElement(chipData, this.selectedTab).subscribe(() => {
         this.getCurrentList();
@@ -87,7 +87,7 @@ export class AdminComponent implements OnInit {
         this.spinner.hide();
       }, (error) => {
         this.spinner.forceHide();
-        if (error.message.code === 11000) {
+        if (error?.message?.code === 11000) {
           this.getCurrentList();
           if (!this.globalModalsService.isWarningModalOpen()) {
             this.globalModalsService.openWarningModal('Sikertelen mentés.\nIdőközben valaki már hozzáadta a(z) "' + chipData.name + '" nevű elemet.').then(() => {
@@ -96,18 +96,18 @@ export class AdminComponent implements OnInit {
           }
           return;
         }
-        if(error.code === 404){
+        if (error?.code === 404) {
           this.getCurrentList();
-          if(!this.globalModalsService.isWarningModalOpen()){
+          if (!this.globalModalsService.isWarningModalOpen()) {
             this.globalModalsService.openWarningModal(error.message).then(() => {
-                this.globalModalsService.closeWarningModal();
+              this.globalModalsService.closeWarningModal();
             });
           }
           return;
         }
-        if(!this.globalModalsService.isErrorModalOpen()){
+        if (!this.globalModalsService.isErrorModalOpen()) {
           this.globalModalsService.openErrorModal(error.message).then(() => {
-              this.globalModalsService.closeErrorModal();
+            this.globalModalsService.closeErrorModal();
           });
         }
       });
@@ -144,14 +144,38 @@ export class AdminComponent implements OnInit {
 
 
 
-  deleteChip(deleteChipId: Guid) {
-    this.chipList = this.chipList.filter(chip => {
-      return !chip.tempId.equals(deleteChipId);
-    });
-    setTimeout(() => {
-      this.isAddVisible = this.validateChips();
-    }, 0);
+  deleteChip(deleteChip: BasicElement) {
 
+    if (deleteChip._id === "-1") {
+      this.chipList = this.chipList.filter(chip => {
+        return !chip.tempId.equals(deleteChip.tempId);
+      });
+      setTimeout(() => {
+        this.isAddVisible = this.validateChips();
+      }, 0);
+      return;
+    }
+    this.basicDataService.deleteBasicElement(deleteChip._id, this.selectedTab).subscribe(() => {
+      //TODO: siker toaster
+      this.getCurrentList();
+    }, (error) => {
+      this.spinner.forceHide();
+      if(error?.code === 409){
+        if(!this.globalModalsService.isWarningModalOpen()){
+          this.globalModalsService.openWarningModal(error.message).then(() => {
+              this.getCurrentList();
+              this.globalModalsService.closeWarningModal();
+          });
+        }
+        return;
+      }
+      if (!this.globalModalsService.isErrorModalOpen()) {
+        this.globalModalsService.openErrorModal(error.message).then(() => {
+          this.getCurrentList();
+          this.globalModalsService.closeErrorModal();
+        });
+      }
+    });
   }
 
   addChip() {

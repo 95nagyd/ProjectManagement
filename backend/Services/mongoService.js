@@ -8,7 +8,6 @@ class MongoService {
         this.dbName = dbName;
     }
 
-    //TODO: db.workingTimes.find({},{projectId: 1, designPhaseId: 1, structuralElementId: 1, subtaskId: 1}).pretty()
     //TODO: docker container
 
     find(collectionName, query, options) {
@@ -105,55 +104,22 @@ class MongoService {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-    replace(collectionName, query, entry) {
-        return new Promise((resolve, reject) => {
-            MongoClient.connect(this.url, { useUnifiedTopology: true }, (err, client) => {
-                if (err) {
-                    console.log('DB Connection Error: ' + err);
-                    reject(err);
-                } else {
-                    var db = client.db(this.dbName);
-
-                    db.collection(collectionName).replaceOne(query, entry, (foundErr, collection) => {
-                        if (foundErr) {
-                            client.close();
-                            reject(foundErr);
-                        } else {
-                            client.close();
-                            resolve();
-                        }
-                    });
-                }
-            });
-        });
-    }
-
     delete(collectionName, query) {
         return new Promise((resolve, reject) => {
             MongoClient.connect(this.url, { useUnifiedTopology: true }, (err, client) => {
                 if (err) {
                     console.log('DB Connection Error: ' + err);
-                    reject(err);
+                    return reject(err);
                 } else {
                     var db = client.db(this.dbName);
 
                     db.collection(collectionName).deleteOne(query, (foundErr, collection) => {
                         if (foundErr) {
                             client.close();
-                            reject(foundErr);
+                            return reject(foundErr);
                         } else {
                             client.close();
-                            resolve();
+                            return resolve();
                         }
                     });
                 }
