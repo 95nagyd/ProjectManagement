@@ -52,8 +52,11 @@ app.post('/saveUser', verifyToken, (req, res) => {
         });
     } else {
         userService.saveUser(req.body.user).then(() => {
-            return res.status(201).send();
+            return res.status(200).send();
         }, (error) => {
+            if(error === 404){
+                return res.status(404).send({ message: "Sikertelen módosítás.\nA módosítandó dolgozó felhasználóját időközben törölték." })
+            }
             return res.status(422).send({ message: error });
         });
     }
@@ -82,8 +85,8 @@ app.post('/workingTime/save/:period', verifyToken, (req, res) => {
     workingTimeService.saveCurrentUserWorkingTimeByGivenPeriod(req.user._id, req.params.period, req.body.workingTime).then(() => {
         return res.status(201).send();
     }, (error) => {
-        if(error === 400){
-            return res.status(400).send({ message: "A a mentésre kerülő elemek közül időközben néhányat töröltek.\nMentés előtt javítsa a hibás mezőket!" })
+        if(error === 404){
+            return res.status(404).send({ message: "A mentésre kerülő elemek közül időközben néhányat töröltek.\nMentés előtt javítsa a hibás mezőket!" })
         }
         return res.status(422).send({ message: error });
     });
@@ -108,7 +111,7 @@ app.get('/basicData/all', verifyToken, (req, res) => {
 });
 
 app.get('/basicData/projects', verifyToken, (req, res) => {
-    basicDataService.getProjects({}).then((projects) => {
+    basicDataService.getBasicElementsByType('projects').then((projects) => {
         return res.status(200).json(projects);
     }, (error) => {
         return res.status(400).json({ message: error });
@@ -116,32 +119,54 @@ app.get('/basicData/projects', verifyToken, (req, res) => {
 });
 
 app.get('/basicData/designPhases', verifyToken, (req, res) => {
-    basicDataService.getDesignPhases({}).then((projects) => {
-        return res.status(200).json(projects);
+    basicDataService.getBasicElementsByType('designPhases').then((designPhases) => {
+        return res.status(200).json(designPhases);
     }, (error) => {
         return res.status(400).json({ message: error });
     });
 });
 
 app.get('/basicData/structuralElements', verifyToken, (req, res) => {
-    basicDataService.getStructuralElements({}).then((projects) => {
-        return res.status(200).json(projects);
+    basicDataService.getBasicElementsByType('structuralElements').then((structuralElements) => {
+        return res.status(200).json(structuralElements);
     }, (error) => {
         return res.status(400).json({ message: error });
     });
 });
 
 app.get('/basicData/subtasks', verifyToken, (req, res) => {
-    basicDataService.getSubtasks({}).then((projects) => {
-        return res.status(200).json(projects);
+    basicDataService.getBasicElementsByType('subtasks').then((subtasks) => {
+        return res.status(200).json(subtasks);
     }, (error) => {
         return res.status(400).json({ message: error });
     });
 });
 
+app.post('/basicData/projects/save', verifyToken, verifyAdminRole, (req, res) => {
+    console.log(req.body.basicElement)
+    if(req.body.basicElement._id === '-1'){
+        basicDataService.addBasicElementByType(req.body.basicElement, 'projects').then(() => {
+            return res.status(201).send();
+        }, (error) => {
+            return res.status(422).send({ message: error });
+        });
+    } else {
+        basicDataService.saveBasicElementByType(req.body.basicElement, 'projects').then(() => {
+            return res.status(200).send();
+        }, (error) => {
+            if(error === 404){
+                return res.status(404).send({ message: "Sikertelen módosítás.\nA módosítandó elemet időközben törölték." })
+            }
+            return res.status(422).send({ message: error });
+        });
+    }
+});
 
 
-
+function verifyAdminRole(req, res, next){
+    if(req.user.role !== "admin"){ return res.status(406).json({ message: "Nincs jogosultsága a művelet végrehajtásához!\nFolytatáshoz jelentkezzen be újra." }) }
+    return next();
+}
 
 function verifyToken(req, res, next){
     const authHeader = req.headers['authorization'];
@@ -151,7 +176,7 @@ function verifyToken(req, res, next){
         if(err) return res.status(401).json({ message: "Azonosítási hiba. Folytatáshoz jelentkezzen be újra." });
         return userService.getUsers({ username: user.username }).then(async (users) => {
             if(users.length !== 1) return res.status(401).json({ message: "Azonosítási hiba. Folytatáshoz jelentkezzen be újra." });
-            req.user = user;
+            req.user = users[0];
             return next();
         }, (error) => {
             return res.status(500).json({ message: "Adatbázis elérési hiba!" });

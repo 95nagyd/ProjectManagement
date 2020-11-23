@@ -6,7 +6,6 @@ html, body {
 .h-max {
     height: calc( 100vh - 70px );
     overflow-y: auto;
-    overflow-x: auto;
 }
 
 
@@ -16,4 +15,6 @@ html, body {
 
 
 
-
+.overflow-x-auto {
+    overflow-x: auto;
+}

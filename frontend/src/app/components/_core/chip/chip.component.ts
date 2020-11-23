@@ -26,7 +26,7 @@ export class ChipComponent implements OnInit {
   //TODO: chip árnyék
 
   @Input() chipData: BasicElement;
-  @Output() validate: EventEmitter<ChipComponent>;
+  @Output() save: EventEmitter<BasicElement>;
   @Output() remove: EventEmitter<Guid>;
   @ViewChild('name') nameRef: ElementRef;
   isEditing: boolean;
@@ -36,7 +36,7 @@ export class ChipComponent implements OnInit {
   isInUse: boolean;
 
   constructor(private globalModalsService: GlobalModalsService) {
-    this.validate = new EventEmitter();
+    this.save = new EventEmitter();
     this.remove = new EventEmitter();
     this.isEditing = false;
     this.isEmpty = false;
@@ -52,7 +52,6 @@ export class ChipComponent implements OnInit {
   }
 
   ngAfterViewInit(){
-    console.log("validate")
   }
 
   toggleEditing(){
@@ -83,13 +82,14 @@ export class ChipComponent implements OnInit {
       this.isEmpty = true; 
     }
     if(this.isNew) this.isNew = false;
+    this.nameRef.nativeElement.textContent = this.nameRef.nativeElement.textContent.trim();
+    if(this.chipData.name === this.nameRef.nativeElement.textContent) { return; }
     this.chipData.name = this.nameRef.nativeElement.textContent;
-    this.validate.emit();
+    this.save.emit(this.chipData);
   }
 
-  delete(){
-    let isForced = false;
-    if(this.isNew && this.nameRef.nativeElement.textContent.trim().length === 0) { isForced = true; }
+  delete(isForced?){
+    if(!isForced && this.isNew && this.nameRef.nativeElement.textContent.trim().length === 0) { isForced = true; }
     this.isEditing = false;
     if(isForced){
       this.remove.emit(this.chipData.tempId);
@@ -108,6 +108,14 @@ export class ChipComponent implements OnInit {
     if(event.key === 'Enter') { 
       this.isEditing = false;
       this.rename();
+    }
+  }
+
+  onKeydown(event){
+    if(event.key === 'Escape') { 
+      if(this.isNew) { this.delete(true); }
+      this.isEditing = false;
+      this.nameRef.nativeElement.textContent = this.chipData.name;
     }
   }
 

@@ -13,7 +13,7 @@ export class BasicDataService {
   constructor(private http: HttpClient) { }
 
 
-  getBasicData(type: BasicDataType): Observable<BasicElement[]> {
+  getBasicElementsByType(type: BasicDataType): Observable<BasicElement[]> {
     return this.http.get<any>(`${environment.apiUrl}/basicData/${type}`).pipe(
       map(res => {
         const data = res.map((data: any) => new BasicElement(data));
@@ -34,6 +34,10 @@ export class BasicDataService {
         return data;
       })
     );
+  }
+
+  saveBasicElement(basicElement: BasicElement, type: BasicDataType){
+    return this.http.post<any>(`${environment.apiUrl}/basicData/${type}/save`, { basicElement: basicElement });
   }
 
 }

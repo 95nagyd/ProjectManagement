@@ -12,6 +12,7 @@ import { Guid } from 'guid-typescript';
 import { ChipComponent } from '../_core/chip/chip.component';
 import { BasicDataService } from '@app/_services/basic-data.service';
 import { take } from 'lodash-es';
+import { GlobalModalsService } from '@app/_services/global-modals.service';
 
 @Component({
   selector: 'admin',
@@ -20,17 +21,19 @@ import { take } from 'lodash-es';
 })
 export class AdminComponent implements OnInit {
 
-  //TODO: lekezelni, hogy ha egy módosítandó elem lastmodified nem annyi mint ami itt van akkor infoba, hogy valamki más módosította, kérem próbálja újra és újra lekérni a listát
+  //TODO: törlés, lekérni az összes 
+  //TODO: ngafterviewinitbe settimeout hide - konstruktor a párja mindenhova
+
   selectedTab: BasicDataType;
   chipList: Array<BasicElement>;
   @ViewChildren(ChipComponent) chipRefList!: QueryList<ChipComponent>;
   isAddVisible: boolean;
-  
-  
-  constructor(private spinner: SpinnerService, private basicDataService: BasicDataService) { 
+
+
+  constructor(private spinner: SpinnerService, private basicDataService: BasicDataService, private globalModalsService: GlobalModalsService) {
 
     this.spinner.show();
-    
+
     this.selectedTab = BasicDataType.PROJECT;
     this.getCurrentList();
 
@@ -41,53 +44,88 @@ export class AdminComponent implements OnInit {
   }
 
   ngAfterViewInit() {
-    this.spinner.hide();
+    setTimeout(() => {
+      this.spinner.hide();
+    }, 0);
   }
 
-  getCurrentList(){
+  getCurrentList() {
     this.spinner.show();
-    this.basicDataService.getBasicData(this.selectedTab).subscribe((result) => {
+    this.basicDataService.getBasicElementsByType(this.selectedTab).subscribe((result) => {
       this.chipList = result;
-      console.log(this.chipList)
       this.spinner.hide();
     }, (error) => {
       this.chipList = [];
-      //TODO: hiba modal
-      console.log("nem siker")
       this.spinner.forceHide();
+      if(!this.globalModalsService.isErrorModalOpen()){
+        this.globalModalsService.openErrorModal(error.message).then(() => {
+            this.globalModalsService.closeErrorModal();
+        });
+      }
     });
   }
 
   public get basicDataTab(): typeof BasicDataType {
-    return BasicDataType; 
+    return BasicDataType;
   }
 
 
-  switchToTab(tab: BasicDataType){
+  switchToTab(tab: BasicDataType) {
     this.selectedTab = tab;
     this.getCurrentList();
   }
 
 
+  saveChip(chipData: BasicElement) {
+    this.spinner.show();
+    const isValid = this.validateChips();
+    if (isValid) {
+      delete chipData.tempId;
+      this.basicDataService.saveBasicElement(chipData, this.selectedTab).subscribe(() => {
+        this.getCurrentList();
+        //TODO: sikeres mentés toaster
+        this.spinner.hide();
+      }, (error) => {
+        this.spinner.forceHide();
+        if (error.message.code === 11000) {
+          this.getCurrentList();
+          if (!this.globalModalsService.isWarningModalOpen()) {
+            this.globalModalsService.openWarningModal('Sikertelen mentés.\nIdőközben valaki már hozzáadta a(z) "' + chipData.name + '" nevű elemet.').then(() => {
+              this.globalModalsService.closeWarningModal();
+            });
+          }
+          return;
+        }
+        if(error.code === 404){
+          this.getCurrentList();
+          if(!this.globalModalsService.isWarningModalOpen()){
+            this.globalModalsService.openWarningModal(error.message).then(() => {
+                this.globalModalsService.closeWarningModal();
+            });
+          }
+          return;
+        }
+        if(!this.globalModalsService.isErrorModalOpen()){
+          this.globalModalsService.openErrorModal(error.message).then(() => {
+              this.globalModalsService.closeErrorModal();
+          });
+        }
+      });
+    }
+  }
 
-
-
-
-
-
-  validateChips(){
-    //ez egyesével fog menni, backendről jön majd a válasz, hogy siker v sem
+  validateChips() {
     this.isAddVisible = false;
     this.chipRefList.forEach((chip, index, chipArray) => {
       chipArray[index].isAlreadyExist = false;
     });
     let unique = []
     const duplicates = this.chipList.filter(chip => {
-      if(unique.find(x => x.name === chip.name)) { return true; }
+      if (unique.find(x => x.name === chip.name)) { return true; }
       unique.push(chip);
       return false;
     });
-    if(duplicates.length > 0){
+    if (duplicates.length > 0) {
       duplicates.forEach(duplicate => {
         this.chipRefList.filter(chipRef => { return chipRef.chipData.name === duplicate.name }).forEach((duplicateChip, index, duplicateArray) => {
           duplicateArray[index].isAlreadyExist = true;
@@ -95,26 +133,28 @@ export class AdminComponent implements OnInit {
       });
       return false;
     }
-    
-    if(this.chipRefList.some(chipRef => chipRef.isEmpty || chipRef.isAlreadyExist)) { 
+
+    if (this.chipRefList.some(chipRef => chipRef.isEmpty || chipRef.isAlreadyExist)) {
       console.log(this.chipRefList)
-      return false; 
+      return false;
     };
     this.isAddVisible = true;
     return true;
   }
 
-  deleteChip(deleteChipId: Guid){
+
+
+  deleteChip(deleteChipId: Guid) {
     this.chipList = this.chipList.filter(chip => {
       return !chip.tempId.equals(deleteChipId);
     });
     setTimeout(() => {
       this.isAddVisible = this.validateChips();
     }, 0);
-    
+
   }
 
-  addChip(){
+  addChip() {
     this.isAddVisible = false;
     this.chipList.push(new BasicElement());
   }

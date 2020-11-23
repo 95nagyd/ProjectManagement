@@ -60,8 +60,7 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
 
 //TODO: spinne show-hide párok
 
-
-  //TODO: hiba modalok, 
+//TODO:!!!!!!!! ha mentek egy hónapra adatot utána pedig törlöm és üresen mentem akkor hiba
 
   //TODO: elnavigáláskor elvatés modál (menupontnál)
 
@@ -87,16 +86,20 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
     private userService: UserService, private globalModalsService: GlobalModalsService, private comboBoxService: ComboBoxService, 
     private basicDataService: BasicDataService) { 
       
-      
       this.spinner.show();
       this.backFunction = new EventEmitter();
+
       this.calendarService.getFirstSavedPeriod().subscribe((firstPeriod) => {
         console.log("firstPeriod:"+ firstPeriod)
+        //TODO: firstperiod-ot beállítani bal limitnek
         this.spinner.hide();
       }, (error) => {
-        //TODO: hiba modal
-        alert("nem sikerült lekérdezni az első mentett időszakot")
         this.spinner.forceHide();
+        if(!this.globalModalsService.isErrorModalOpen()){
+          this.globalModalsService.openErrorModal(error.message).then(() => {
+              this.globalModalsService.closeErrorModal();
+          });
+        }
       });
       this.isComboReady = false;
       this.getComboElements();
@@ -126,14 +129,13 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.isInitComplete = true;
       this.comboColWidth = (this.header.nativeElement.getBoundingClientRect().width - 445) * 0.25;
+      this.spinner.hide();
     }, 0);
-    this.spinner.hide();
   }
 
   getComboElements(){
     this.spinner.show();
     this.basicDataService.getAllBasicElements().subscribe((result) => {
-      console.log(result)
       this.projectList = result.projects;
       this.designPhaseList = result.designPhases;
       this.structuralElementList = result.structuralElements;
@@ -141,9 +143,12 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
       this.isComboReady = true;
       this.spinner.hide();
     }, (error) => {
-      //TODO: hiba modal
-      console.log(error)
       this.spinner.forceHide();
+      if(!this.globalModalsService.isErrorModalOpen()){
+        this.globalModalsService.openErrorModal(error.message).then(() => {
+            this.globalModalsService.closeErrorModal();
+        });
+      }
     });
   }
 
@@ -201,7 +206,6 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
     this.spinner.show();
     if(this.user){
       this.calendarService.getUserWorkingTimeByGivenPeriod(this.chosenPeriod.getTime(), this.user._id).subscribe((workingTime) => {
-
         this.calendarViewData = workingTime;
         this.calendarOldData = _.cloneDeep<CalendarData>(this.calendarViewData);
         this.daysOfMonth.forEach(dayData => {
@@ -212,13 +216,17 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
         });
         this.spinner.hide();
       }, (error) => {
-        //TODO: hiba modal
-        console.log(error)
         this.spinner.forceHide();
+        if(!this.globalModalsService.isErrorModalOpen()){
+          this.globalModalsService.openErrorModal(error.message).then(() => {
+              this.globalModalsService.closeErrorModal();
+          });
+        }
       });
     } else {
       this.calendarService.getUserWorkingTimeByGivenPeriod(this.chosenPeriod.getTime()).subscribe((workingTime) => {
         this.calendarViewData = workingTime;
+        console.log(workingTime)
         this.calendarOldData = _.cloneDeep<CalendarData>(this.calendarViewData);
         this.daysOfMonth.forEach(dayData => {
           if(!this.calendarViewData[dayData.number]) { 
@@ -228,9 +236,12 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
         });
         this.spinner.hide();
       }, (error) => {
-        //TODO: hiba modal
-        console.log(error)
         this.spinner.forceHide();
+        if(!this.globalModalsService.isErrorModalOpen()){
+          this.globalModalsService.openErrorModal(error.message).then(() => {
+              this.globalModalsService.closeErrorModal();
+          });
+        }
       });
     }
   }
@@ -383,13 +394,17 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
     if(!this.isCalSavable() || !this.isCalendarDataChanged()){ return; }
 
     if(!this.validateCalendar()){
-      //TODO: Kérem javítsa a hibás mezőket! toaster
+      if(!this.globalModalsService.isWarningModalOpen()){
+        this.globalModalsService.openWarningModal('Mentés előtt kérem javítsa a hibás mezőket.').then(() => {
+            this.getComboElements();
+            this.globalModalsService.closeWarningModal();
+        });
+      }
       return;
     }
     
     this.spinner.show();
     let saveData = this.removeEmptyRows(this.calendarViewData);
-    
     this.calendarService.saveWorkingTime(this.chosenPeriod.getTime(), saveData).subscribe((data) => {
       this.globalModalsService.hasChanges = false;
       //TODO: toaster
@@ -398,23 +413,21 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
       this.updateCalendarViewData();
       this.spinner.hide();
     }, error => {
-      console.log(error.code === 400)
-      console.log(error)
-      if(error.code === 400){
+      this.spinner.forceHide();
+      if(error.code === 404){
         if(!this.globalModalsService.isWarningModalOpen()){
           this.globalModalsService.openWarningModal(error.message).then(() => {
               this.getComboElements();
               this.globalModalsService.closeWarningModal();
           });
         }
-      } else {
-        if(!this.globalModalsService.isErrorModalOpen()){
-          this.globalModalsService.openErrorModal(error.message).then(() => {
-              this.globalModalsService.closeErrorModal();
-          });
-        }
+        return;
+      } 
+      if(!this.globalModalsService.isErrorModalOpen()){
+        this.globalModalsService.openErrorModal(error.message).then(() => {
+            this.globalModalsService.closeErrorModal();
+        });
       }
-      this.spinner.forceHide();
     });
   }
 

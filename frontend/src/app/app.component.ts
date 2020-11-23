@@ -9,6 +9,8 @@ import { switchMap } from 'rxjs/operators';
 import { GlobalModalsService } from './_services/global-modals.service';
 import { ComboBoxService } from './_services/combo-box.service';
 import { Location } from '@angular/common';
+import { MatIconRegistry } from '@angular/material/icon';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-root',
@@ -23,13 +25,30 @@ export class AppComponent {
   @ViewChild(NavbarComponent) navbar: NavbarComponent;
   @ViewChild('page') page: ElementRef;
 
-  constructor(private authenticationService: AuthenticationService, private router: Router, private _ngZone: NgZone, private spinner: SpinnerService, 
-    private scrollOffsetService: PageContentScrollOffsetService, private location: Location) { 
+  constructor(private authenticationService: AuthenticationService, private router: Router, private _ngZone: NgZone, private spinner: SpinnerService,
+    private scrollOffsetService: PageContentScrollOffsetService, private location: Location, private matIconRegistry: MatIconRegistry, private domSanitizer: DomSanitizer) {
+
+    this.matIconRegistry.addSvgIcon(
+      "project",
+      this.domSanitizer.bypassSecurityTrustResourceUrl("../assets/icon/project.svg")
+    );
+    this.matIconRegistry.addSvgIcon(
+      "design-phase",
+      this.domSanitizer.bypassSecurityTrustResourceUrl("../assets/icon/design-phase.svg")
+    );
+    this.matIconRegistry.addSvgIcon(
+      "structural-element",
+      this.domSanitizer.bypassSecurityTrustResourceUrl("../assets/icon/structural-element.svg")
+    );
+    this.matIconRegistry.addSvgIcon(
+      "subtask",
+      this.domSanitizer.bypassSecurityTrustResourceUrl("../assets/icon/subtask.svg")
+    );
 
     this.scrollOffsetService.register(this);
 
     this.isLoggedInPastState = this.isLoggedIn();
-          
+
     if (this.isLoggedInPastState) this.router.navigate([this.location.path()]);
 
     this._ngZone.runOutsideAngular(() => {
@@ -48,33 +67,33 @@ export class AppComponent {
       switchMap(() => {
         return of(this.isLoggedIn());
       }))
-      .subscribe((isLoggedInActualState) => { 
-        if(isLoggedInActualState !== this.isLoggedInPastState){
-          if(isLoggedInActualState) this._ngZone.run(() => { this.router.navigate(['']); });
-          if(!isLoggedInActualState) this._ngZone.run(() => { this.router.navigate(['/login']); });
+      .subscribe((isLoggedInActualState) => {
+        if (isLoggedInActualState !== this.isLoggedInPastState) {
+          if (isLoggedInActualState) this._ngZone.run(() => { this.router.navigate(['']); });
+          if (!isLoggedInActualState) this._ngZone.run(() => { this.router.navigate(['/login']); });
           this.isLoggedInPastState = isLoggedInActualState;
         }
       })
   }
 
-  isLoggedIn(){
+  isLoggedIn() {
     return this.authenticationService.isLoggedIn();
   }
 
-  setScrollTop(offset: number){
-    if(this.page) { this.page.nativeElement.scrollTop = offset; }
+  setScrollTop(offset: number) {
+    if (this.page) { this.page.nativeElement.scrollTop = offset; }
   }
 
-  @HostListener('document:keydown', ['$event'])   
+  @HostListener('document:keydown', ['$event'])
   onKeydown(event: KeyboardEvent) {
-    if(this.spinner.isSpinnerVisible()){
+    if (this.spinner.isSpinnerVisible()) {
       event.preventDefault();
     }
   }
 
-  @HostListener('document:click', ['$event'])   
+  @HostListener('document:click', ['$event'])
   onClick(event: MouseEvent) {
-    if(this.spinner.isSpinnerVisible()){
+    if (this.spinner.isSpinnerVisible()) {
       event.preventDefault();
     }
   }

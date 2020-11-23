@@ -32,7 +32,7 @@ export class ComboBoxDropdownComponent implements OnInit {
 
   ngOnInit(): void {
   }
-
+  
   isExactMatch(){
     return !!this.choices.find((choice) => choice.name === this.chosenName)
   }

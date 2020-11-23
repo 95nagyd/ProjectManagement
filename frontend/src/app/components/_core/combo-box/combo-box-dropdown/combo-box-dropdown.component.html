@@ -1,7 +1,7 @@
 <div *ngIf="isVisible" [ngStyle]="{'min-width': styleData.minWidth + 'px', 'left':  styleData.x + 'px', 'top': styleData.y + 'px'}"
      class="choices-container"
      (clickOutside)="isVisible ? onClickInOutEvent(true) : ''"
-     (clickInside)="isVisible ? onClickInOutEvent(false) : ''">
+     (click)="isVisible ? onClickInOutEvent(false) : ''">
 
     <p *ngFor="let item of choices; index as choiceIndex; first as isFirst;"
         class="choices-item"

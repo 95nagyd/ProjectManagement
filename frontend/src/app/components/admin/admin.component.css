@@ -9,9 +9,18 @@
 
 
 .active-icon {
+    display: flex;
+    transform: scale(2.5);
     vertical-align: -5px;
     font-size: 32px;
     margin-right: 10px;
+    margin-left: 7px;
+}
+
+.icon {
+    display: flex;
+    transform: scale(1.8);
+    margin-bottom: 3px;
 }
 
 

@@ -25,8 +25,7 @@ export class TeamComponent implements OnInit {
     this.spinner.show();
   }
 
-  //TODO: alert-ek toasterbe
-  //TODO: hosszú név hogy fér ki a név mezőbe
+  //TODO: hosszú név hogy fér ki a név mezőbe megoldani (magasság növelésével)
 
   ngOnInit(): void {
     this.currentUser = this.authenticationService.getCurrentUser();
@@ -47,12 +46,12 @@ export class TeamComponent implements OnInit {
       this.users = tempUsers;
       this.spinner.hide();
     }, error => {
+      this.spinner.forceHide();
       if(!this.globalModalsService.isErrorModalOpen()){
         this.globalModalsService.openErrorModal(error.message).then(() => {
           this.globalModalsService.closeErrorModal();
         });
       }
-      this.spinner.forceHide();
     });
   }
 
