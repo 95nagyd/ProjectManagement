@@ -3,13 +3,14 @@ var MongoClient = require('mongodb').MongoClient;
 var ObjectId = require("mongodb").ObjectId;
 const mongoService = require('./mongoService');
 const _ = require("underscore");
+const { isNull } = require('underscore');
 
 
 async function getWorkingTimeByGivenUserIdAndPeriod(userId, period) {
-    return await mongoService.find('workingTimes', { userId: new ObjectId(userId), period:period}, { projection: { _id:0, workingTime:1 }});
+    return await mongoService.find('workingTimes', { userId: new ObjectId(userId), period: period }, { projection: { _id: 0, periodData: 1 } });
 }
 
-async function saveCurrentUserWorkingTimeByGivenPeriod(userId, period, workingTime) {
+async function saveCurrentUserWorkingTimeByGivenPeriod(userId, period, periodData) {
     return await new Promise((resolve, reject) => {
         MongoClient.connect(process.env.URL, { useUnifiedTopology: true }, (err, client) => {
             if (err) {
@@ -17,41 +18,56 @@ async function saveCurrentUserWorkingTimeByGivenPeriod(userId, period, workingTi
                 return reject(err);
             } else {
 
+                console.log(periodData)
+                if (periodData.length === 0) {
+                    var db = client.db(process.env.DBNAME);
+
+                    return db.collection('workingTimes').deleteOne({ userId: new ObjectId(userId), period: period }, (foundErr, collection) => {
+                        if (foundErr) {
+                            client.close();
+                            return reject(foundErr);
+                        } else {
+                            client.close();
+                            return resolve();
+                        }
+                    });
+                }
+
                 var projectIdList = [];
                 var designPhaseIdList = [];
                 var structuralElementIdList = [];
                 var subtaskIdList = [];
 
-                workingTime.filter(hasValues => {
-                    return hasValues;
-                }).forEach(element => {
+                for (let dayIndex in periodData) {
+                    const element = periodData[dayIndex];
+
                     element.forEach(innerElement => {
-                        if (!!innerElement.projectId) {
-                            const idObject = { _id: new ObjectId(innerElement.projectId) }
-                            if (projectIdList.findIndex(projectId => projectId._id.equals(idObject._id)) === -1) {
-                                projectIdList.push(idObject)
+                        if (innerElement.projectId.length !== 0) {
+                            const projectIdObject = { _id: new ObjectId(innerElement.projectId) }
+                            if (projectIdList.findIndex(projectId => projectId._id.equals(projectIdObject._id)) === -1) {
+                                projectIdList.push(projectIdObject);
                             }
                         }
-                        if (!!innerElement.designPhaseId) {
-                            const idObject = { _id: new ObjectId(innerElement.designPhaseId) }
-                            if (designPhaseIdList.findIndex(designPhaseId => designPhaseId._id.equals(idObject._id)) === -1) {
-                                designPhaseIdList.push(idObject)
+                        if (innerElement.designPhaseId.length !== 0) {
+                            const designPhaseIdObject = { _id: new ObjectId(innerElement.designPhaseId) }
+                            if (designPhaseIdList.findIndex(designPhaseId => designPhaseId._id.equals(designPhaseIdObject._id)) === -1) {
+                                designPhaseIdList.push(designPhaseIdObject);
                             }
                         }
-                        if (!!innerElement.structuralElementId) {
-                            const idObject = { _id: new ObjectId(innerElement.structuralElementId) }
-                            if (structuralElementIdList.findIndex(structuralElementId => structuralElementId._id.equals(idObject._id)) === -1) {
-                                structuralElementIdList.push(idObject)
+                        if (innerElement.structuralElementId.length !== 0) {
+                            const structuralElementIdObject = { _id: new ObjectId(innerElement.structuralElementId) }
+                            if (structuralElementIdList.findIndex(structuralElementId => structuralElementId._id.equals(structuralElementIdObject._id)) === -1) {
+                                structuralElementIdList.push(structuralElementIdObject);
                             }
                         }
-                        if (!!innerElement.subtaskId) {
-                            const idObject = { _id: new ObjectId(innerElement.subtaskId) }
-                            if (subtaskIdList.findIndex(subtaskId => subtaskId._id.equals(idObject._id)) === -1) {
-                                subtaskIdList.push(idObject)
+                        if (innerElement.subtaskId.length !== 0) {
+                            const subtaskIdObject = { _id: new ObjectId(innerElement.subtaskId) }
+                            if (subtaskIdList.findIndex(subtaskId => subtaskId._id.equals(subtaskIdObject._id)) === -1) {
+                                subtaskIdList.push(subtaskIdObject);
                             }
                         }
                     });
-                });
+                }
 
                 structuralElementIdList = structuralElementIdList.length > 0 ? structuralElementIdList : [{ _id: null }];
                 subtaskIdList = subtaskIdList.length > 0 ? subtaskIdList : [{ _id: null }];
@@ -94,7 +110,7 @@ async function saveCurrentUserWorkingTimeByGivenPeriod(userId, period, workingTi
                                                     client.close();
                                                     return reject(404);
                                                 }
-                                                db.collection('workingTimes').updateOne({ userId: new ObjectId(userId), period: period }, { $set: { workingTime: workingTime } }, { upsert: true }, (foundErr, collection) => {
+                                                db.collection('workingTimes').updateOne({ userId: new ObjectId(userId), period: period }, { $set: { periodData: periodData } }, { upsert: true }, (foundErr, collection) => {
                                                     if (foundErr) {
                                                         client.close();
                                                         return reject(foundErr);
@@ -119,9 +135,9 @@ async function saveCurrentUserWorkingTimeByGivenPeriod(userId, period, workingTi
     });
 }
 
-async function getFirstSavedPeriod(){
-    return await mongoService.aggregate('workingTimes', [{$group:{_id:{}, firstPeriod: {$min: "$period"}}}]);
-    
+async function getFirstSavedPeriod() {
+    return await mongoService.aggregate('workingTimes', [{ $group: { _id: {}, firstPeriod: { $min: "$period" } } }]);
+
 }
 
 module.exports = {

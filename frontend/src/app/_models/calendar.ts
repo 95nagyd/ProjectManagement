@@ -8,11 +8,12 @@ export interface CalendarDayDetails {
 
 
 export interface CalendarData {
-  [index: number] : CalendarDayData[] | any[]
+  [index: string]: Array<CalendarRowData> | any[]
 }
 
 
-export class CalendarDayData {
+
+export class CalendarRowData {
   workingTime: string;
   projectId: string;
   designPhaseId: string;
@@ -20,8 +21,8 @@ export class CalendarDayData {
   subtaskId: string;
   comment: string;
 
-  constructor(data?: CalendarDayData) {
-    data = data || <CalendarDayData>{};
+  constructor(data?: CalendarRowData) {
+    data = data || <CalendarRowData>{};
 
     this.workingTime = data.workingTime || '00:00';
     this.projectId = data.projectId || '';

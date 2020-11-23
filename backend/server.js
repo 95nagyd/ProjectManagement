@@ -65,8 +65,9 @@ app.post('/saveUser', verifyToken, (req, res) => {
 
 app.get('/workingTime/:period', verifyToken, (req, res) => {
     workingTimeService.getWorkingTimeByGivenUserIdAndPeriod(req.user._id, req.params.period).then((result) => {
-        var workingTime = result[0] === undefined ? [] : result[0].workingTime;
-        return res.status(200).json(workingTime);
+        var periodData = result[0] === undefined ? {} : result[0].periodData;
+
+        return res.status(200).json(periodData);
     }, (error) => {
         return res.status(400).json({ message: error });
     });
@@ -74,7 +75,7 @@ app.get('/workingTime/:period', verifyToken, (req, res) => {
 
 app.get('/workingTime/:userId/:period', verifyToken, (req, res) => {
     workingTimeService.getWorkingTimeByGivenUserIdAndPeriod(req.params.userId, req.params.period).then((result) => {
-        var workingTime = result[0] === undefined ? [] : result[0].workingTime;
+        var workingTime = result[0] === undefined ? {} : result[0].periodData;
         return res.status(200).json(workingTime);
     }, (error) => {
         return res.status(400).json({ message: error });
@@ -82,7 +83,7 @@ app.get('/workingTime/:userId/:period', verifyToken, (req, res) => {
 });
 
 app.post('/workingTime/save/:period', verifyToken, (req, res) => {
-    workingTimeService.saveCurrentUserWorkingTimeByGivenPeriod(req.user._id, req.params.period, req.body.workingTime).then(() => {
+    workingTimeService.saveCurrentUserWorkingTimeByGivenPeriod(req.user._id, req.params.period, req.body.periodData).then(() => {
         return res.status(201).send();
     }, (error) => {
         if(error === 404){
@@ -162,7 +163,15 @@ function verifyToken(req, res, next){
         if(err) return res.status(401).json({ message: "Azonosítási hiba. Folytatáshoz jelentkezzen be újra." });
         return userService.getUsers({ username: user.username }).then(async (users) => {
             if(users.length !== 1) return res.status(401).json({ message: "Azonosítási hiba. Folytatáshoz jelentkezzen be újra." });
-            req.user = users[0];
+            req.user = _.pick(users[0], [
+                '_id',
+                'username',
+                'title',
+                'lastName',
+                'middleName',
+                'firstName',
+                'role'
+            ]);
             return next();
         }, (error) => {
             return res.status(500).json({ message: "Adatbázis elérési hiba!" });

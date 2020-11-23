@@ -4,7 +4,7 @@ import { SpinnerService } from '@app/_services/spinner.service';
 import { CommentBoxComponent } from '@app/components/_core/working-time-calendar/comment-box/comment-box.component';
 import { PageContentScrollOffsetService } from '@app/_services/page-content-scroll-offset.service';
 import { CalendarService } from '@app/_services/calendar.service';
-import { CalendarDayDetails, CalendarDayData, CalendarData } from '@app/_models/calendar';
+import { CalendarDayDetails, CalendarRowData, CalendarData } from '@app/_models/calendar';
 import { ComboBoxService } from '@app/_services/combo-box.service';
 import * as _ from 'lodash-es';
 import { ComboBoxComponent } from '../combo-box/combo-box.component';
@@ -47,8 +47,11 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
 
   comboColWidth: number;
   
-  calendarViewData: CalendarData;
+  periodData: CalendarData;
   calendarOldData: CalendarData;
+
+  calendarViewData_TEST: any;
+  calendarOldData_TEST: any;
 
   projectList: Array<BasicElement>;
   designPhaseList: Array<BasicElement>;
@@ -62,7 +65,7 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
   //TODO: menü váltásra ha van changes akkor modal
 //TODO: spinne show-hide párok
 
-//TODO:!!!!!!!! ha mentek egy hónapra adatot utána pedig törlöm és üresen mentem akkor hiba
+//TODO: hónap ne lista legyen, hanem számosított property-k
 
   //TODO: elnavigáláskor elvatés modál (menupontnál)
 
@@ -180,7 +183,7 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
     this.spinner.show();
     this.getComboElements();
     this.chosenPeriod.setMonth(this.chosenPeriod.getMonth() + (direction === 'previous' ? -1 : 1)); 
-    this.calendarViewData = null;
+    this.periodData = null;
     this.setPeriod();
     this.refreshCalendar();
     this.spinner.hide();
@@ -196,7 +199,7 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
       this.daysOfMonth.push({
          number : dayIndex, 
          name : this.dayNames[tempDate.getDay()],
-         backgroundColor : dayIndex % 2 == 1 ? 'rgb(243, 243, 243)' : 'rgb(218, 218, 218)'
+         backgroundColor : dayIndex % 2 == 1 ? 'rgb(227, 228, 232)' : 'rgb(196, 196, 204)'
       });
     }
     this.updateCalendarViewData();
@@ -208,12 +211,12 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
   private updateCalendarViewData() {
     this.spinner.show();
     if(this.user){
-      this.calendarService.getUserWorkingTimeByGivenPeriod(this.chosenPeriod.getTime(), this.user._id).subscribe((workingTime) => {
-        this.calendarViewData = workingTime;
-        this.calendarOldData = _.cloneDeep<CalendarData>(this.calendarViewData);
+      this.calendarService.getUserWorkingTimeByGivenPeriod(this.chosenPeriod.getTime(), this.user._id).subscribe((periodData) => {
+        this.periodData = periodData;
+        this.calendarOldData = _.cloneDeep<CalendarData>(this.periodData);
         this.daysOfMonth.forEach(dayData => {
-          if(!this.calendarViewData[dayData.number]) { 
-            this.calendarViewData[dayData.number] = [];
+          if(!this.periodData[dayData.number]) { 
+            this.periodData[dayData.number] = [];
             this.addEmptyRow(dayData.number); 
           }
         });
@@ -227,13 +230,15 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
         }
       });
     } else {
-      this.calendarService.getUserWorkingTimeByGivenPeriod(this.chosenPeriod.getTime()).subscribe((workingTime) => {
-        this.calendarViewData = workingTime;
-        console.log(workingTime)
-        this.calendarOldData = _.cloneDeep<CalendarData>(this.calendarViewData);
+      this.calendarService.getUserWorkingTimeByGivenPeriod(this.chosenPeriod.getTime()).subscribe((periodData) => {
+        this.periodData = periodData;
+        this.calendarOldData = _.cloneDeep<CalendarData>(this.periodData);
+
+        
+
         this.daysOfMonth.forEach(dayData => {
-          if(!this.calendarViewData[dayData.number]) { 
-            this.calendarViewData[dayData.number] = [];
+          if(!this.periodData[dayData.number]) { 
+            this.periodData[dayData.number] = [];
             this.addEmptyRow(dayData.number); 
           }
         });
@@ -253,13 +258,13 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
     this.backFunction.emit();
   }
 
-  addEmptyRow(dayNumber: number) { this.calendarViewData[dayNumber].push(new CalendarDayData()); }
+  addEmptyRow(dayNumber: number) { this.periodData[dayNumber].push(new CalendarRowData()); }
 
   deleteRow(dayNumber: number, rowIndex: number){ 
     this.globalModalsService.openConfirmModal(ConfirmModalType.Delete).then((isDeleteRequired) => {
       if(isDeleteRequired) {
         this.globalModalsService.hasChanges = true;
-        this.calendarViewData[dayNumber].splice(rowIndex, 1); 
+        this.periodData[dayNumber].splice(rowIndex, 1); 
       };
       this.globalModalsService.closeConfirmModal();
     });
@@ -270,38 +275,38 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
   //#region cell control
 
   updateWorkingTime(value: string, dayNumber: number, dataIndex: number){
-    this.calendarViewData[dayNumber][dataIndex].workingTime = value;
+    this.periodData[dayNumber][dataIndex].workingTime = value;
   }
 
   updateCombo(combo: string, chosenId: string, dayNumber: number, dataIndex: number){
     switch(combo) { 
       case 'project': { 
-        this.calendarViewData[dayNumber][dataIndex].projectId = chosenId;
+        this.periodData[dayNumber][dataIndex].projectId = chosenId;
          break; 
       } 
       case 'designPhase': { 
-        this.calendarViewData[dayNumber][dataIndex].designPhaseId = chosenId;
+        this.periodData[dayNumber][dataIndex].designPhaseId = chosenId;
          break; 
       } 
       case 'structuralElement': { 
-        this.calendarViewData[dayNumber][dataIndex].structuralElementId = chosenId;
+        this.periodData[dayNumber][dataIndex].structuralElementId = chosenId;
          break; 
       } 
       case 'subtask': { 
-        this.calendarViewData[dayNumber][dataIndex].subtaskId = chosenId;
+        this.periodData[dayNumber][dataIndex].subtaskId = chosenId;
          break; 
       }
     }
   }
 
   updateComment(value: string){
-    this.calendarViewData[this.editingComment.dayNumber][this.editingComment.dataIndex].comment = value;
+    this.periodData[this.editingComment.dayNumber][this.editingComment.dataIndex].comment = value;
   }
 
   previewComment(e: any, dayNumber: number, dataIndex: number) {
     if(this.commentbox && !this.commentbox.isEditing){
       this.editingComment = { dayNumber: dayNumber, dataIndex: dataIndex }
-      this.commentbox.preview(e.target, this.calendarViewData[dayNumber][dataIndex].comment);
+      this.commentbox.preview(e.target, this.periodData[dayNumber][dataIndex].comment);
     }
   }
 
@@ -310,7 +315,7 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
     if(this.commentbox && this.commentbox.isEditing) { this.commentbox.hide(); return; }
     if(this.commentbox){
       this.editingComment = { dayNumber: dayNumber, dataIndex: dataIndex }
-      this.commentbox.edit(e.target, this.calendarViewData[dayNumber][dataIndex].comment);
+      this.commentbox.edit(e.target, this.periodData[dayNumber][dataIndex].comment);
     }
   }
 
@@ -331,38 +336,36 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
   //#region save
 
   isCalendarDataChanged(){
-    return !(_.isEqual(this.calendarOldData, this.removeEmptyRows(this.calendarViewData)));
+    return !(_.isEqual(this.calendarOldData, this.removeEmptyRows(this.periodData)));
   }
 
   removeEmptyRows(data: CalendarData){
     const daysInMonth = this.getDaysInMonth();
     let temp = _.cloneDeep<CalendarData>(data);
-    let clearedData: CalendarData = [];
-    let isAllEmpty = true;
+    let clearedData: CalendarData = {};
     for(let dayIndex = 0; dayIndex < daysInMonth; dayIndex++){
       temp[dayIndex] = temp[dayIndex].filter(dataRow => {
         return !this.isDataRowEmpty(dataRow);
       });
       if(temp[dayIndex].length > 0) { 
         clearedData[dayIndex] = temp[dayIndex]; 
-        isAllEmpty = false;
       } else {
-        clearedData[dayIndex] = null;
+        delete clearedData[dayIndex];
       }
     }
-    return isAllEmpty ? [] : clearedData;
+    return clearedData;
   }
 
-  isDataRowEmpty(dataRow: CalendarDayData){
+  isDataRowEmpty(dataRow: CalendarRowData){
     return (dataRow.workingTime === '00:00' && !dataRow.projectId && !dataRow.designPhaseId && !dataRow.structuralElementId && !dataRow.subtaskId && !dataRow.comment);
   }
   
   validateCalendar(){
     if(this.workingTimeInputList.some(workingTimeInput => workingTimeInput.hasError === true)) { return false; };
-    let temp: CalendarData = this.removeEmptyRows(this.calendarViewData);
+    let temp: CalendarData = this.removeEmptyRows(this.periodData);
     let isCalValid = true;
     for (const [dayKey, data] of Object.entries(temp)) {
-      data?.forEach((dataRow: CalendarDayData, index: number) => {
+      data?.forEach((dataRow: CalendarRowData, index: number) => {
         if(dataRow.workingTime !== '00:00' || dataRow.projectId || dataRow.designPhaseId || dataRow.structuralElementId || dataRow.subtaskId || dataRow.comment){
           const dayNumber = parseInt(dayKey)+1
           const dayText = (dayNumber < 10 ? '0' + dayNumber.toString() : dayNumber.toString()) + '.';
@@ -387,7 +390,7 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
   }
 
   isCalSavable(){
-    return this.isInitComplete && this.isEditable && this.calendarViewData 
+    return this.isInitComplete && this.isEditable && this.periodData 
       && (!this.workingTimeInputList.some(workingTimeInput => workingTimeInput.hasError === true)
       && !this.projectComboList.some(projectCombo => projectCombo.hasError === true)
       && !this.designPhaseComboList.some(designPhaseCombo => designPhaseCombo.hasError === true))
@@ -407,7 +410,8 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
     }
     
     this.spinner.show();
-    let saveData = this.removeEmptyRows(this.calendarViewData);
+    let saveData = this.removeEmptyRows(this.periodData);
+    console.log(saveData)
     this.calendarService.saveWorkingTime(this.chosenPeriod.getTime(), saveData).subscribe((data) => {
       this.globalModalsService.hasChanges = false;
       //TODO: toaster
