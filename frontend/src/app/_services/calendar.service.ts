@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { CalendarData, CalendarRowData } from '@app/_models/calendar';
+import { CalendarData } from '@app/_models/calendar';
 import { Observable } from 'rxjs';
 import { environment } from '@environments/environment';
 import { map } from 'rxjs/operators';
@@ -12,13 +12,12 @@ import { map } from 'rxjs/operators';
 export class CalendarService {
 
 
-  constructor(private http: HttpClient) { 
+  constructor(private http: HttpClient) {
   }
 
 
-
   getUserWorkingTimeByGivenPeriod(period: number, userID?: string): Observable<any> {
-    const url = userID 
+    const url = userID
       ? `${environment.apiUrl}/workingTime/${userID}/${period}`
       : `${environment.apiUrl}/workingTime/${period}`
     return this.http.get<any>(url).pipe(

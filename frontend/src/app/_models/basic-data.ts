@@ -10,7 +10,7 @@ export class BasicElement {
 
         this._id = data._id || '-1';
         this.name = data.name || '';
-        if(data && !isReadOnly){
+        if (data && !isReadOnly) {
             this.tempId = data.tempId || Guid.create();
         }
     }

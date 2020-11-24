@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpErrorResponse } from '@angular/common/http';
-import { EMPTY, Observable, throwError } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { SpinnerService } from '@app/_services/spinner.service';
 
@@ -17,8 +17,8 @@ export class ErrorInterceptor implements HttpInterceptor {
         return next.handle(request).pipe(catchError(err => {
 
             if (err instanceof HttpErrorResponse && (err.status === 401 || err.status === 403)) {
-                if(request.url.startsWith(environment.apiUrl)){
-                    if(!this.globalModalsService.isInfoModalOpen()){
+                if (request.url.startsWith(environment.apiUrl)) {
+                    if (!this.globalModalsService.isInfoModalOpen()) {
                         this.globalModalsService.openInfoModal(InfoModalType.EXPIRED).then((() => {
                             this.authenticationService.logout();
                             this.globalModalsService.closeInfoModal();
@@ -26,29 +26,29 @@ export class ErrorInterceptor implements HttpInterceptor {
                     }
                 }
 
-                if(request.url.startsWith(environment.authApiUrl) && this.authenticationService.isLoggedIn()){
+                if (request.url.startsWith(environment.authApiUrl) && this.authenticationService.isLoggedIn()) {
                     this.authenticationService.logout().then(() => {
                         setTimeout(() => {
-                            if(!this.globalModalsService.isErrorModalOpen()){
+                            if (!this.globalModalsService.isErrorModalOpen()) {
                                 this.globalModalsService.openErrorModal(err.error.message || err).then(() => {
                                     this.globalModalsService.closeErrorModal();
                                 });
                             }
                         }, 0);
-                    }, () => {});
+                    }, () => { });
                 }
 
             }
 
-            
+
             if (err instanceof HttpErrorResponse && (err.status === 0)) {
 
-                
-                this.spinner.forceHide();
-                err.error.message = (request.url.startsWith(environment.authApiUrl) ? "Az autentikációs szerver nem válaszol." : "Az szerver nem válaszol.") +" Kérem próbálja meg később."
 
-                if(this.authenticationService.isLoggedIn()){
-                    if(!this.globalModalsService.isErrorModalOpen()){
+                this.spinner.forceHide();
+                err.error.message = (request.url.startsWith(environment.authApiUrl) ? "Az autentikációs szerver nem válaszol." : "Az szerver nem válaszol.") + " Kérem próbálja meg később."
+
+                if (this.authenticationService.isLoggedIn()) {
+                    if (!this.globalModalsService.isErrorModalOpen()) {
                         this.globalModalsService.openErrorModal(err.error.message).then(() => {
                             this.globalModalsService.closeErrorModal();
                         });
@@ -58,21 +58,21 @@ export class ErrorInterceptor implements HttpInterceptor {
             }
 
 
-            if(err instanceof HttpErrorResponse && (err.status === 406)){
+            if (err instanceof HttpErrorResponse && (err.status === 406)) {
                 this.authenticationService.logout().then(() => {
                     setTimeout(() => {
-                        if(!this.globalModalsService.isInfoModalOpen()){
+                        if (!this.globalModalsService.isInfoModalOpen()) {
                             this.globalModalsService.openCustomInfoModal('Változás', err.error.message || err).then((() => {
                                 this.globalModalsService.closeInfoModal();
                             }));
                         }
                     }, 0);
-                }, () => {});
+                }, () => { });
             }
 
-            
 
-            const error = { 
+
+            const error = {
                 code: err.status,
                 message: err.error.message
             };

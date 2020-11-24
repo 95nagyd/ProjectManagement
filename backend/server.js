@@ -64,7 +64,6 @@ app.post('/saveUser', verifyToken, (req, res) => {
 app.get('/workingTime/:period', verifyToken, (req, res) => {
     workingTimeService.getWorkingTimeByGivenUserIdAndPeriod(req.user._id, req.params.period).then((result) => {
         var periodData = result[0] === undefined ? {} : result[0].periodData;
-
         return res.status(200).json(periodData);
     }, (error) => {
         return res.status(400).json({ message: error });
@@ -73,8 +72,8 @@ app.get('/workingTime/:period', verifyToken, (req, res) => {
 
 app.get('/workingTime/:userId/:period', verifyToken, (req, res) => {
     workingTimeService.getWorkingTimeByGivenUserIdAndPeriod(req.params.userId, req.params.period).then((result) => {
-        var workingTime = result[0] === undefined ? {} : result[0].periodData;
-        return res.status(200).json(workingTime);
+        var periodData = result[0] === undefined ? {} : result[0].periodData;
+        return res.status(200).json(periodData);
     }, (error) => {
         return res.status(400).json({ message: error });
     });

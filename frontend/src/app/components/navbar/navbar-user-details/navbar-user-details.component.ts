@@ -17,15 +17,13 @@ export class NavbarUserDetailsComponent implements OnInit, OnDestroy {
 
   currentUserFullName: string;
   timeLeft: number;
-  intervalId: any;
-  isViewReady: any;
   intervalSubscription: Subscription;
 
-  constructor(private authenticationService: AuthenticationService, private userService: UserService, private globalModalsService: GlobalModalsService, private spinner: SpinnerService) { 
+  constructor(private authenticationService: AuthenticationService, private userService: UserService, private globalModalsService: GlobalModalsService, private spinner: SpinnerService) {
     this.initInterval();
   }
 
-  ngOnInit(): void { 
+  ngOnInit(): void {
     this.currentUserFullName = this.userService.getFullName(this.authenticationService.getCurrentUser());
   }
 
@@ -37,25 +35,25 @@ export class NavbarUserDetailsComponent implements OnInit, OnDestroy {
     this.intervalSubscription = interval(1000).pipe(
       takeWhile(() => this.authenticationService.isLoggedIn()),
       switchMap(() => {
-        const diff = (this.authenticationService.getTokenExpirationDateTime() - Date.now())/1000;
-        if(diff < 0) return of(true);
+        const diff = (this.authenticationService.getTokenExpirationDateTime() - Date.now()) / 1000;
+        if (diff < 0) return of(true);
         this.timeLeft = diff;
         return of(false);
       })
     ).subscribe((isExpired) => {
-      if(isExpired) {
+      if (isExpired) {
         this.spinner.forceHide();
-        if(!this.globalModalsService.isInfoModalOpen()){
+        if (!this.globalModalsService.isInfoModalOpen()) {
           this.globalModalsService.openInfoModal(InfoModalType.EXPIRED).then((() => {
-              this.authenticationService.logout();
-              this.globalModalsService.closeInfoModal();
+            this.authenticationService.logout();
+            this.globalModalsService.closeInfoModal();
           }));
         }
       }
     })
   }
 
-  isTimeLeftIndicatorReady(){
+  isTimeLeftIndicatorReady() {
     return this.timeLeft ? !Number.isNaN(this.timeLeft) : false;
   }
 }

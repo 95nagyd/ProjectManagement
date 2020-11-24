@@ -1,9 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { SpinnerService } from '@app/_services/spinner.service';
 
-import { User } from '@app/_models/user';
-import { AuthenticationService } from '@app/_services/authentication.service';
-
 
 @Component({
   selector: 'working-time',
@@ -12,12 +9,16 @@ import { AuthenticationService } from '@app/_services/authentication.service';
 })
 export class WorkingTimeComponent implements OnInit {
 
-  constructor(private spinner: SpinnerService) { 
+  constructor(private spinner: SpinnerService) {
+    this.spinner.show();
   }
 
   ngOnInit(): void {
   }
 
   ngAfterViewInit() {
+    setTimeout(() => {
+      this.spinner.hide();
+    }, 0);
   }
 }

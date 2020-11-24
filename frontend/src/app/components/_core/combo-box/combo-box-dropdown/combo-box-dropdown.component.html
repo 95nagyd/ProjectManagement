@@ -1,17 +1,15 @@
-<div *ngIf="isVisible" [ngStyle]="{'min-width': styleData.minWidth + 'px', 'left':  styleData.x + 'px', 'top': styleData.y + 'px'}"
-     class="choices-container"
-     (clickOutside)="isVisible ? onClickInOutEvent(true) : ''"
-     (click)="isVisible ? onClickInOutEvent(false) : ''">
+<div *ngIf="isVisible"
+    [ngStyle]="{'min-width': styleData.minWidth + 'px', 'left':  styleData.x + 'px', 'top': styleData.y + 'px'}"
+    class="choices-container" (clickOutside)="isVisible ? onClickInOutEvent(true) : ''"
+    (click)="isVisible ? onClickInOutEvent(false) : ''">
 
-    <p *ngFor="let item of choices; index as choiceIndex; first as isFirst;"
-        class="choices-item"
+    <p *ngFor="let item of choices; index as choiceIndex; first as isFirst;" class="choices-item"
         (click)="choose(choiceIndex);"
-        [ngClass]="{ 'selected': item.name === chosenName || (isFirst && !isExactMatch()) }">  
-            {{item.name}}
+        [ngClass]="{ 'selected': item.name === chosenName || (isFirst && !isExactMatch()) }">
+        {{item.name}}
     </p>
-    <p *ngIf="choices.length == 0"
-        class="not-found">
-        <span   class="d-inline-block">
+    <p *ngIf="choices.length == 0" class="not-found">
+        <span class="d-inline-block">
             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
         </span>
         Nincs találat!

@@ -19,12 +19,12 @@ export class ComboBoxDropdownComponent implements OnInit {
 
 
 
-  constructor(private comboBoxService: ComboBoxService, private scrollOffsetService: PageContentScrollOffsetService) { 
+  constructor(private comboBoxService: ComboBoxService, private scrollOffsetService: PageContentScrollOffsetService) {
     this.comboBoxService.registerDropdown(this);
 
 
     this.isVisible = false;
-    this.styleData = {x: -2000, y:-2000, minWidth: 0};
+    this.styleData = { x: -2000, y: -2000, minWidth: 0 };
     this.chosenName = '';
     this.choices = new Array<BasicElement>();
     this.isClickOutside = false;
@@ -32,12 +32,12 @@ export class ComboBoxDropdownComponent implements OnInit {
 
   ngOnInit(): void {
   }
-  
-  isExactMatch(){
+
+  isExactMatch() {
     return !!this.choices.find((choice) => choice.name === this.chosenName)
   }
 
-  show(){
+  show() {
     const comboRef = this.comboBoxService.getComboRef();
 
     // a megjelölendő elem szövege
@@ -48,10 +48,10 @@ export class ComboBoxDropdownComponent implements OnInit {
     this.setPosition();
   }
 
-  setPosition(){
-    let dropdownControl =  this.comboBoxService.getComboRef().elementRef.nativeElement.firstElementChild.firstElementChild;
-    let position = { 
-      x: dropdownControl.getBoundingClientRect().x,  
+  setPosition() {
+    let dropdownControl = this.comboBoxService.getComboRef().elementRef.nativeElement.firstElementChild.firstElementChild;
+    let position = {
+      x: dropdownControl.getBoundingClientRect().x,
       y: dropdownControl.getBoundingClientRect().y + this.scrollOffsetService.getOffsetY(),
       minWidth: dropdownControl.getBoundingClientRect().width
     };
@@ -63,17 +63,13 @@ export class ComboBoxDropdownComponent implements OnInit {
     dropdownControl.firstElementChild.select();
   }
 
-  hide(){
+  hide() {
     this.isVisible = false;
     this.isClickOutside = false;
   }
 
-  onClickInOutEvent(isOut: Boolean) {
-    this.isClickOutside = isOut;
-  }
+  onClickInOutEvent(isOut: Boolean) { this.isClickOutside = isOut; }
 
-  choose(choiceIndex: any){
-    this.comboBoxService.getComboRef().updateValue(choiceIndex);
-  }
+  choose(choiceIndex: number) { this.comboBoxService.getComboRef().updateValue(choiceIndex); }
 
 }

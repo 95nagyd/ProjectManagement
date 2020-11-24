@@ -1,5 +1,4 @@
 import { Component, Input, OnInit, Output } from '@angular/core';
-import { CalendarService } from '@app/_services/calendar.service';
 import { EventEmitter } from '@angular/core'
 
 @Component({
@@ -8,12 +7,16 @@ import { EventEmitter } from '@angular/core'
   styleUrls: ['./formatted-time.component.css']
 })
 export class FormattedTimeComponent implements OnInit {
-
-  hasError: Boolean;
+//TODO dataPosition kell e?
+  @Input() value: number;
+  @Input() isDisabled: Boolean;
+  @Input() dataPosition: any;
+  @Output() update: EventEmitter<number>;
   private pattern: any;
+  hasError: Boolean;
   formattedTime: string;
 
-  constructor(private calendarService: CalendarService) {
+  constructor() {
     this.hasError = false;
     this.pattern = /^[0-9]{0,2}[\:]?[0-9]{0,2}$/;
     this.update = new EventEmitter();
@@ -25,12 +28,6 @@ export class FormattedTimeComponent implements OnInit {
 
   ngAfterViewInit() {
   }
-
-
-  @Input() value: number;
-  @Input() isDisabled: Boolean;
-  @Input() dataPosition: any;
-  @Output() update: EventEmitter<number>;
 
   setInitialFormattedTimeFromMinutes() {
     if (this.value == 0) {

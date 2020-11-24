@@ -1,13 +1,12 @@
-import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, NgZone, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { Role } from '@app/_models/role';
 import { User } from '@app/_models/user';
 import { SpinnerService } from '@app/_services/spinner.service';
-import { NgbModal, ModalDismissReasons, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UserService } from '@app/_services/user.service';
 import { GlobalModalsService } from '@app/_services/global-modals.service';
 import { ConfirmModalType } from '@app/_models/modals';
-import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
 
 
@@ -25,17 +24,12 @@ export class UserModalComponent implements OnInit, OnDestroy {
   userForm: FormGroup;
   validations: Record<string, any>;
   openUserModalRef: any;
-
-
   isPassVisible: Boolean;
   role: Role;
-
   patterns: Record<string, RegExp>;
 
-
-
   constructor(private modalService: NgbModal, private globalModalsService: GlobalModalsService, private spinner: SpinnerService, private formBuilder: FormBuilder,
-    private userService: UserService, private _ngZone: NgZone) {
+    private userService: UserService) {
     this.spinner.show();
     this.onClose = new EventEmitter();
     this.isPassVisible = false;
@@ -71,7 +65,9 @@ export class UserModalComponent implements OnInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    this.spinner.hide();
+    setTimeout(() => {
+      this.spinner.hide();
+    }, 0);
   }
 
   open(editUser?: User) {

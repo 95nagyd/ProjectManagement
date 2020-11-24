@@ -1,14 +1,8 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, QueryList, ViewChildren } from '@angular/core';
-import { first, delay, take } from 'rxjs/operators';
-import { MatIconModule } from '@angular/material/icon';
+import { Component, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { take } from 'rxjs/operators';
 
-
-import { User } from '@app/_models/user';
-import { UserService } from '@app/_services/user.service';
 import { SpinnerService } from '@app/_services/spinner.service'
-import { AuthenticationService } from '@app/_services/authentication.service';
 import { BasicElement, BasicDataType } from '@app/_models/basic-data';
-import { Guid } from 'guid-typescript';
 import { ChipComponent } from '../_core/chip/chip.component';
 import { BasicDataService } from '@app/_services/basic-data.service';
 import { GlobalModalsService } from '@app/_services/global-modals.service';
@@ -150,16 +144,18 @@ export class AdminComponent implements OnInit {
       }, 0);
       return;
     }
+    this.spinner.show();
     this.basicDataService.deleteBasicElement(deleteChip._id, this.selectedTab).pipe(take(1)).subscribe(() => {
       //TODO: siker toaster
       this.getCurrentList();
+      this.spinner.hide();
     }, (error) => {
       this.spinner.forceHide();
-      if(error?.code === 409){
-        if(!this.globalModalsService.isWarningModalOpen()){
+      if (error?.code === 409) {
+        if (!this.globalModalsService.isWarningModalOpen()) {
           this.globalModalsService.openWarningModal(error.message).then(() => {
-              this.getCurrentList();
-              this.globalModalsService.closeWarningModal();
+            this.getCurrentList();
+            this.globalModalsService.closeWarningModal();
           });
         }
         return;
@@ -177,5 +173,4 @@ export class AdminComponent implements OnInit {
     this.isAddVisible = false;
     this.chipList.push(new BasicElement());
   }
-
 }

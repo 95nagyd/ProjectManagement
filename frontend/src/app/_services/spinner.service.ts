@@ -1,4 +1,4 @@
-import { Injectable, NgZone } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { NgxSpinnerService } from "ngx-spinner";
 import { ComboBoxService } from './combo-box.service';
 
@@ -9,12 +9,12 @@ export class SpinnerService {
 
   private callCount: number;
 
-  constructor(private spinner: NgxSpinnerService, private comboBoxService: ComboBoxService, private _ngZone: NgZone) { 
+  constructor(private spinner: NgxSpinnerService, private comboBoxService: ComboBoxService) {
     this.callCount = 0;
   }
 
   show() {
-    if(this.callCount === 0) this.spinner.show();
+    if (this.callCount === 0) this.spinner.show();
 
     this.comboBoxService.externalCloseComboAndHideDropdown();
 
@@ -22,12 +22,12 @@ export class SpinnerService {
   }
 
   hide() {
-    if(this.callCount === 1) this.spinner.hide();
-    
-    if(this.callCount > 0) this.callCount--;
+    if (this.callCount === 1) this.spinner.hide();
+
+    if (this.callCount > 0) this.callCount--;
   }
 
-  forceHide() { while(this.callCount !== 0){ this.hide(); } }
+  forceHide() { while (this.callCount !== 0) { this.hide(); } }
 
   isSpinnerVisible() { return this.callCount > 0 ? true : false; }
 }

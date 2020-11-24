@@ -12,7 +12,6 @@ import { User } from '@app/_models/user';
 import { UserService } from '@app/_services/user.service';
 import { GlobalModalsService } from '@app/_services/global-modals.service';
 import { ConfirmModalType } from '@app/_models/modals';
-import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { BasicDataService } from '@app/_services/basic-data.service';
 import { BasicElement } from '@app/_models/basic-data';
 import { take } from 'rxjs/operators';
@@ -29,8 +28,6 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
   @Input() user?: User;
   @Output() backFunction?: EventEmitter<void>;
 
-  userFullName: string;
-
   @ViewChild('commentbox') commentbox: CommentBoxComponent;
   @ViewChild('header') header: ElementRef;
   @ViewChildren(FormattedTimeComponent) workingTimeInputList!: QueryList<FormattedTimeComponent>;
@@ -39,7 +36,11 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
   @ViewChildren('structuralElementComboList') structuralElementComboList!: QueryList<ComboBoxComponent>;
   @ViewChildren('subtaskComboList') subtaskComboList!: QueryList<ComboBoxComponent>;
 
+  userFullName: string;
   isInitComplete: Boolean;
+  comboColWidth: number;
+
+
   monthNames: string[];
   dayNames: string[];
   daysOfMonth: CalendarDayDetails[] = [];
@@ -48,18 +49,11 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
 
   private chosenPeriod: Date;
   period: string;
-
   firstPeriodTime: number;
-
   isPreviousChangeAvailable: boolean;
-
-  comboColWidth: number;
 
   periodData: CalendarData;
   calendarOldData: CalendarData;
-
-  calendarViewData_TEST: any;
-  calendarOldData_TEST: any;
 
   projectList: Array<BasicElement>;
   designPhaseList: Array<BasicElement>;
@@ -69,14 +63,8 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
 
   editingComment: { dayNumber: number, dataIndex: number }
 
-
-  
-  //TODO: változók a kostruktor elé
-  //TODO: mindenhova type-ot írni (változók, metódus visszatérések)
-  //TODO: format document 
-
   //TODO: toaster
-  //TODO: spinne show-hide párok subscribe-ok előtt + benne + (konstruktor show - ngafterviewinitbe settimeout hide ) 
+
 
   //TODO: alul kiférjen a legnagyobb message
   //TODO: havi összes munkaidő az utolsó nap után (legalább annyi hely kell , hogy az utolsó nap max magasságos tooltipje kiférjen), frontenden szamolodik 
@@ -89,6 +77,7 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
     private basicDataService: BasicDataService) {
 
     this.spinner.show();
+
     this.backFunction = new EventEmitter();
     this.isDataChanged = false;
     this.isComboReady = false;
@@ -99,6 +88,8 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
 
     this.firstPeriodTime = this.chosenPeriod.getTime();
     this.isPreviousChangeAvailable = false;
+
+    this.spinner.show();
     this.calendarService.getFirstSavedPeriod().pipe(take(1)).subscribe((firstPeriod) => {
       if (firstPeriod !== -1 && firstPeriod < this.chosenPeriod.getTime()) {
         this.firstPeriodTime = firstPeriod;
@@ -114,6 +105,7 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
       }
     });
 
+    //TODO: ezt model-be
     this.monthNames = ['január', 'február', 'március', 'április', 'május', 'június', 'július', 'augusztus', 'szeptember', 'október', 'november', 'december'];
 
     this.dayNames = ['vasárnap', 'hétfő', 'kedd', 'szerda', 'csütörtök', 'péntek', 'szombat'];
@@ -121,7 +113,6 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.spinner.show();
     this.userFullName = this.user ? this.userService.getFullName(this.user) : '';
     this.setPeriod();
     this.refreshCalendar();
@@ -164,8 +155,8 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
 
   getDaysInMonth() { return new Date(this.chosenPeriod.getFullYear(), this.chosenPeriod.getMonth() + 1, 0).getDate(); }
 
-  changeMonth(direction: string) {
-    if (this.getActualChangeState()) {
+  async changeMonth(direction: string) {
+    if ((await this.getActualChangeState())) {
       this.globalModalsService.openConfirmModal(ConfirmModalType.DISCARD).then((isDiscardRequired) => {
         if (isDiscardRequired) {
           this.doChange(direction);
@@ -208,16 +199,16 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
   private updateCalendarViewData() {
     this.spinner.show();
     if (this.user) {
-      this.calendarService.getUserWorkingTimeByGivenPeriod(this.chosenPeriod.getTime(), this.user._id).pipe(take(1)).subscribe((periodData) => {
-        this.periodData = periodData;
+      this.calendarService.getUserWorkingTimeByGivenPeriod(this.chosenPeriod.getTime(), this.user._id).pipe(take(1)).subscribe(async (result) => {
+        this.periodData = result;
         this.calendarOldData = _.cloneDeep<CalendarData>(this.periodData);
-        this.getActualChangeState();
         this.daysOfMonth.forEach(dayData => {
           if (!this.periodData[dayData.number]) {
             this.periodData[dayData.number] = [];
             this.addEmptyRow(dayData.number);
           }
         });
+        this.getActualChangeState();
         this.spinner.hide();
       }, (error) => {
         this.spinner.forceHide();
@@ -228,16 +219,19 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
         }
       });
     } else {
-      this.calendarService.getUserWorkingTimeByGivenPeriod(this.chosenPeriod.getTime()).pipe(take(1)).subscribe((periodData) => {
-        this.periodData = periodData;
+      this.calendarService.getUserWorkingTimeByGivenPeriod(this.chosenPeriod.getTime()).pipe(take(1)).subscribe(async (result) => {
+        console.log(result)
+        
+        this.periodData = result;
         this.calendarOldData = _.cloneDeep<CalendarData>(this.periodData);
-        this.getActualChangeState();
+
         this.daysOfMonth.forEach(dayData => {
           if (!this.periodData[dayData.number]) {
             this.periodData[dayData.number] = [];
             this.addEmptyRow(dayData.number);
           }
         });
+        this.getActualChangeState();
         this.spinner.hide();
       }, (error) => {
         this.spinner.forceHide();
@@ -257,10 +251,10 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
   addEmptyRow(dayNumber: number) { this.periodData[dayNumber].push(new CalendarRowData()); }
 
   deleteRow(dayNumber: number, rowIndex: number) {
-    this.globalModalsService.openConfirmModal(ConfirmModalType.DELETE).then((isDeleteRequired) => {
+    this.globalModalsService.openConfirmModal(ConfirmModalType.DELETE).then(async (isDeleteRequired) => {
       if (isDeleteRequired) {
-        this.getActualChangeState();
         this.periodData[dayNumber].splice(rowIndex, 1);
+        this.getActualChangeState();
       };
       this.globalModalsService.closeConfirmModal();
     });
@@ -276,7 +270,6 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
   }
 
   updateCombo(combo: string, chosenId: string, dayNumber: number, dataIndex: number) {
-    this.getActualChangeState();
     switch (combo) {
       case 'project': {
         this.periodData[dayNumber][dataIndex].projectId = chosenId;
@@ -295,11 +288,12 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
         break;
       }
     }
+    this.getActualChangeState();
   }
 
   updateComment(value: string) {
-    this.getActualChangeState();
     this.periodData[this.editingComment.dayNumber][this.editingComment.dataIndex].comment = value;
+    this.getActualChangeState();
   }
 
   previewComment(e: any, dayNumber: number, dataIndex: number) {
@@ -335,11 +329,14 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
   //#region save
 
   getActualChangeState() {
-    return setTimeout(() => {
-      this.isDataChanged = !(_.isEqual(this.calendarOldData, this.removeEmptyRows(this.periodData)));
-      this.globalModalsService.hasChanges = this.isDataChanged;
-      return this.isDataChanged;
-    }, 0);
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        this.isDataChanged = !(_.isEqual(this.calendarOldData, this.removeEmptyRows(this.periodData)));
+        this.globalModalsService.hasChanges = this.isDataChanged;
+        resolve(this.isDataChanged);
+      }, 0);
+    });
+    
   }
 
   removeEmptyRows(data: CalendarData) {
@@ -402,8 +399,8 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
         && !this.subtaskComboList.some(subtaskCombo => subtaskCombo.hasError === true))
   }
 
-  saveCalendar() {
-    if (!this.isCalSavable() || !this.getActualChangeState()) { return; }
+  async saveCalendar() {
+    if (!this.isCalSavable() || !(await this.getActualChangeState())) { return; }
 
     if (!this.validateCalendar()) {
       if (!this.globalModalsService.isWarningModalOpen()) {

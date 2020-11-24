@@ -1,5 +1,3 @@
-import { BasicElement } from './basic-data';
-
 export interface CalendarDayDetails {
   number: number;
   name: string;

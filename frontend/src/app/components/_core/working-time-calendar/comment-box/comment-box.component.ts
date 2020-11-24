@@ -1,7 +1,5 @@
-import { animate, state, style, transition, trigger } from '@angular/animations';
 import { Component, ElementRef, HostListener, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { PageContentScrollOffsetService } from '@app/_services/page-content-scroll-offset.service';
-import { CalendarService } from '@app/_services/calendar.service';
 import { EventEmitter } from '@angular/core'
 
 @Component({
@@ -27,8 +25,7 @@ export class CommentBoxComponent implements OnInit {
   value: string;
   mouseEventCounter: number;
 
-  constructor(private scrollOffsetService: PageContentScrollOffsetService) { 
-  
+  constructor(private scrollOffsetService: PageContentScrollOffsetService) {
     this.update = new EventEmitter();
     this.isVisible = false;
     this.isPreview = false;
@@ -37,14 +34,14 @@ export class CommentBoxComponent implements OnInit {
     this.isCommentInFocus = false;
     this.isNewDisplayInTimeout = false;
     this.commentIcon = null;
-    this.boxPosition = {x: -2000, y:-2000, triangle: 'top'};
+    this.boxPosition = { x: -2000, y: -2000, triangle: 'top' };
     this.mouseEventCounter = 0;
   }
 
   ngOnInit(): void {
   }
 
-  preview(commentIcon: any, comment: string){
+  preview(commentIcon: any, comment: string) {
     this.isVisible = false;
     this.isPreview = true;
     this.isEditing = false;
@@ -54,8 +51,8 @@ export class CommentBoxComponent implements OnInit {
     this.setPosition();
     this.autosize();
   }
-  
-  edit(commentIcon: any, comment: string){
+
+  edit(commentIcon: any, comment: string) {
     this.isVisible = false;
     this.isPreview = false;
     this.isEditing = true;
@@ -70,8 +67,8 @@ export class CommentBoxComponent implements OnInit {
     }, 500);
   }
 
-  switchToEdit(){
-    if(this.isDisabled) return;
+  switchToEdit() {
+    if (this.isDisabled) return;
     this.isPreview = false;
     this.isEditing = true;
     this.isEditFromIcon = false;
@@ -79,16 +76,16 @@ export class CommentBoxComponent implements OnInit {
     this.autosize();
   }
 
-  setPosition(){
+  setPosition() {
     setTimeout(() => {
-      if(this.commentbox && this.commentIcon){
-        let position = { 
-          x: this.commentIcon.getBoundingClientRect().x,  
+      if (this.commentbox && this.commentIcon) {
+        let position = {
+          x: this.commentIcon.getBoundingClientRect().x,
           y: this.commentIcon.getBoundingClientRect().y + this.scrollOffsetService.getOffsetY(),
           triangle: ''
         };
         position.triangle = position.y < 200 ? 'top' : 'middle';
-        position.x = this.commentbox.nativeElement.offsetWidth > 200 ?  (position.x - this.commentbox.nativeElement.offsetWidth -26) : position.x - 226;
+        position.x = this.commentbox.nativeElement.offsetWidth > 200 ? (position.x - this.commentbox.nativeElement.offsetWidth - 26) : position.x - 226;
         position.y = position.y - (position.triangle === 'top' ? 82 : 89)
         this.boxPosition = position;
         this.isVisible = true;
@@ -96,8 +93,8 @@ export class CommentBoxComponent implements OnInit {
     }, 0);
   }
 
-  hide(){
-    if(this.commentbox && this.mouseEventCounter === 0){
+  hide() {
+    if (this.commentbox && this.mouseEventCounter === 0) {
       this.isVisible = false;
       this.value = '';
       this.isPreview = false;
@@ -107,20 +104,20 @@ export class CommentBoxComponent implements OnInit {
       return;
     }
   }
-  
-  SetCommentInFocus(isCommentInFocus: Boolean){
-    if(!this.isEditing && this.isCommentInFocus && !isCommentInFocus) {
+
+  SetCommentInFocus(isCommentInFocus: boolean) {
+    if (!this.isEditing && this.isCommentInFocus && !isCommentInFocus) {
       this.hide();
     }
     this.isCommentInFocus = isCommentInFocus;
   }
 
-  autosize() { 
+  autosize() {
     setTimeout(() => {
-      if(this.textarea){
+      if (this.textarea) {
         let textarea = this.textarea.nativeElement;
-        if(!textarea.style.height){ textarea.style.height = "30px"; }
-        if(textarea.scrollHeight < 30) { return; }
+        if (!textarea.style.height) { textarea.style.height = "30px"; }
+        if (textarea.scrollHeight < 30) { return; }
         textarea.style.height = "30px";
         textarea.style.height = textarea.scrollHeight + 3 + 'px';
       }
@@ -131,17 +128,17 @@ export class CommentBoxComponent implements OnInit {
     this.update.emit(value);
   }
 
-  onMouseEvent(add: number){
+  onMouseEvent(add: number) {
     this.mouseEventCounter += add;
   }
 
-  onClickOutside(){
-    if(this.mouseEventCounter === -1 || this.mouseEventCounter === 1) { this.mouseEventCounter = 0; }
+  onClickOutside() {
+    if (this.mouseEventCounter === -1 || this.mouseEventCounter === 1) { this.mouseEventCounter = 0; }
   }
 
   @HostListener('window:resize')
   onResize() {
-    if(this.isVisible){
+    if (this.isVisible) {
       this.setPosition();
       this.autosize();
     }

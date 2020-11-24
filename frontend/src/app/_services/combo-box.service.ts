@@ -10,17 +10,17 @@ export class ComboBoxService {
   private comboBoxDropdown: ComboBoxDropdownComponent;
   private comboBoxRef: ComboBoxComponent;
 
-  registerDropdown(comboBoxDropdown: ComboBoxDropdownComponent){
+  registerDropdown(comboBoxDropdown: ComboBoxDropdownComponent) {
     this.comboBoxDropdown = comboBoxDropdown;
   }
 
-  externalCloseComboAndHideDropdown(){
+  externalCloseComboAndHideDropdown() {
     this.comboBoxDropdown?.hide();
     this.comboBoxRef?.closeComboBox();
   }
 
 
-  showDropdown(comboBoxRef) {
+  showDropdown(comboBoxRef: ComboBoxComponent) {
     this.comboBoxRef?.closeComboBox();
 
     this.comboBoxRef = comboBoxRef;
@@ -31,16 +31,16 @@ export class ComboBoxService {
     this.comboBoxDropdown.hide();
   }
 
-  updateDropdown(choices: Array<BasicElement>, chosenName?: string){
+  updateDropdown(choices: Array<BasicElement>, chosenName?: string) {
     this.comboBoxDropdown.choices = choices;
-    if(chosenName) this.comboBoxDropdown.chosenName = chosenName;
+    if (chosenName) this.comboBoxDropdown.chosenName = chosenName;
   }
 
-  getComboRef(){
+  getComboRef() {
     return this.comboBoxRef;
   }
 
-  isLastClickOutOfDropdown(){
+  isLastClickOutOfDropdown() {
     return this.comboBoxDropdown.isClickOutside;
   }
 }

@@ -1,5 +1,4 @@
 <div class="tab-switch-container">
-    <!-- bezárás kinyitás összecsúszással legyen, színváltás egyből, magasság megnő -->
     <div (click)="switchToTab(basicDataTab.PROJECT)" class="tab" [ngClass]="{'active-tab': selectedTab === basicDataTab.PROJECT}" [ngbTooltip]="selectedTab !== basicDataTab.PROJECT ? 'Projektek' : ''">
         <span>
             <mat-icon svgIcon="project"  placement="top" [ngClass]="selectedTab === basicDataTab.PROJECT ? 'active-icon' : 'icon'"></mat-icon>

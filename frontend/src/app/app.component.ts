@@ -1,13 +1,11 @@
-import { Component, NgZone, HostListener, ViewChild, ElementRef } from '@angular/core';
+import { Component, NgZone, HostListener, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { AuthenticationService } from '@app/_services/authentication.service';
 import { PageContentScrollOffsetService } from '@app/_services/page-content-scroll-offset.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { SpinnerService } from './_services/spinner.service';
 import { NavbarComponent } from './components/navbar/navbar.component';
-import { interval, of } from 'rxjs';
+import { interval, of, Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { GlobalModalsService } from './_services/global-modals.service';
-import { ComboBoxService } from './_services/combo-box.service';
 import { Location } from '@angular/common';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -19,14 +17,16 @@ import { DomSanitizer } from '@angular/platform-browser';
 })
 
 export class AppComponent {
-
-  private isLoggedInPastState: any;
-
+//TODO: interval subscription-t unsibolni ngdestroyba
   @ViewChild(NavbarComponent) navbar: NavbarComponent;
   @ViewChild('page') page: ElementRef;
+  private isLoggedInPastState: any;
 
   constructor(private authenticationService: AuthenticationService, private router: Router, private _ngZone: NgZone, private spinner: SpinnerService,
-    private scrollOffsetService: PageContentScrollOffsetService, private location: Location, private matIconRegistry: MatIconRegistry, private domSanitizer: DomSanitizer) {
+    private scrollOffsetService: PageContentScrollOffsetService, private location: Location, private matIconRegistry: MatIconRegistry,
+    private domSanitizer: DomSanitizer) {
+
+    this.spinner.show();
 
     this.matIconRegistry.addSvgIcon(
       "project",
@@ -59,8 +59,10 @@ export class AppComponent {
 
   ngAfterViewInit() {
     this.scrollOffsetService.setOffsetY(0);
+    setTimeout(() => {
+      this.spinner.hide();
+    }, 0);
   }
-
 
   initInterval() {
     interval(500).pipe(
@@ -73,16 +75,18 @@ export class AppComponent {
           if (!isLoggedInActualState) this._ngZone.run(() => { this.router.navigate(['/login']); });
           this.isLoggedInPastState = isLoggedInActualState;
         }
-      })
+      });
   }
 
-  isLoggedIn() {
-    return this.authenticationService.isLoggedIn();
+  isLoggedIn() { return this.authenticationService.isLoggedIn(); }
+
+  setScrollTop(offset: number) { 
+    if (this.page) { this.page.nativeElement.scrollTop = offset; } 
   }
 
-  setScrollTop(offset: number) {
-    if (this.page) { this.page.nativeElement.scrollTop = offset; }
-  }
+  onScroll() { 
+    this.scrollOffsetService.setOffsetY(this.page.nativeElement.scrollTop); 
+  };
 
   @HostListener('document:keydown', ['$event'])
   onKeydown(event: KeyboardEvent) {
@@ -97,8 +101,4 @@ export class AppComponent {
       event.preventDefault();
     }
   }
-
-  onScroll() {
-    this.scrollOffsetService.setOffsetY(this.page.nativeElement.scrollTop);
-  };
 }

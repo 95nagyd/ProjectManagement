@@ -14,8 +14,8 @@ export class PageContentScrollOffsetService {
     this.offsetY = 0;
   }
 
-  register(application: AppComponent){
-    this.application = application;
+  register(application: AppComponent) { 
+    this.application = application; 
   }
 
   setOffsetY(offsetY: number) {
@@ -23,7 +23,7 @@ export class PageContentScrollOffsetService {
     this.application.setScrollTop(offsetY);
   }
 
-  getOffsetY() {
-    return this.offsetY;
+  getOffsetY(): number { 
+    return this.offsetY; 
   }
 }

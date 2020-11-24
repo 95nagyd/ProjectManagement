@@ -31,7 +31,7 @@ export class GlobalModalsComponent implements OnInit {
   warningModalContent: any;
   openWarningModalRef: any;
 
-  constructor(private modalService: NgbModal, private globalModalsService: GlobalModalsService, private comboBoxService: ComboBoxService, private spinner: SpinnerService) { 
+  constructor(private modalService: NgbModal, private globalModalsService: GlobalModalsService, private comboBoxService: ComboBoxService, private spinner: SpinnerService) {
     this.globalModalsService.register(this);
 
     this.confirmModalTitle = '';
@@ -53,14 +53,14 @@ export class GlobalModalsComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  openConfirmModal(modalType: ConfirmModalType){
+  openConfirmModal(modalType: ConfirmModalType) {
     this.confirmModalTitle = ConfirmModalData[modalType].title;
     this.confirmModalContent = ConfirmModalData[modalType].content;
-    this.openConfirmModalRef = this.modalService.open(this.confirmModalRef, {centered: true, windowClass: 'modal-holder confirm-modal-' + modalType, backdrop: 'static', keyboard: false});
+    this.openConfirmModalRef = this.modalService.open(this.confirmModalRef, { centered: true, windowClass: 'modal-holder confirm-modal-' + modalType, backdrop: 'static', keyboard: false });
     return this.openConfirmModalRef.result;
   }
 
-  closeConfirmModal(){
+  closeConfirmModal() {
     this.openConfirmModalRef?.close();
     this.openConfirmModalRef = null;
   }
@@ -69,32 +69,32 @@ export class GlobalModalsComponent implements OnInit {
 
 
 
-  openInfoModal(modalType: InfoModalType, additionalContent?: string){
+  openInfoModal(modalType: InfoModalType, additionalContent?: string) {
     this.comboBoxService.externalCloseComboAndHideDropdown();
     this.infoModalTitle = InfoModalData[modalType].title;
     this.infoModalContent = InfoModalData[modalType].content;
     this.infoModalAdditionalContent = additionalContent;
     this.spinner.forceHide();
-    this.openInfoModalRef = this.modalService.open(this.infoModalRef, {centered: true, windowClass: 'modal-holder info-modal', backdrop: 'static', keyboard: false});
+    this.openInfoModalRef = this.modalService.open(this.infoModalRef, { centered: true, windowClass: 'modal-holder info-modal', backdrop: 'static', keyboard: false });
     return this.openInfoModalRef.result;
   }
 
-  openCustomInfoModal(title: string, content: string){
+  openCustomInfoModal(title: string, content: string) {
     this.comboBoxService.externalCloseComboAndHideDropdown();
     this.infoModalTitle = title;
     this.infoModalContent = content;
     this.spinner.forceHide();
-    this.openInfoModalRef = this.modalService.open(this.infoModalRef, {centered: true, windowClass: 'modal-holder info-modal', backdrop: 'static', keyboard: false});
+    this.openInfoModalRef = this.modalService.open(this.infoModalRef, { centered: true, windowClass: 'modal-holder info-modal', backdrop: 'static', keyboard: false });
     return this.openInfoModalRef.result;
   }
 
-  closeInfoModal(){
+  closeInfoModal() {
     this.openInfoModalRef?.close();
     this.openInfoModalRef = null;
     this.infoModalAdditionalContent = '';
   }
 
-  isInfoModalOpen(){
+  isInfoModalOpen() {
     return !!this.openInfoModalRef;
   }
 
@@ -102,38 +102,38 @@ export class GlobalModalsComponent implements OnInit {
 
 
 
-  openErrorModal(content: any){
+  openErrorModal(content: any) {
     this.comboBoxService.externalCloseComboAndHideDropdown();
     this.errorModalContent = content.toString() === "[object Object]" ? JSON.stringify(content) : content.toString();
     this.spinner.forceHide();
-    this.openErrorModalRef = this.modalService.open(this.errorModalRef, {centered: true, windowClass: 'modal-holder error-modal', backdrop: 'static', keyboard: false});
+    this.openErrorModalRef = this.modalService.open(this.errorModalRef, { centered: true, windowClass: 'modal-holder error-modal', backdrop: 'static', keyboard: false });
     return this.openErrorModalRef.result;
   }
 
-  closeErrorModal(){
+  closeErrorModal() {
     this.openErrorModalRef?.close();
     this.openErrorModalRef = null;
   }
 
-  isErrorModalOpen(){
+  isErrorModalOpen() {
     return !!this.openErrorModalRef;
   }
 
 
-  openWarningModal(content: any){
+  openWarningModal(content: any) {
     this.comboBoxService.externalCloseComboAndHideDropdown();
     this.warningModalContent = content.toString() === "[object Object]" ? JSON.stringify(content) : content.toString();
     this.spinner.forceHide();
-    this.openWarningModalRef = this.modalService.open(this.warningModalRef, {centered: true, windowClass: 'modal-holder warning-modal', backdrop: 'static', keyboard: false});
+    this.openWarningModalRef = this.modalService.open(this.warningModalRef, { centered: true, windowClass: 'modal-holder warning-modal', backdrop: 'static', keyboard: false });
     return this.openWarningModalRef.result;
   }
 
-  closeWarningModal(){
+  closeWarningModal() {
     this.openWarningModalRef?.close();
     this.openWarningModalRef = null;
   }
 
-  isWarningModalOpen(){
+  isWarningModalOpen() {
     return !!this.openWarningModalRef;
   }
 

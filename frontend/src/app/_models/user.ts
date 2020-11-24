@@ -14,7 +14,7 @@ export class User {
 
     telephone: string;
     email: string;
-    
+
 
     constructor(data?: User) {
         data = data || <User>{};

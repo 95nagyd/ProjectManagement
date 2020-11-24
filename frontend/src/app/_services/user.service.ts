@@ -22,16 +22,16 @@ export class UserService {
     );
   }
 
-  saveUser(user: User){
-    return this.http.post<any>(`${environment.apiUrl}/saveUser`, { user : user });
+  saveUser(user: User) {
+    return this.http.post<any>(`${environment.apiUrl}/saveUser`, { user: user });
   }
 
-  getFullName(user: User) {
-    return ((user.title ? user.title + '. ' : '') + 
-            user.lastName + ' ' + 
-            (user.middleName ? user.middleName + ' ' : '') +
-            user.firstName
+  getFullName(user: User): string {
+    return ((user.title ? user.title + '. ' : '') +
+      user.lastName + ' ' +
+      (user.middleName ? user.middleName + ' ' : '') +
+      user.firstName
     );
   }
-  
+
 }

@@ -1,15 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { catchError, map, take } from 'rxjs/operators';
+import { map, take } from 'rxjs/operators';
 import { JwtHelperService } from '@auth0/angular-jwt';
 
 import { environment } from '@environments/environment';
 import { SpinnerService } from '@app/_services/spinner.service';
 import { User } from '@app/_models/user';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
 import { GlobalModalsService } from './global-modals.service';
-import { ConfirmModalType, InfoModalType } from '@app/_models/modals';
 
 @Injectable({
   providedIn: 'root',
@@ -23,11 +22,11 @@ export class AuthenticationService {
   private currentUser: User;
 
 
-  constructor(private http: HttpClient, private spinner: SpinnerService, private router: Router, private globalModalsService: GlobalModalsService) {
+  constructor(private http: HttpClient, private spinner: SpinnerService, private router: Router) {
     this.jwtHelper = new JwtHelperService();
   }
 
-  private getAccessTokenPayload(){
+  private getAccessTokenPayload() {
     let payload = this.jwtHelper.decodeToken(this.getAccessToken());
     delete payload.iat;
     delete payload.exp;
@@ -36,14 +35,14 @@ export class AuthenticationService {
 
   login(username: string, password: string): Observable<any> {
     return this.http.post<any>(`${environment.authApiUrl}/login`, { username, password })
-        .pipe(map(res => {
-            if(res.username){ return res; }
-            if (res.accessToken && res.refreshToken) {
-              localStorage.setItem(this.ACCESS_TOKEN, res.accessToken);
-              localStorage.setItem(this.REFRESH_TOKEN, res.refreshToken);
-              this.currentUser = new User(this.getAccessTokenPayload());
-            }
-        }));
+      .pipe(map(res => {
+        if (res.username) { return res; }
+        if (res.accessToken && res.refreshToken) {
+          localStorage.setItem(this.ACCESS_TOKEN, res.accessToken);
+          localStorage.setItem(this.REFRESH_TOKEN, res.refreshToken);
+          this.currentUser = new User(this.getAccessTokenPayload());
+        }
+      }));
   }
 
   logout() {
@@ -63,8 +62,7 @@ export class AuthenticationService {
     return this.router.navigate(['/login']);
   }
 
-
-  renewAccessToken(){
+  renewAccessToken() {
     return new Promise((resolve, reject) => {
       this.http.post<any>(`${environment.authApiUrl}/token`, { refreshToken: this.getRefreshToken() }).pipe(take(1)).subscribe((res) => {
         localStorage.setItem(this.ACCESS_TOKEN, res.accessToken);
@@ -77,17 +75,25 @@ export class AuthenticationService {
 
   getCurrentUser(): User { return this.currentUser; }
 
-  getAccessToken(){ return localStorage.getItem(this.ACCESS_TOKEN); }
+  getAccessToken() { 
+    return localStorage.getItem(this.ACCESS_TOKEN); 
+  }
 
-  getRefreshToken(){ return localStorage.getItem(this.REFRESH_TOKEN); }
+  getRefreshToken() { 
+    return localStorage.getItem(this.REFRESH_TOKEN); 
+  }
 
-  getTokenExpirationDateTime(){ return this.jwtHelper.getTokenExpirationDate(this.getAccessToken()).getTime(); }
+  getTokenExpirationDateTime() { 
+    return this.jwtHelper.getTokenExpirationDate(this.getAccessToken()).getTime(); 
+  }
 
-  isTokenExpired(){ return this.jwtHelper.isTokenExpired(this.getAccessToken()) }
+  isTokenExpired() { 
+    return this.jwtHelper.isTokenExpired(this.getAccessToken()) 
+  }
 
   isLoggedIn() {
-    if(!!this.getAccessToken() && !!this.getRefreshToken()) {
-      if(!this.currentUser) this.currentUser = new User(this.getAccessTokenPayload());
+    if (!!this.getAccessToken() && !!this.getRefreshToken()) {
+      if (!this.currentUser) this.currentUser = new User(this.getAccessTokenPayload());
       return true;
     }
     return false;

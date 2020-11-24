@@ -33,7 +33,7 @@
                 Nincs megjeleníthető adat.
             </span>
         </span>
-
+        <!--TODO class-ba odd even a hatterszin-->
         <div *ngFor="let user of users; index as rowIndex;"
              class="user-row"
              [ngStyle]="{'background-color': rowIndex % 2 === 0 ? 'rgb(255, 255, 255)' : 'rgb(235, 235, 235)'}"

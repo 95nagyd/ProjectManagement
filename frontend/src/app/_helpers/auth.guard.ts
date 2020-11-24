@@ -14,7 +14,7 @@ export class AuthGuard implements CanActivate {
 
   canActivate(route: ActivatedRouteSnapshot) {
     //changes
-    if(this.globalModalsService?.hasChanges){
+    if (this.globalModalsService?.hasChanges) {
       return this.globalModalsService.openConfirmModal(ConfirmModalType.DISCARD).then((isDiscardRequired) => {
         if (isDiscardRequired) {
           this.globalModalsService.hasChanges = false;
@@ -26,11 +26,11 @@ export class AuthGuard implements CanActivate {
 
     //role
     if (this.authenticationService.isLoggedIn()) {
-        if (route.data.expectedRole && (route.data.expectedRole !== this.authenticationService.getCurrentUser().role)) {
-          this.router.navigate(['']);
-          return false;
-        }
-        return true;
+      if (route.data.expectedRole && (route.data.expectedRole !== this.authenticationService.getCurrentUser().role)) {
+        this.router.navigate(['']);
+        return false;
+      }
+      return true;
     }
 
     this.router.navigate(['login']);

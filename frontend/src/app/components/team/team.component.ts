@@ -20,9 +20,9 @@ export class TeamComponent implements OnInit {
   selectedUser: User;
   isAdmin: Boolean;
 
-  @ViewChild(UserModalComponent) userModal : UserModalComponent;
+  @ViewChild(UserModalComponent) userModal: UserModalComponent;
 
-  constructor(public authenticationService: AuthenticationService, private spinner: SpinnerService, private userService: UserService, private globalModalsService: GlobalModalsService) { 
+  constructor(public authenticationService: AuthenticationService, private spinner: SpinnerService, private userService: UserService, private globalModalsService: GlobalModalsService) {
     this.spinner.show();
   }
 
@@ -34,19 +34,21 @@ export class TeamComponent implements OnInit {
   }
 
   ngAfterViewInit() {
-    this.spinner.hide();
+    setTimeout(() => {
+      this.spinner.hide();
+    }, 0);
   }
 
-  refreshUserList(){
+  refreshUserList() {
     this.spinner.show();
     this.userService.getAll().pipe(take(1)).subscribe(users => {
       let tempUsers = [];
-      users.map(user => { if(this.currentUser._id !== user._id) tempUsers.push(new User(user)) });
+      users.map(user => { if (this.currentUser._id !== user._id) tempUsers.push(new User(user)) });
       this.users = tempUsers;
       this.spinner.hide();
     }, error => {
       this.spinner.forceHide();
-      if(!this.globalModalsService.isErrorModalOpen()){
+      if (!this.globalModalsService.isErrorModalOpen()) {
         this.globalModalsService.openErrorModal(error.message).then(() => {
           this.globalModalsService.closeErrorModal();
         });
@@ -54,24 +56,19 @@ export class TeamComponent implements OnInit {
     });
   }
 
-  getUserFullName(user: User){
+  getUserFullName(user: User) {
     return this.userService.getFullName(user);
   }
 
-  selectUser(user?: User){
+  selectUser(user?: User) {
     this.selectedUser = user || null;
-    if(!user){
+    if (!user) {
       this.refreshUserList();
     }
   }
 
-  openUserModal(modifyUser?: User){
+  openUserModal(modifyUser?: User) {
     this.userModal.open(modifyUser);
   }
 
-
-
-
-
-  
 }

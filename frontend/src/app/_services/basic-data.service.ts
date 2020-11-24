@@ -26,21 +26,21 @@ export class BasicDataService {
     return this.http.get<any>(`${environment.apiUrl}/basicData/all`).pipe(
       map(res => {
         let data: { projects: Array<BasicElement>; designPhases: Array<BasicElement>; structuralElements: Array<BasicElement>; subtasks: Array<BasicElement>; } = {
-          projects : res.projects.map((data: any) => new BasicElement(data, true)),
-          designPhases : res.designPhases.map((data: any) => new BasicElement(data, true)),
-          structuralElements : res.structuralElements.map((data: any) => new BasicElement(data, true)),
-          subtasks : res.subtasks.map((data: any) => new BasicElement(data, true))
+          projects: res.projects.map((data: any) => new BasicElement(data, true)),
+          designPhases: res.designPhases.map((data: any) => new BasicElement(data, true)),
+          structuralElements: res.structuralElements.map((data: any) => new BasicElement(data, true)),
+          subtasks: res.subtasks.map((data: any) => new BasicElement(data, true))
         };
         return data;
       })
     );
   }
 
-  saveBasicElement(basicElement: BasicElement, type: BasicDataType){
+  saveBasicElement(basicElement: BasicElement, type: BasicDataType) {
     return this.http.post<any>(`${environment.apiUrl}/basicData/${type}/save`, { basicElement: basicElement });
   }
 
-  deleteBasicElement(basicElementId: string, type: BasicDataType){
+  deleteBasicElement(basicElementId: string, type: BasicDataType) {
     return this.http.delete<any>(`${environment.apiUrl}/basicData/${type}/delete/${basicElementId}`);
   }
 
