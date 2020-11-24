@@ -12,10 +12,16 @@
     cursor: pointer;
     height: 20px;
     padding: 0;
-    border: 1px solid black;
+    border: 1px solid rgb(104, 104, 104);
     border-radius: 3px; 
     background-color: white;
-    
+
+}
+
+
+.dropdown-control:hover {
+    border: 1px solid black;
+    box-shadow: 0px 0px 2px rgb(0,0,0);
 }
 
 .dropdown-visible {
@@ -24,7 +30,8 @@
 }
 
 .invalid {
-    border: 1px solid red;
+    border: 1px solid red !important;
+    box-shadow: 0 0 4px red !important;
 }
 
 .dropdown-control.disabled{

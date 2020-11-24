@@ -12,7 +12,7 @@ const routes: Routes = [
   { path: '', redirectTo: 'workingTime', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'workingTime', component: WorkingTimeComponent, canActivate: [AuthGuard] },
-  { path: 'administration', component: AdminComponent, canActivate: [AuthGuard], data: { expectedRole: Role.Admin } },
+  { path: 'administration', component: AdminComponent, canActivate: [AuthGuard], data: { expectedRole: Role.ADMIN } },
   { path: 'team', component: TeamComponent, canActivate: [AuthGuard] },
   { path: '**', redirectTo: 'workingTime'}
 ];

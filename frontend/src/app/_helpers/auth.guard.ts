@@ -14,10 +14,11 @@ export class AuthGuard implements CanActivate {
 
   canActivate(route: ActivatedRouteSnapshot) {
     //changes
-    console.log("has changes: " + this.globalModalsService?.hasChanges)
     if(this.globalModalsService?.hasChanges){
-      return this.globalModalsService.openConfirmModal(ConfirmModalType.Discard).then((isDiscardRequired) => {
-        this.globalModalsService.hasChanges = !isDiscardRequired;
+      return this.globalModalsService.openConfirmModal(ConfirmModalType.DISCARD).then((isDiscardRequired) => {
+        if (isDiscardRequired) {
+          this.globalModalsService.hasChanges = false;
+        };
         this.globalModalsService.closeConfirmModal();
         return isDiscardRequired;
       });

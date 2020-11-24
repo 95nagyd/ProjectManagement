@@ -17,19 +17,16 @@ async function saveCurrentUserWorkingTimeByGivenPeriod(userId, period, periodDat
                 console.log('DB Connection Error: ' + err);
                 return reject(err);
             } else {
-
-                console.log(periodData)
-                if (periodData.length === 0) {
+                if (_.isEmpty(periodData)) {
                     var db = client.db(process.env.DBNAME);
 
                     return db.collection('workingTimes').deleteOne({ userId: new ObjectId(userId), period: period }, (foundErr, collection) => {
                         if (foundErr) {
                             client.close();
                             return reject(foundErr);
-                        } else {
-                            client.close();
-                            return resolve();
                         }
+                        client.close();
+                        return resolve();
                     });
                 }
 
@@ -78,57 +75,53 @@ async function saveCurrentUserWorkingTimeByGivenPeriod(userId, period, periodDat
                     if (foundErr) {
                         client.close();
                         return reject(foundErr);
-                    } else {
-                        if (projectIdList.length !== projects.length) {
+                    }
+                    if (projectIdList.length !== projects.length) {
+                        client.close();
+                        return reject(404);
+                    }
+                    db.collection('designPhases').find({ $or: designPhaseIdList }).toArray((foundErr, designPhases) => {
+                        if (foundErr) {
+                            client.close();
+                            return reject(foundErr);
+                        }
+                        if (designPhaseIdList.length !== designPhases.length) {
                             client.close();
                             return reject(404);
                         }
-                        db.collection('designPhases').find({ $or: designPhaseIdList }).toArray((foundErr, designPhases) => {
+                        db.collection('structuralElements').find({ $or: structuralElementIdList }).toArray((foundErr, structuralElements) => {
                             if (foundErr) {
                                 client.close();
                                 return reject(foundErr);
-                            } else {
-                                if (designPhaseIdList.length !== designPhases.length) {
+                            }
+                            if (structuralElementIdList.filter(structuralElementId => structuralElementId._id !== null).length !== structuralElements.length) {
+                                client.close();
+                                return reject(404);
+                            }
+                            db.collection('subtasks').find({ $or: subtaskIdList }).toArray((foundErr, subtasks) => {
+                                if (foundErr) {
+                                    client.close();
+                                    return reject(foundErr);
+                                }
+                                if (subtaskIdList.filter(subtaskId => subtaskId._id !== null).length !== subtasks.length) {
                                     client.close();
                                     return reject(404);
                                 }
-                                db.collection('structuralElements').find({ $or: structuralElementIdList }).toArray((foundErr, structuralElements) => {
+                                db.collection('workingTimes').updateOne({ userId: new ObjectId(userId), period: period }, { $set: { periodData: periodData } }, { upsert: true }, (foundErr, collection) => {
                                     if (foundErr) {
                                         client.close();
                                         return reject(foundErr);
-                                    } else {
-                                        if (structuralElementIdList.filter(structuralElementId => structuralElementId._id !== null).length !== structuralElements.length) {
-                                            client.close();
-                                            return reject(404);
-                                        }
-                                        db.collection('subtasks').find({ $or: subtaskIdList }).toArray((foundErr, subtasks) => {
-                                            if (foundErr) {
-                                                client.close();
-                                                return reject(foundErr);
-                                            } else {
-                                                if (subtaskIdList.filter(subtaskId => subtaskId._id !== null).length !== subtasks.length) {
-                                                    client.close();
-                                                    return reject(404);
-                                                }
-                                                db.collection('workingTimes').updateOne({ userId: new ObjectId(userId), period: period }, { $set: { periodData: periodData } }, { upsert: true }, (foundErr, collection) => {
-                                                    if (foundErr) {
-                                                        client.close();
-                                                        return reject(foundErr);
-                                                    } else if (collection.matchedCount === 0 && collection.modifiedCount === 0 && collection.upsertedId === null) {
-                                                        client.close();
-                                                        return reject(404);
-                                                    } else {
-                                                        client.close();
-                                                        return resolve();
-                                                    }
-                                                });
-                                            }
-                                        });
                                     }
+                                    if (collection.matchedCount === 0 && collection.modifiedCount === 0 && collection.upsertedId === null) {
+                                        client.close();
+                                        return reject(404);
+                                    }
+                                    client.close();
+                                    return resolve();
                                 });
-                            }
+                            });
                         });
-                    }
+                    });
                 });
             }
         });

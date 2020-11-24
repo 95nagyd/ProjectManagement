@@ -8,7 +8,6 @@ class MongoService {
         this.dbName = dbName;
     }
 
-    //TODO: docker container
 
     find(collectionName, query, options) {
         return new Promise((resolve, reject) => {
@@ -22,10 +21,9 @@ class MongoService {
                         if (foundErr) {
                             client.close();
                             return reject(foundErr);
-                        } else {
-                            client.close();
-                            return resolve(result);
                         }
+                        client.close();
+                        return resolve(result);
                     });
                 }
             });
@@ -45,13 +43,15 @@ class MongoService {
                         if (foundErr) {
                             client.close();
                             return reject(foundErr);
-                        } else if (collection.matchedCount === 0 && collection.modifiedCount === 0 && collection.upsertedId === null) {
+                        }
+                        if (collection.matchedCount === 0 && collection.modifiedCount === 0 && collection.upsertedId === null) {
                             client.close();
                             return reject(404);
-                        } else {
-                            client.close();
-                            return resolve();
                         }
+
+                        client.close();
+                        return resolve();
+
                     });
                 }
             });
@@ -70,10 +70,9 @@ class MongoService {
                         if (foundErr) {
                             client.close();
                             return reject(foundErr);
-                        } else {
-                            client.close();
-                            return resolve(aggregated);
                         }
+                        client.close();
+                        return resolve(aggregated);
                     });
                 }
             });
@@ -93,10 +92,9 @@ class MongoService {
                         if (foundErr) {
                             client.close();
                             return reject(foundErr);
-                        } else {
-                            client.close();
-                            return resolve();
                         }
+                        client.close();
+                        return resolve();
                     });
                 }
             });
@@ -117,10 +115,9 @@ class MongoService {
                         if (foundErr) {
                             client.close();
                             return reject(foundErr);
-                        } else {
-                            client.close();
-                            return resolve();
                         }
+                        client.close();
+                        return resolve();
                     });
                 }
             });

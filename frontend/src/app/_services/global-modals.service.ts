@@ -32,7 +32,6 @@ export class GlobalModalsService {
   }
 
   closeConfirmModal(){
-    console.log("close")
     this.globalModals?.closeConfirmModal();
   }
 

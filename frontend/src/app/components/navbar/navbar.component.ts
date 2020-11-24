@@ -47,7 +47,7 @@ export class NavbarComponent implements OnInit {
     this.authenticationService.logout();
   }
 
-  isAdmin() { return this.currentUser && this.currentUser.role === Role.Admin; }
+  isAdmin() { return this.currentUser && this.currentUser.role === Role.ADMIN; }
 
   isExpandable() { return window.innerWidth < 1200; }
 

@@ -23,8 +23,6 @@ import { Guid } from 'guid-typescript';
 })
 export class ChipComponent implements OnInit {
 
-  //TODO: chip árnyék
-
   @Input() chipData: BasicElement;
   @Output() save: EventEmitter<BasicElement>;
   @Output() remove: EventEmitter<BasicElement>;
@@ -99,7 +97,7 @@ export class ChipComponent implements OnInit {
       this.remove.emit(this.chipData);
       return;
     }
-    this.globalModalsService.openConfirmModal(ConfirmModalType.Delete).then((isDeleteRequired) => {
+    this.globalModalsService.openConfirmModal(ConfirmModalType.DELETE).then((isDeleteRequired) => {
       if(isDeleteRequired) {
         this.remove.emit(this.chipData);
       };
@@ -124,7 +122,6 @@ export class ChipComponent implements OnInit {
 
   onPaste(event){
     event.preventDefault();
-    console.log(event.clipboardData.getData('text/plain'))
     document.execCommand('insertText', false, event.clipboardData.getData('text/plain').trim());
   }
 

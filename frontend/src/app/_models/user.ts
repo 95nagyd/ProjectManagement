@@ -26,7 +26,7 @@ export class User {
         this.lastName = data.lastName || '';
         this.middleName = data.middleName || '';
         this.firstName = data.firstName || '';
-        this.role = data.role || Role.User;
+        this.role = data.role || Role.USER;
         this.telephone = data.telephone || '';
         this.email = data.email || '';
     }

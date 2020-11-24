@@ -4,23 +4,24 @@
     flex-direction: row;
     margin-left: 10px;
     align-items: flex-end;
-    height: 50px;
+    height: 66px;
+    min-width: 477px;
 }
 
 
 .active-icon {
     display: flex;
-    transform: scale(2.5);
-    vertical-align: -5px;
-    font-size: 32px;
-    margin-right: 10px;
-    margin-left: 7px;
+    transform: scale(2.3);
+    margin-left: 27px;
+    margin-right: 27px;
 }
 
 .icon {
     display: flex;
-    transform: scale(1.8);
-    margin-bottom: 3px;
+    transform: scale(1.7);
+    margin-bottom: 4px;
+    margin-left: 11.5px;
+    transition: all 0.1s ease-in-out;
 }
 
 
@@ -39,9 +40,9 @@
     border: 1px solid rgb(55, 55, 55);
     border-bottom: none;
     cursor: pointer;
-    height: 30px;
-
-    transition: all 0.3s ease;
+    height: 53px;
+    width: 55px;
+    transition: all 0.4s, height 0s ease;
 }
 
 
@@ -56,19 +57,20 @@
 .active-tab {
     background-color: rgb(116, 135, 148);
     cursor: default;
-    height: 50px;
+    height: 100%;;
     padding-top: 0px;
     border-top-left-radius: 10px !important;
     border-top-right-radius: 10px !important;
-    padding-right: 5px;
-    font-size: 32px;
+    padding-right: 10px;
+    font-size: 26px;
     font-weight: 600;
+    width: fit-content;
 }
 
 
 .chip-container{
-    min-width: 410px;
-    height: calc(100vh - 180px); 
+    min-width: 500px;
+    height: calc(100vh - 205px); 
     overflow: auto; 
     border-radius: 10px;
     border: 1px solid rgb(55, 55, 55);

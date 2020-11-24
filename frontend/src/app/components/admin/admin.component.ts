@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, QueryList, ViewChildren } from '@angular/core';
-import { first, delay } from 'rxjs/operators';
+import { first, delay, take } from 'rxjs/operators';
 import { MatIconModule } from '@angular/material/icon';
 
 
@@ -11,7 +11,6 @@ import { BasicElement, BasicDataType } from '@app/_models/basic-data';
 import { Guid } from 'guid-typescript';
 import { ChipComponent } from '../_core/chip/chip.component';
 import { BasicDataService } from '@app/_services/basic-data.service';
-import { take } from 'lodash-es';
 import { GlobalModalsService } from '@app/_services/global-modals.service';
 
 @Component({
@@ -20,9 +19,6 @@ import { GlobalModalsService } from '@app/_services/global-modals.service';
   styleUrls: ['./admin.component.css']
 })
 export class AdminComponent implements OnInit {
-
-  //TODO: szebb ikonok, kissebb betűk, valahogy szebbé csinálni
-  //TODO: ngafterviewinitbe settimeout hide - konstruktor a párja mindenhova
 
   selectedTab: BasicDataType;
   chipList: Array<BasicElement>;
@@ -51,7 +47,7 @@ export class AdminComponent implements OnInit {
 
   getCurrentList() {
     this.spinner.show();
-    this.basicDataService.getBasicElementsByType(this.selectedTab).subscribe((result) => {
+    this.basicDataService.getBasicElementsByType(this.selectedTab).pipe(take(1)).subscribe((result) => {
       this.chipList = result;
       this.spinner.hide();
     }, (error) => {
@@ -81,7 +77,7 @@ export class AdminComponent implements OnInit {
     if (isValid) {
       this.spinner.show();
       delete chipData.tempId;
-      this.basicDataService.saveBasicElement(chipData, this.selectedTab).subscribe(() => {
+      this.basicDataService.saveBasicElement(chipData, this.selectedTab).pipe(take(1)).subscribe(() => {
         this.getCurrentList();
         //TODO: sikeres mentés toaster
         this.spinner.hide();
@@ -90,7 +86,7 @@ export class AdminComponent implements OnInit {
         if (error?.message?.code === 11000) {
           this.getCurrentList();
           if (!this.globalModalsService.isWarningModalOpen()) {
-            this.globalModalsService.openWarningModal('Sikertelen mentés.\nIdőközben valaki már hozzáadta a(z) "' + chipData.name + '" nevű elemet.').then(() => {
+            this.globalModalsService.openWarningModal('Sikertelen mentés.\nIdőközben valaki már hozzáadta a(z) "' + chipData.name + '" nevű elemet, vagy átnevezett egyet erre a névre.').then(() => {
               this.globalModalsService.closeWarningModal();
             });
           }
@@ -135,7 +131,6 @@ export class AdminComponent implements OnInit {
     }
 
     if (this.chipRefList.some(chipRef => chipRef.isEmpty || chipRef.isAlreadyExist)) {
-      console.log(this.chipRefList)
       return false;
     };
     this.isAddVisible = true;
@@ -155,7 +150,7 @@ export class AdminComponent implements OnInit {
       }, 0);
       return;
     }
-    this.basicDataService.deleteBasicElement(deleteChip._id, this.selectedTab).subscribe(() => {
+    this.basicDataService.deleteBasicElement(deleteChip._id, this.selectedTab).pipe(take(1)).subscribe(() => {
       //TODO: siker toaster
       this.getCurrentList();
     }, (error) => {

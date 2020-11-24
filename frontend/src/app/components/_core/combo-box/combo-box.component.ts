@@ -104,7 +104,6 @@ export class ComboBoxComponent implements OnInit, OnChanges {
   
 
   clickedOutside(){
-    console.log("close call")
     if(this.comboBoxService.isLastClickOutOfDropdown() && this.mouseEventCounter === 0){
       const chosenName = this.getChosenName();
       //ha a szűrés nem egyezik a korábban kiválasztott értékkel akkor a kiválasztott név marad

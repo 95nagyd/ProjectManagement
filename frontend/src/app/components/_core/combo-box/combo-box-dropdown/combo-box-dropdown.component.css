@@ -5,7 +5,7 @@
     font-size: 14px;
     z-index: 1;
     min-width: 100%;
-    width: max-content;
+    width: fit-content;
     margin-right: 100%;
     background: white;
     display: inline-block;
@@ -14,8 +14,11 @@
     border-top-left-radius: 0px;
     border-top-right-radius: 0px;
     min-height: 20px;
+    max-height: 215px;
     overflow-y: auto;
     box-shadow: 3px 7px 10px #7a7a7a;
+    overflow-wrap: break-word;
+    max-width: 300px;
 }
 
 .choices-item {

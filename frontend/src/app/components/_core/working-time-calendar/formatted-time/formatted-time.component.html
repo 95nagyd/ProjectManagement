@@ -5,7 +5,7 @@
         maxlength="5"
         class="pretty-time" 
         [ngClass]="{ 'invalid': hasError }"
-        [(ngModel)]="value"
+        [(ngModel)]="formattedTime"
         (focus)="onFocus($event);"
         (blur)="onFocusOut();"
         (keypress)="onKeyPress($event);"/>

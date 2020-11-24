@@ -16,12 +16,10 @@ export class ErrorInterceptor implements HttpInterceptor {
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         return next.handle(request).pipe(catchError(err => {
 
-            //TODO: error-t egységesre formálni itt és és backend-en is
-
             if (err instanceof HttpErrorResponse && (err.status === 401 || err.status === 403)) {
                 if(request.url.startsWith(environment.apiUrl)){
                     if(!this.globalModalsService.isInfoModalOpen()){
-                        this.globalModalsService.openInfoModal(InfoModalType.Expired).then((() => {
+                        this.globalModalsService.openInfoModal(InfoModalType.EXPIRED).then((() => {
                             this.authenticationService.logout();
                             this.globalModalsService.closeInfoModal();
                         }));

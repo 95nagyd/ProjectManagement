@@ -23,7 +23,6 @@ export class CalendarService {
       : `${environment.apiUrl}/workingTime/${period}`
     return this.http.get<any>(url).pipe(
       map(data => {
-        console.log(data)
         return data;
       })
     );

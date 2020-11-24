@@ -11,71 +11,81 @@ export class FormattedTimeComponent implements OnInit {
 
   hasError: Boolean;
   private pattern: any;
+  formattedTime: string;
 
-  constructor(private calendarService: CalendarService) { 
+  constructor(private calendarService: CalendarService) {
     this.hasError = false;
     this.pattern = /^[0-9]{0,2}[\:]?[0-9]{0,2}$/;
     this.update = new EventEmitter();
   }
 
-  ngOnInit(): void { 
-    this.value = !this.value || this.value.length === 0 ? '00:00' : this.value;
+  ngOnInit(): void {
+    this.setInitialFormattedTimeFromMinutes();
   }
 
   ngAfterViewInit() {
-    setTimeout(() => {
-      this.updateValue();
-    }, 0);
   }
-  
 
-  @Input() value: string;
+
+  @Input() value: number;
   @Input() isDisabled: Boolean;
   @Input() dataPosition: any;
-  @Output() update: EventEmitter<string>;
+  @Output() update: EventEmitter<number>;
 
-  onFocus(event: any){
+  setInitialFormattedTimeFromMinutes() {
+    if (this.value == 0) {
+      this.formattedTime = '00:00';
+      return;
+    }
+    const hours = Math.floor(this.value / 60);
+    const minutes = this.value % 60;
+
+    this.formattedTime = (hours < 10 ? ('0' + hours) : hours.toString()) + ':' + (minutes < 10 ? ('0' + minutes) : minutes.toString());
+  }
+
+  onFocus(event: any) {
     event.target.select();
   }
 
   onFocusOut() {
-    const input = this.value;
+    const input = this.formattedTime;
     let hours = 0;
     let minutes = 0;
 
     // --- üres input
-    if(!input || input.length === 0) {
+    if (!input || input.length === 0) {
       this.hasError = false;
-      this.value = '00:00';
+      this.value = 0;
+      this.formattedTime = '00:00';
       this.updateValue();
       return;
     }
 
     // --- ha az input nem felel meg a regex-nek, akkor hiba
-    if (!this.pattern.test(input)) { 
+    if (!this.pattern.test(input)) {
       this.hasError = true;
       return;
     }
 
-    if(input.indexOf(':') == -1){
+    if (input.indexOf(':') == -1) {
       // --- kevesebb mint 3 számjegy, csak az óra van megadva
-      if(input.length < 3){
+      if (input.length < 3) {
         hours = parseInt(input)
       }
       // --- 3 számjegy, első óra, többi perc
-      if(input.length == 3){
+      if (input.length == 3) {
         hours = parseInt(input.substring(0, 1));
         minutes = parseInt(input.substring(1, 3));
       }
       // --- 4 számjegy, első kettő óra, többi perc
-      if(input.length == 4){
+      if (input.length == 4) {
         hours = parseInt(input.substring(0, 2));
         minutes = parseInt(input.substring(2, 4));
       }
       // --- 5 számjegy, hibás
-      if(input.length > 4) {  
-        this.hasError = true; 
-        return; 
+      if (input.length > 4) {
+        this.hasError = true;
+        return;
       }
     } else {
       let parts = input.split(':');
@@ -83,25 +93,25 @@ export class FormattedTimeComponent implements OnInit {
       hours = isNaN(parseInt(parts[0])) ? 0 : parseInt(parts[0]);
       minutes = isNaN(parseInt(parts[1])) ? 0 : parseInt(parts[1]);
     }
-  
-    if(hours > 23 || minutes > 59){
+
+    if (hours > 23 || minutes > 59) {
       this.hasError = true;
       return;
     }
 
     this.hasError = false;
-    this.value = (hours < 10 ? ('0' + hours) : hours.toString()) + ':' + (minutes < 10 ? ('0' + minutes) : minutes.toString());
+    this.formattedTime = (hours < 10 ? ('0' + hours) : hours.toString()) + ':' + (minutes < 10 ? ('0' + minutes) : minutes.toString());
+    this.value = hours * 60 + minutes;
     this.updateValue();
   }
 
-  updateValue(){
-    //TODO: split : , parseintelső *60 + parseint második
+  updateValue() {
     this.update.emit(this.value);
   }
 
-  onKeyPress(event: any){
+  onKeyPress(event: any) {
 
-    if(event.key === 'Enter') event.target.blur();
+    if (event.key === 'Enter') event.target.blur();
 
     if (!this.pattern.test(event.key)) { event.preventDefault(); }
   }

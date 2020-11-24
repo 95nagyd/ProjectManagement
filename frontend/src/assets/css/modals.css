@@ -3,6 +3,10 @@
   animation-duration: 0.3s;
 }
 
+.modal-content {
+  box-shadow: 4px 6px 13px 1px rgb(51, 51, 51);
+}
+
 .modal-dialog{
   margin: auto;
 }

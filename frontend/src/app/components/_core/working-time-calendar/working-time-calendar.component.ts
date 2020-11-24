@@ -15,6 +15,7 @@ import { ConfirmModalType } from '@app/_models/modals';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { BasicDataService } from '@app/_services/basic-data.service';
 import { BasicElement } from '@app/_models/basic-data';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'working-time-calendar',
@@ -35,18 +36,25 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
   @ViewChildren(FormattedTimeComponent) workingTimeInputList!: QueryList<FormattedTimeComponent>;
   @ViewChildren('projectComboList') projectComboList!: QueryList<ComboBoxComponent>;
   @ViewChildren('designPhaseComboList') designPhaseComboList!: QueryList<ComboBoxComponent>;
-  
+  @ViewChildren('structuralElementComboList') structuralElementComboList!: QueryList<ComboBoxComponent>;
+  @ViewChildren('subtaskComboList') subtaskComboList!: QueryList<ComboBoxComponent>;
+
   isInitComplete: Boolean;
   monthNames: string[];
   dayNames: string[];
   daysOfMonth: CalendarDayDetails[] = [];
+  isDataChanged: Boolean;
 
 
   private chosenPeriod: Date;
   period: string;
 
+  firstPeriodTime: number;
+
+  isPreviousChangeAvailable: boolean;
+
   comboColWidth: number;
-  
+
   periodData: CalendarData;
   calendarOldData: CalendarData;
 
@@ -62,65 +70,57 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
   editingComment: { dayNumber: number, dataIndex: number }
 
 
-  //TODO: menü váltásra ha van changes akkor modal
-//TODO: spinne show-hide párok
+  
+  //TODO: változók a kostruktor elé
+  //TODO: mindenhova type-ot írni (változók, metódus visszatérések)
+  //TODO: format document 
 
-//TODO: hónap ne lista legyen, hanem számosított property-k
+  //TODO: toaster
+  //TODO: spinne show-hide párok subscribe-ok előtt + benne + (konstruktor show - ngafterviewinitbe settimeout hide ) 
 
-  //TODO: elnavigáláskor elvatés modál (menupontnál)
-
-  //TODO: első időszak ha nincs senkinek akkor -1 a minperiod az aktuális hónap 
-  //TODO: az első töltésig (bárkié) lehessen visszamenni
-
-  //TODO: alul kiférjen a legnagyobb message, ahhoz a mérethez beállítani a max dropdown height-t
-  //TODO: munkaidő millisec-be legyen tárolva
+  //TODO: alul kiférjen a legnagyobb message
+  //TODO: havi összes munkaidő az utolsó nap után (legalább annyi hely kell , hogy az utolsó nap max magasságos tooltipje kiférjen), frontenden szamolodik 
   //TODO: aktuális napra színes keret
-  //TODO: naptár szürke színeket kicsit kékebbé
 
-    //TODO: havi összes munkaidő az utolsó nap után (legalább annyi hely kell , hogy az utolsó nap max magasságos tooltipje kiférjen), frontenden szamolodik 
+  //TODO: képek css-ből legyenek (login, és nevbar)
 
-    
-    //TODO: subscribe-ok unsubscribe ngondestroyba
+  constructor(private spinner: SpinnerService, private scrollOffsetService: PageContentScrollOffsetService, private calendarService: CalendarService,
+    private userService: UserService, private globalModalsService: GlobalModalsService, private comboBoxService: ComboBoxService,
+    private basicDataService: BasicDataService) {
 
-    //TODO: szabadság, betegszabadság (akkor a sor más szinű) (datpickerrel gombról megnyílik modal)
+    this.spinner.show();
+    this.backFunction = new EventEmitter();
+    this.isDataChanged = false;
+    this.isComboReady = false;
+    this.getComboElements();
+    this.chosenPeriod = new Date();
+    this.chosenPeriod.setHours(0, 0, 0, 0);
+    this.chosenPeriod.setDate(1);
 
-    //TODO: mai nap keret
-    
-    //TODO: képek css-ből legyenek
+    this.firstPeriodTime = this.chosenPeriod.getTime();
+    this.isPreviousChangeAvailable = false;
+    this.calendarService.getFirstSavedPeriod().pipe(take(1)).subscribe((firstPeriod) => {
+      if (firstPeriod !== -1 && firstPeriod < this.chosenPeriod.getTime()) {
+        this.firstPeriodTime = firstPeriod;
+        this.isPreviousChangeAvailable = this.firstPeriodTime < this.chosenPeriod.getTime();
+      }
+      this.spinner.hide();
+    }, (error) => {
+      this.spinner.forceHide();
+      if (!this.globalModalsService.isErrorModalOpen()) {
+        this.globalModalsService.openErrorModal(error.message).then(() => {
+          this.globalModalsService.closeErrorModal();
+        });
+      }
+    });
 
-  constructor(private spinner: SpinnerService, private scrollOffsetService: PageContentScrollOffsetService, private calendarService: CalendarService, 
-    private userService: UserService, private globalModalsService: GlobalModalsService, private comboBoxService: ComboBoxService, 
-    private basicDataService: BasicDataService) { 
-      
-      this.spinner.show();
-      this.backFunction = new EventEmitter();
+    this.monthNames = ['január', 'február', 'március', 'április', 'május', 'június', 'július', 'augusztus', 'szeptember', 'október', 'november', 'december'];
 
-      this.calendarService.getFirstSavedPeriod().subscribe((firstPeriod) => {
-        console.log("firstPeriod:"+ firstPeriod)
-        //TODO: firstperiod-ot beállítani bal limitnek
-        this.spinner.hide();
-      }, (error) => {
-        this.spinner.forceHide();
-        if(!this.globalModalsService.isErrorModalOpen()){
-          this.globalModalsService.openErrorModal(error.message).then(() => {
-              this.globalModalsService.closeErrorModal();
-          });
-        }
-      });
-      this.isComboReady = false;
-      this.getComboElements();
+    this.dayNames = ['vasárnap', 'hétfő', 'kedd', 'szerda', 'csütörtök', 'péntek', 'szombat'];
 
-      this.chosenPeriod = new Date();
-      this.chosenPeriod.setHours(0,0,0,0);
-      this.chosenPeriod.setDate(1);
+  }
 
-      this.monthNames = ['január','február','március','április','május','június','július','augusztus','szeptember','október','november','december'];
-
-      this.dayNames = ['vasárnap','hétfő','kedd','szerda','csütörtök','péntek','szombat'];
-
-    }
-
-  ngOnInit(): void { 
+  ngOnInit(): void {
     this.spinner.show();
     this.userFullName = this.user ? this.userService.getFullName(this.user) : '';
     this.setPeriod();
@@ -139,9 +139,9 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
     }, 0);
   }
 
-  getComboElements(){
+  getComboElements() {
     this.spinner.show();
-    this.basicDataService.getAllBasicElements().subscribe((result) => {
+    this.basicDataService.getAllBasicElements().pipe(take(1)).subscribe((result) => {
       this.projectList = result.projects;
       this.designPhaseList = result.designPhases;
       this.structuralElementList = result.structuralElements;
@@ -150,28 +150,25 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
       this.spinner.hide();
     }, (error) => {
       this.spinner.forceHide();
-      if(!this.globalModalsService.isErrorModalOpen()){
+      if (!this.globalModalsService.isErrorModalOpen()) {
         this.globalModalsService.openErrorModal(error.message).then(() => {
-            this.globalModalsService.closeErrorModal();
+          this.globalModalsService.closeErrorModal();
         });
       }
     });
   }
 
   //#region calendar control
-  
+
   setPeriod() { this.period = this.chosenPeriod.getFullYear().toString() + ' ' + this.monthNames[this.chosenPeriod.getMonth()] }
 
-  getDaysInMonth() { return new Date(this.chosenPeriod.getFullYear(), this.chosenPeriod.getMonth()+1, 0).getDate(); }
+  getDaysInMonth() { return new Date(this.chosenPeriod.getFullYear(), this.chosenPeriod.getMonth() + 1, 0).getDate(); }
 
   changeMonth(direction: string) {
-    if(this.isCalendarDataChanged()){
-      this.globalModalsService.hasChanges = true;
-      this.globalModalsService.openConfirmModal(ConfirmModalType.Discard).then((isDiscardRequired) => {
-        if(isDiscardRequired){
-          
+    if (this.getActualChangeState()) {
+      this.globalModalsService.openConfirmModal(ConfirmModalType.DISCARD).then((isDiscardRequired) => {
+        if (isDiscardRequired) {
           this.doChange(direction);
-          this.globalModalsService.hasChanges = false;
         }
         this.globalModalsService.closeConfirmModal();
       });
@@ -179,10 +176,11 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
       this.doChange(direction);
     }
   }
-  private doChange(direction: string){
+  private doChange(direction: string) {
     this.spinner.show();
     this.getComboElements();
-    this.chosenPeriod.setMonth(this.chosenPeriod.getMonth() + (direction === 'previous' ? -1 : 1)); 
+    this.chosenPeriod.setMonth(this.chosenPeriod.getMonth() + (direction === 'previous' ? -1 : 1));
+    this.isPreviousChangeAvailable = this.firstPeriodTime < this.chosenPeriod.getTime();
     this.periodData = null;
     this.setPeriod();
     this.refreshCalendar();
@@ -193,78 +191,76 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
     this.spinner.show();
     this.daysOfMonth = [];
     const daysInMonth = this.getDaysInMonth();
-    for(let dayIndex = 0; dayIndex < daysInMonth; dayIndex++){
+    for (let dayIndex = 0; dayIndex < daysInMonth; dayIndex++) {
       let tempDate = new Date(this.chosenPeriod);
-      tempDate.setDate(dayIndex+1);
+      tempDate.setDate(dayIndex + 1);
       this.daysOfMonth.push({
-         number : dayIndex, 
-         name : this.dayNames[tempDate.getDay()],
-         backgroundColor : dayIndex % 2 == 1 ? 'rgb(227, 228, 232)' : 'rgb(196, 196, 204)'
+        number: dayIndex,
+        name: this.dayNames[tempDate.getDay()]
       });
     }
     this.updateCalendarViewData();
     this.scrollOffsetService.setOffsetY(0);
-    if(this.commentbox) { this.commentbox.hide(); }
+    if (this.commentbox) { this.commentbox.hide(); }
     this.spinner.hide();
   }
 
   private updateCalendarViewData() {
     this.spinner.show();
-    if(this.user){
-      this.calendarService.getUserWorkingTimeByGivenPeriod(this.chosenPeriod.getTime(), this.user._id).subscribe((periodData) => {
+    if (this.user) {
+      this.calendarService.getUserWorkingTimeByGivenPeriod(this.chosenPeriod.getTime(), this.user._id).pipe(take(1)).subscribe((periodData) => {
         this.periodData = periodData;
         this.calendarOldData = _.cloneDeep<CalendarData>(this.periodData);
+        this.getActualChangeState();
         this.daysOfMonth.forEach(dayData => {
-          if(!this.periodData[dayData.number]) { 
+          if (!this.periodData[dayData.number]) {
             this.periodData[dayData.number] = [];
-            this.addEmptyRow(dayData.number); 
+            this.addEmptyRow(dayData.number);
           }
         });
         this.spinner.hide();
       }, (error) => {
         this.spinner.forceHide();
-        if(!this.globalModalsService.isErrorModalOpen()){
+        if (!this.globalModalsService.isErrorModalOpen()) {
           this.globalModalsService.openErrorModal(error.message).then(() => {
-              this.globalModalsService.closeErrorModal();
+            this.globalModalsService.closeErrorModal();
           });
         }
       });
     } else {
-      this.calendarService.getUserWorkingTimeByGivenPeriod(this.chosenPeriod.getTime()).subscribe((periodData) => {
+      this.calendarService.getUserWorkingTimeByGivenPeriod(this.chosenPeriod.getTime()).pipe(take(1)).subscribe((periodData) => {
         this.periodData = periodData;
         this.calendarOldData = _.cloneDeep<CalendarData>(this.periodData);
-
-        
-
+        this.getActualChangeState();
         this.daysOfMonth.forEach(dayData => {
-          if(!this.periodData[dayData.number]) { 
+          if (!this.periodData[dayData.number]) {
             this.periodData[dayData.number] = [];
-            this.addEmptyRow(dayData.number); 
+            this.addEmptyRow(dayData.number);
           }
         });
         this.spinner.hide();
       }, (error) => {
         this.spinner.forceHide();
-        if(!this.globalModalsService.isErrorModalOpen()){
+        if (!this.globalModalsService.isErrorModalOpen()) {
           this.globalModalsService.openErrorModal(error.message).then(() => {
-              this.globalModalsService.closeErrorModal();
+            this.globalModalsService.closeErrorModal();
           });
         }
       });
     }
   }
 
-  back(){
+  back() {
     this.backFunction.emit();
   }
 
   addEmptyRow(dayNumber: number) { this.periodData[dayNumber].push(new CalendarRowData()); }
 
-  deleteRow(dayNumber: number, rowIndex: number){ 
-    this.globalModalsService.openConfirmModal(ConfirmModalType.Delete).then((isDeleteRequired) => {
-      if(isDeleteRequired) {
-        this.globalModalsService.hasChanges = true;
-        this.periodData[dayNumber].splice(rowIndex, 1); 
+  deleteRow(dayNumber: number, rowIndex: number) {
+    this.globalModalsService.openConfirmModal(ConfirmModalType.DELETE).then((isDeleteRequired) => {
+      if (isDeleteRequired) {
+        this.getActualChangeState();
+        this.periodData[dayNumber].splice(rowIndex, 1);
       };
       this.globalModalsService.closeConfirmModal();
     });
@@ -274,81 +270,88 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
 
   //#region cell control
 
-  updateWorkingTime(value: string, dayNumber: number, dataIndex: number){
+  updateWorkingTime(value: number, dayNumber: number, dataIndex: number) {
     this.periodData[dayNumber][dataIndex].workingTime = value;
+    this.getActualChangeState();
   }
 
-  updateCombo(combo: string, chosenId: string, dayNumber: number, dataIndex: number){
-    switch(combo) { 
-      case 'project': { 
+  updateCombo(combo: string, chosenId: string, dayNumber: number, dataIndex: number) {
+    this.getActualChangeState();
+    switch (combo) {
+      case 'project': {
         this.periodData[dayNumber][dataIndex].projectId = chosenId;
-         break; 
-      } 
-      case 'designPhase': { 
+        break;
+      }
+      case 'designPhase': {
         this.periodData[dayNumber][dataIndex].designPhaseId = chosenId;
-         break; 
-      } 
-      case 'structuralElement': { 
+        break;
+      }
+      case 'structuralElement': {
         this.periodData[dayNumber][dataIndex].structuralElementId = chosenId;
-         break; 
-      } 
-      case 'subtask': { 
+        break;
+      }
+      case 'subtask': {
         this.periodData[dayNumber][dataIndex].subtaskId = chosenId;
-         break; 
+        break;
       }
     }
   }
 
-  updateComment(value: string){
+  updateComment(value: string) {
+    this.getActualChangeState();
     this.periodData[this.editingComment.dayNumber][this.editingComment.dataIndex].comment = value;
   }
 
   previewComment(e: any, dayNumber: number, dataIndex: number) {
-    if(this.commentbox && !this.commentbox.isEditing){
+    if (this.commentbox && !this.commentbox.isEditing) {
       this.editingComment = { dayNumber: dayNumber, dataIndex: dataIndex }
       this.commentbox.preview(e.target, this.periodData[dayNumber][dataIndex].comment);
     }
   }
 
   editComment(e: any, dayNumber: number, dataIndex: number) {
-    if(!this.isEditable) return;
-    if(this.commentbox && this.commentbox.isEditing) { this.commentbox.hide(); return; }
-    if(this.commentbox){
+    if (!this.isEditable) return;
+    if (this.commentbox && this.commentbox.isEditing) { this.commentbox.hide(); return; }
+    if (this.commentbox) {
       this.editingComment = { dayNumber: dayNumber, dataIndex: dataIndex }
       this.commentbox.edit(e.target, this.periodData[dayNumber][dataIndex].comment);
     }
   }
 
   hideComment() {
-    if(this.commentbox){
+    if (this.commentbox) {
       this.commentbox.isNewDisplayInTimeout = false;
       setTimeout(() => {
-        if(this.commentbox && this.commentbox.isPreview && !this.commentbox.isEditing && !this.commentbox.isCommentInFocus && !this.commentbox.isNewDisplayInTimeout){ 
-          this.commentbox.hide(); 
+        if (this.commentbox && this.commentbox.isPreview && !this.commentbox.isEditing && !this.commentbox.isCommentInFocus && !this.commentbox.isNewDisplayInTimeout) {
+          this.commentbox.hide();
           this.editingComment = { dayNumber: -1, dataIndex: -1 }
         }
       }, 100);
     }
   }
-  
+
   //#endregion
 
   //#region save
 
-  isCalendarDataChanged(){
-    return !(_.isEqual(this.calendarOldData, this.removeEmptyRows(this.periodData)));
+  getActualChangeState() {
+    return setTimeout(() => {
+      this.isDataChanged = !(_.isEqual(this.calendarOldData, this.removeEmptyRows(this.periodData)));
+      this.globalModalsService.hasChanges = this.isDataChanged;
+      return this.isDataChanged;
+    }, 0);
   }
 
-  removeEmptyRows(data: CalendarData){
+  removeEmptyRows(data: CalendarData) {
     const daysInMonth = this.getDaysInMonth();
     let temp = _.cloneDeep<CalendarData>(data);
     let clearedData: CalendarData = {};
-    for(let dayIndex = 0; dayIndex < daysInMonth; dayIndex++){
+    for (let dayIndex = 0; dayIndex < daysInMonth; dayIndex++) {
       temp[dayIndex] = temp[dayIndex].filter(dataRow => {
         return !this.isDataRowEmpty(dataRow);
       });
-      if(temp[dayIndex].length > 0) { 
-        clearedData[dayIndex] = temp[dayIndex]; 
+      if (temp[dayIndex].length > 0) {
+        clearedData[dayIndex] = temp[dayIndex];
       } else {
         delete clearedData[dayIndex];
       }
@@ -356,31 +359,32 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
     return clearedData;
   }
 
-  isDataRowEmpty(dataRow: CalendarRowData){
-    return (dataRow.workingTime === '00:00' && !dataRow.projectId && !dataRow.designPhaseId && !dataRow.structuralElementId && !dataRow.subtaskId && !dataRow.comment);
+  isDataRowEmpty(dataRow: CalendarRowData) {
+    return (dataRow.workingTime == 0 && !dataRow.projectId && !dataRow.designPhaseId && !dataRow.structuralElementId && !dataRow.subtaskId && !dataRow.comment);
   }
-  
-  validateCalendar(){
-    if(this.workingTimeInputList.some(workingTimeInput => workingTimeInput.hasError === true)) { return false; };
+
+  validateCalendar() {
+    if (this.workingTimeInputList.some(workingTimeInput => workingTimeInput.hasError === true)) { return false; };
     let temp: CalendarData = this.removeEmptyRows(this.periodData);
+
     let isCalValid = true;
     for (const [dayKey, data] of Object.entries(temp)) {
       data?.forEach((dataRow: CalendarRowData, index: number) => {
-        if(dataRow.workingTime !== '00:00' || dataRow.projectId || dataRow.designPhaseId || dataRow.structuralElementId || dataRow.subtaskId || dataRow.comment){
-          const dayNumber = parseInt(dayKey)+1
+        if (dataRow.workingTime != 0 || dataRow.projectId || dataRow.designPhaseId || dataRow.structuralElementId || dataRow.subtaskId || dataRow.comment) {
+          const dayNumber = parseInt(dayKey) + 1
           const dayText = (dayNumber < 10 ? '0' + dayNumber.toString() : dayNumber.toString()) + '.';
-          if(!dataRow.projectId){
+          if (!dataRow.projectId) {
             isCalValid = false;
-            this.projectComboList.filter(projectCombo => 
-              projectCombo.elementRef.nativeElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.firstChild.firstChild.firstChild.textContent 
-                === dayText
+            this.projectComboList.filter(projectCombo =>
+              projectCombo.elementRef.nativeElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.firstChild.firstChild.firstChild.textContent
+              === dayText
             )[index].hasError = true;
           }
-          if(!dataRow.designPhaseId){
+          if (!dataRow.designPhaseId) {
             isCalValid = false;
-            this.designPhaseComboList.filter(designPhaseCombo => 
-              designPhaseCombo.elementRef.nativeElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.firstChild.firstChild.firstChild.textContent 
-                === dayText
+            this.designPhaseComboList.filter(designPhaseCombo =>
+              designPhaseCombo.elementRef.nativeElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.firstChild.firstChild.firstChild.textContent
+              === dayText
             )[index].hasError = true;
           }
         }
@@ -389,50 +393,49 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
     return isCalValid;
   }
 
-  isCalSavable(){
-    return this.isInitComplete && this.isEditable && this.periodData 
+  isCalSavable() {
+    return this.isInitComplete && this.isEditable && this.periodData
       && (!this.workingTimeInputList.some(workingTimeInput => workingTimeInput.hasError === true)
-      && !this.projectComboList.some(projectCombo => projectCombo.hasError === true)
-      && !this.designPhaseComboList.some(designPhaseCombo => designPhaseCombo.hasError === true))
+        && !this.projectComboList.some(projectCombo => projectCombo.hasError === true)
+        && !this.designPhaseComboList.some(designPhaseCombo => designPhaseCombo.hasError === true)
+        && !this.structuralElementComboList.some(structuralElementCombo => structuralElementCombo.hasError === true)
+        && !this.subtaskComboList.some(subtaskCombo => subtaskCombo.hasError === true))
   }
 
-  saveCalendar(){
-    if(!this.isCalSavable() || !this.isCalendarDataChanged()){ return; }
+  saveCalendar() {
+    if (!this.isCalSavable() || !this.getActualChangeState()) { return; }
 
-    if(!this.validateCalendar()){
-      if(!this.globalModalsService.isWarningModalOpen()){
+    if (!this.validateCalendar()) {
+      if (!this.globalModalsService.isWarningModalOpen()) {
         this.globalModalsService.openWarningModal('Mentés előtt kérem javítsa a hibás mezőket.').then(() => {
-            this.getComboElements();
-            this.globalModalsService.closeWarningModal();
+          this.getComboElements();
+          this.globalModalsService.closeWarningModal();
         });
       }
       return;
     }
-    
+
     this.spinner.show();
     let saveData = this.removeEmptyRows(this.periodData);
-    console.log(saveData)
-    this.calendarService.saveWorkingTime(this.chosenPeriod.getTime(), saveData).subscribe((data) => {
-      this.globalModalsService.hasChanges = false;
-      //TODO: toaster
-      console.log("sikeres mentés toaster")
+    this.calendarService.saveWorkingTime(this.chosenPeriod.getTime(), saveData).pipe(take(1)).subscribe((data) => {
+      //TODO: toaster mentés
       this.getComboElements();
       this.updateCalendarViewData();
       this.spinner.hide();
     }, error => {
       this.spinner.forceHide();
-      if(error?.code === 404){
-        if(!this.globalModalsService.isWarningModalOpen()){
+      if (error?.code === 404) {
+        if (!this.globalModalsService.isWarningModalOpen()) {
           this.globalModalsService.openWarningModal(error.message).then(() => {
-              this.getComboElements();
-              this.globalModalsService.closeWarningModal();
+            this.getComboElements();
+            this.globalModalsService.closeWarningModal();
           });
         }
         return;
-      } 
-      if(!this.globalModalsService.isErrorModalOpen()){
+      }
+      if (!this.globalModalsService.isErrorModalOpen()) {
         this.globalModalsService.openErrorModal(error.message).then(() => {
-            this.globalModalsService.closeErrorModal();
+          this.globalModalsService.closeErrorModal();
         });
       }
     });

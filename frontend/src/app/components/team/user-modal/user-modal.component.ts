@@ -8,6 +8,7 @@ import { UserService } from '@app/_services/user.service';
 import { GlobalModalsService } from '@app/_services/global-modals.service';
 import { ConfirmModalType } from '@app/_models/modals';
 import { Observable } from 'rxjs';
+import { take } from 'rxjs/operators';
 
 
 @Component({
@@ -38,7 +39,7 @@ export class UserModalComponent implements OnInit, OnDestroy {
     this.spinner.show();
     this.onClose = new EventEmitter();
     this.isPassVisible = false;
-    this.role = Role.User;
+    this.role = Role.USER;
 
     this.patterns = {
       'username': new RegExp('^[a-zA-Z0-9]*$'),
@@ -96,7 +97,7 @@ export class UserModalComponent implements OnInit, OnDestroy {
       beforeDismiss: () => {
         if (!this.userForm.dirty) { this.onClose.emit(); return true; }
 
-        return this.globalModalsService.openConfirmModal(ConfirmModalType.Discard).then((isDiscardRequired) => {
+        return this.globalModalsService.openConfirmModal(ConfirmModalType.DISCARD).then((isDiscardRequired) => {
           if (isDiscardRequired) {
             this.onClose.emit();
           };
@@ -126,9 +127,7 @@ export class UserModalComponent implements OnInit, OnDestroy {
     userToSave.telephone = this.userFormControls.telephone.value.trim();
     userToSave.email = this.userFormControls.email.value.trim();
 
-    console.log(userToSave);
-
-    this.userService.saveUser(userToSave).subscribe(() => {
+    this.userService.saveUser(userToSave).pipe(take(1)).subscribe(() => {
       //TODO: sikeres mentés toaster
       this.onClose.emit();
       this.openUserModalRef.close();

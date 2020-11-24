@@ -159,6 +159,14 @@
     max-width: 60px;
 }
 
+.row-color:nth-child(odd) {
+    background-color: rgb(196, 196, 204);
+}
+
+.row-color:nth-child(even){
+    background-color: rgb(227, 228, 232);
+}
+
 
 
 .date-cell-w{
@@ -255,6 +263,20 @@ table table tr:not(:first-child) {
     width: 100%;
     align-self: center;
     text-align: center;
+}
+
+.sunday {
+    background-color: rgb(78, 127, 212);
+    color: rgb(255, 25, 25);
+    font-weight: bold;
+    text-shadow: 0px 0px 3px rgb(0, 0, 0);
+}
+
+.saturday {
+    background-color: rgb(123, 155, 209);
+    color: rgb(222, 222, 222); 
+    font-weight: bold; 
+    text-shadow: 0px 0px 5px rgb(0, 0, 0);
 }
     
 .modify {

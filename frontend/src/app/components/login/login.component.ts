@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { first } from 'rxjs/operators';
+import { first, take } from 'rxjs/operators';
 
 import { AuthenticationService } from '@app/_services/authentication.service';
 import { Subscription } from 'rxjs';
@@ -25,10 +25,9 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.submitted = false;
   }
 
-//TODO: username, password regex hibaüzenetekkel
+//TODO: username, password regex hibaüzenetekkel (regex a usermodalrol)
 
   ngOnInit(): void {
-    console.log(this.authenticationService.isLoggedIn())
     this.globalModalsService.closeAllModal();
     if (this.authenticationService.isLoggedIn()) {
       this.router.navigate(['']);
@@ -55,10 +54,10 @@ export class LoginComponent implements OnInit, OnDestroy {
       return;
     }
     this.loading = true;
-    this.authenticationService.login(this.formControls.username.value, this.formControls.password.value).subscribe((result) => {
+    this.authenticationService.login(this.formControls.username.value, this.formControls.password.value).pipe(take(1)).subscribe((result) => {
       if(result){
         const additional = "\nFelhasználónév: " + this.formControls.username.value + "\nJelszó: " + this.formControls.password.value;
-        this.globalModalsService.openInfoModal(InfoModalType.FirstUser, additional).then((() => {
+        this.globalModalsService.openInfoModal(InfoModalType.FIRST_USER, additional).then((() => {
           this.globalModalsService.closeInfoModal();
         }));
         this.loading = false;

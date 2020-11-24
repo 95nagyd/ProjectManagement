@@ -5,6 +5,7 @@ import { AuthenticationService } from '@app/_services/authentication.service';
 import { GlobalModalsService } from '@app/_services/global-modals.service';
 import { SpinnerService } from '@app/_services/spinner.service';
 import { UserService } from '@app/_services/user.service';
+import { take } from 'rxjs/operators';
 import { UserModalComponent } from './user-modal/user-modal.component';
 
 @Component({
@@ -25,11 +26,9 @@ export class TeamComponent implements OnInit {
     this.spinner.show();
   }
 
-  //TODO: hosszú név hogy fér ki a név mezőbe megoldani (magasság növelésével)
-
   ngOnInit(): void {
     this.currentUser = this.authenticationService.getCurrentUser();
-    this.isAdmin = this.currentUser.role === Role.Admin;
+    this.isAdmin = this.currentUser.role === Role.ADMIN;
 
     this.refreshUserList();
   }
@@ -40,7 +39,7 @@ export class TeamComponent implements OnInit {
 
   refreshUserList(){
     this.spinner.show();
-    this.userService.getAll().subscribe(users => {
+    this.userService.getAll().pipe(take(1)).subscribe(users => {
       let tempUsers = [];
       users.map(user => { if(this.currentUser._id !== user._id) tempUsers.push(new User(user)) });
       this.users = tempUsers;

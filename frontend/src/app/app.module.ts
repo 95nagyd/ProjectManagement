@@ -32,7 +32,6 @@ import { FormattedTimeComponent } from './components/_core/working-time-calendar
 import { CommentBoxComponent } from './components/_core/working-time-calendar/comment-box/comment-box.component';
 import { ComboBoxComponent } from './components/_core/combo-box/combo-box.component';
 import { ComboBoxDropdownComponent } from './components/_core/combo-box/combo-box-dropdown/combo-box-dropdown.component';
-import { ClickInsideDirective } from './_custom/click-inside.directive';
 import { TwoDigitNumberPipe } from './_custom/two-digit-number.pipe';
 import { UserModalComponent } from './components/team/user-modal/user-modal.component';
 import { ErrorStateMatcher, ShowOnDirtyErrorStateMatcher } from '@angular/material/core';
@@ -57,7 +56,6 @@ import { MatIconModule } from '@angular/material/icon';
     CommentBoxComponent,
     ComboBoxComponent,
     ComboBoxDropdownComponent,
-    ClickInsideDirective,
     TwoDigitNumberPipe,
     UserModalComponent,
     GlobalModalsComponent,

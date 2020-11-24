@@ -1,9 +1,14 @@
 .pretty-time {
     width: 70px; 
     height: 20px;
-    border: 1px solid black;
+    border: 1px solid rgb(104, 104, 104);
     border-radius: 3px; 
     text-align: center;
+}
+
+.pretty-time:hover {
+    border: 1px solid black;
+    box-shadow: 0px 0px 2px rgb(0,0,0);
 }
 
 .pretty-time:focus {
@@ -14,7 +19,8 @@
 }
 
 .invalid {
-    border: 1px solid red;
+    border: 1px solid red !important;
+    box-shadow: 0 0 4px red !important;
 }
 
 .pretty-time-fake-input {

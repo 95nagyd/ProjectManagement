@@ -3,7 +3,6 @@ import { BasicElement } from './basic-data';
 export interface CalendarDayDetails {
   number: number;
   name: string;
-  backgroundColor: string;
 }
 
 
@@ -14,7 +13,7 @@ export interface CalendarData {
 
 
 export class CalendarRowData {
-  workingTime: string;
+  workingTime: number;
   projectId: string;
   designPhaseId: string;
   structuralElementId: string;
@@ -24,7 +23,7 @@ export class CalendarRowData {
   constructor(data?: CalendarRowData) {
     data = data || <CalendarRowData>{};
 
-    this.workingTime = data.workingTime || '00:00';
+    this.workingTime = data.workingTime || 0;
     this.projectId = data.projectId || '';
     this.designPhaseId = data.designPhaseId || '';
     this.structuralElementId = data.structuralElementId || '';

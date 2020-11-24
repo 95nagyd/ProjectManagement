@@ -16,8 +16,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.options('*', cors());
 
-//TODO: lekezelni a promise reject-eket
-//TODO: returnonli az osszes res-t
 
 app.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
@@ -174,7 +172,7 @@ function verifyToken(req, res, next){
             ]);
             return next();
         }, (error) => {
-            return res.status(500).json({ message: "Adatbázis elérési hiba!" });
+            return res.status(500).json({ message: error });
         });
     });
 }
