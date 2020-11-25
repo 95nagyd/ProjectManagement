@@ -3,7 +3,7 @@
     flex-direction: column;
     width: 100%; 
     height: 100%;
-    min-width: 450px; 
+    min-width: 383px;
 }
 
 .header {
@@ -28,7 +28,8 @@
 }
 
 .seq {
-    width: 50px;
+    min-width: 20px;
+    max-width: 50px;
 }
 
 .add-user {
@@ -77,6 +78,14 @@
     align-self: center;
 }
 
+.list-content .user-row:nth-child(odd) {
+    background-color: rgb(235, 235, 235);
+}
+
+.list-content .user-row:nth-child(even){
+    background-color: rgb(255, 255, 255);
+}
+
 .list-content .user-row {
     display: flex; 
     flex-direction: row; 
@@ -96,6 +105,8 @@
     padding-left: 10px; 
     font-size: 16px;
 }
+
+
 
 .name {
     font-weight: 600;

@@ -69,6 +69,7 @@
 
 
 .chip-container{
+    min-height: 200px;
     min-width: 500px;
     height: calc(100vh - 205px); 
     overflow: auto; 

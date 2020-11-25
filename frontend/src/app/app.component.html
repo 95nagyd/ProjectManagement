@@ -7,7 +7,7 @@
 <navbar *ngIf="isLoggedIn()" (clickOutside)="navbar.collapseIfPossible()"></navbar>
 <div class="route-component">
 
-    <div [ngClass]="{ 'w-100 h-max row mx-auto': isLoggedIn() }" class="w-100 h-max row mx-auto overflow-x-auto" (scroll)="onScroll();" #page>
+    <div [ngClass]="{ 'w-100 h-max row mx-auto': isLoggedIn() }" (scroll)="onScroll();" #page >
         <div class="col-12 p-0 pt-1">
             <div [ngClass]="{ 'component-content-container card card-body mx-2 mb-2': isLoggedIn() }">
                 <global-modals></global-modals>

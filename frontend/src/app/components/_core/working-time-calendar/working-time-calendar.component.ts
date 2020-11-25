@@ -64,12 +64,14 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
   editingComment: { dayNumber: number, dataIndex: number }
 
   //TODO: toaster
-
-
+//TODO:kombó hosszú szövegének tooltip amint megjelenik
+//TODO:popover z index
   //TODO: alul kiférjen a legnagyobb message
   //TODO: havi összes munkaidő az utolsó nap után (legalább annyi hely kell , hogy az utolsó nap max magasságos tooltipje kiférjen), frontenden szamolodik 
   //TODO: aktuális napra színes keret
-
+//TODO:dropdown,comment x offset
+//TODO: dinamikus modal szélesség
+//TODO: háttér width fit content overflow-x scroll
   //TODO: képek css-ből legyenek (login, és nevbar)
 
   constructor(private spinner: SpinnerService, private scrollOffsetService: PageContentScrollOffsetService, private calendarService: CalendarService,
@@ -220,8 +222,6 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
       });
     } else {
       this.calendarService.getUserWorkingTimeByGivenPeriod(this.chosenPeriod.getTime()).pipe(take(1)).subscribe(async (result) => {
-        console.log(result)
-        
         this.periodData = result;
         this.calendarOldData = _.cloneDeep<CalendarData>(this.periodData);
 

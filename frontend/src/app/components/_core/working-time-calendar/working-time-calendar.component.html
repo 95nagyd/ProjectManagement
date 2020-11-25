@@ -1,7 +1,9 @@
 <comment-box    [isDisabled]="!isEditable" 
                 #commentbox 
-                (update)="updateComment($event);"></comment-box>
-                
+                (update)="updateComment($event);">
+</comment-box>
+    
+
 <div class="calendar-container">
     <div class="calendar-slider p-2">
 
@@ -88,7 +90,6 @@
                                 <td>
                                     <div>
                                         <formatted-time value="{{cellData.workingTime}}"
-                                                        [dataPosition]="{'dayNumber': dayData.number, 'dataIndex': dataRowIndex}"
                                                         [isDisabled]="!isEditable"
                                                         (update)="updateWorkingTime($event, dayData.number, dataRowIndex);">
                                         </formatted-time>

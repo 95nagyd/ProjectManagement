@@ -7,10 +7,8 @@ import { EventEmitter } from '@angular/core'
   styleUrls: ['./formatted-time.component.css']
 })
 export class FormattedTimeComponent implements OnInit {
-//TODO dataPosition kell e?
   @Input() value: number;
   @Input() isDisabled: Boolean;
-  @Input() dataPosition: any;
   @Output() update: EventEmitter<number>;
   private pattern: any;
   hasError: Boolean;

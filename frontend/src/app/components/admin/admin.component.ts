@@ -19,6 +19,7 @@ export class AdminComponent implements OnInit {
   @ViewChildren(ChipComponent) chipRefList!: QueryList<ChipComponent>;
   isAddVisible: boolean;
 
+  //TODO: lentre irodjon ki kivalasztott a szövege az elso sorba
 
   constructor(private spinner: SpinnerService, private basicDataService: BasicDataService, private globalModalsService: GlobalModalsService) {
 

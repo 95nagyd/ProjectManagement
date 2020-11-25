@@ -16,11 +16,12 @@ import { DomSanitizer } from '@angular/platform-browser';
   styleUrls: ['./app.component.css']
 })
 
-export class AppComponent {
-//TODO: interval subscription-t unsibolni ngdestroyba
+export class AppComponent implements OnDestroy {
   @ViewChild(NavbarComponent) navbar: NavbarComponent;
   @ViewChild('page') page: ElementRef;
   private isLoggedInPastState: any;
+
+  private intervalSubscription: Subscription;
 
   constructor(private authenticationService: AuthenticationService, private router: Router, private _ngZone: NgZone, private spinner: SpinnerService,
     private scrollOffsetService: PageContentScrollOffsetService, private location: Location, private matIconRegistry: MatIconRegistry,
@@ -56,7 +57,6 @@ export class AppComponent {
     });
   }
 
-
   ngAfterViewInit() {
     this.scrollOffsetService.setOffsetY(0);
     setTimeout(() => {
@@ -64,8 +64,12 @@ export class AppComponent {
     }, 0);
   }
 
+  ngOnDestroy(){
+    this.intervalSubscription?.unsubscribe();
+  }
+
   initInterval() {
-    interval(500).pipe(
+    this.intervalSubscription = interval(500).pipe(
       switchMap(() => {
         return of(this.isLoggedIn());
       }))

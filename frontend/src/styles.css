@@ -13,8 +13,3 @@ html, body {
     height: calc(100% - 0.5rem);
 }
 
-
-
-.overflow-x-auto {
-    overflow-x: auto;
-}
