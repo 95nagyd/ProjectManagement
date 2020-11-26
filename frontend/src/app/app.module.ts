@@ -24,7 +24,6 @@ import { ClickOutsideDirective } from './_custom/click-outside.directive';
 import { TeamComponent } from './components/team/team.component';
 import { WorkingTimeCalendarComponent } from './components/_core/working-time-calendar/working-time-calendar.component';
 import { FormattedTimeComponent } from './components/_core/working-time-calendar/formatted-time/formatted-time.component';
-import { CommentBoxComponent } from './components/_core/working-time-calendar/comment-box/comment-box.component';
 import { ComboBoxComponent } from './components/_core/combo-box/combo-box.component';
 import { ComboBoxDropdownComponent } from './components/_core/combo-box/combo-box-dropdown/combo-box-dropdown.component';
 import { TwoDigitNumberPipe } from './_custom/two-digit-number.pipe';
@@ -33,6 +32,7 @@ import { ErrorStateMatcher, ShowOnDirtyErrorStateMatcher } from '@angular/materi
 import { GlobalModalsComponent } from './components/_core/global-modals/global-modals.component';
 import { ChipComponent } from './components/_core/chip/chip.component';
 import { MatIconModule } from '@angular/material/icon';
+import { AutosizeModule } from 'ngx-autosize';
 
 @NgModule({
   declarations: [
@@ -48,7 +48,6 @@ import { MatIconModule } from '@angular/material/icon';
     TeamComponent,
     WorkingTimeCalendarComponent,
     FormattedTimeComponent,
-    CommentBoxComponent,
     ComboBoxComponent,
     ComboBoxDropdownComponent,
     TwoDigitNumberPipe,
@@ -68,7 +67,8 @@ import { MatIconModule } from '@angular/material/icon';
     MatInputModule,
     MatFormFieldModule,
     MatRadioModule,
-    MatIconModule
+    MatIconModule,
+    AutosizeModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   providers: [

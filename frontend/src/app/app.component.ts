@@ -45,6 +45,14 @@ export class AppComponent implements OnDestroy {
       "subtask",
       this.domSanitizer.bypassSecurityTrustResourceUrl("../assets/icon/subtask.svg")
     );
+    this.matIconRegistry.addSvgIcon(
+      "save",
+      this.domSanitizer.bypassSecurityTrustResourceUrl("../assets/icon/save.svg")
+    );
+    this.matIconRegistry.addSvgIcon(
+      "save-disabled",
+      this.domSanitizer.bypassSecurityTrustResourceUrl("../assets/icon/save-disabled.svg")
+    );
 
     this.scrollOffsetService.register(this);
 
@@ -59,6 +67,7 @@ export class AppComponent implements OnDestroy {
 
   ngAfterViewInit() {
     this.scrollOffsetService.setOffsetY(0);
+    this.scrollOffsetService.setOffsetX(0);
     setTimeout(() => {
       this.spinner.hide();
     }, 0);
@@ -90,6 +99,7 @@ export class AppComponent implements OnDestroy {
 
   onScroll() { 
     this.scrollOffsetService.setOffsetY(this.page.nativeElement.scrollTop); 
+    this.scrollOffsetService.setOffsetX(this.page.nativeElement.scrollLeft); 
   };
 
   @HostListener('document:keydown', ['$event'])

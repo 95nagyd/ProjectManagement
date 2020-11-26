@@ -101,7 +101,6 @@ export class ComboBoxComponent implements OnInit, OnChanges {
 
   closeComboBox() {
     this.isActive = false;
-    this.cdRef.detectChanges();
     // szűrés lista kiürítése
     this.searchResult = [];
     this.arrowIndex = 0;

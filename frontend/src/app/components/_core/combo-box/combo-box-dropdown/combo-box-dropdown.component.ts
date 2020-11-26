@@ -33,10 +33,6 @@ export class ComboBoxDropdownComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  detectChanges(){
-    this.cdRef.detectChanges();
-  }
-
   isExactMatch() {
     return !!this.choices.find((choice) => choice.name === this.chosenName)
   }
@@ -56,7 +52,7 @@ export class ComboBoxDropdownComponent implements OnInit {
   setPosition() {
     let dropdownControl = this.comboBoxService.getComboRef().elementRef.nativeElement.firstElementChild.firstElementChild;
     let position = {
-      x: dropdownControl.getBoundingClientRect().x,
+      x: dropdownControl.getBoundingClientRect().x + this.scrollOffsetService.getOffsetX(),
       y: dropdownControl.getBoundingClientRect().y + this.scrollOffsetService.getOffsetY(),
       minWidth: dropdownControl.getBoundingClientRect().width
     };
@@ -71,7 +67,6 @@ export class ComboBoxDropdownComponent implements OnInit {
   hide() {
     this.isVisible = false;
     this.isClickOutside = false;
-    this.cdRef.detectChanges();
   }
 
   updateFields(choices: Array<BasicElement>, chosenName?: string){

@@ -1,7 +1,6 @@
 import { Component, OnInit, Input, ViewChild, ViewChildren, QueryList, ElementRef, HostListener, EventEmitter, Output, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { FormattedTimeComponent } from '@app/components/_core/working-time-calendar/formatted-time/formatted-time.component'
 import { SpinnerService } from '@app/_services/spinner.service';
-import { CommentBoxComponent } from '@app/components/_core/working-time-calendar/comment-box/comment-box.component';
 import { PageContentScrollOffsetService } from '@app/_services/page-content-scroll-offset.service';
 import { CalendarService } from '@app/_services/calendar.service';
 import { CalendarDayDetails, CalendarRowData, CalendarData, MonthNames, DayNames } from '@app/_models/calendar';
@@ -28,8 +27,7 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
   @Input() isEditable: Boolean;
   @Input() user?: User;
   @Output() backFunction?: EventEmitter<void>;
-
-  @ViewChild('commentbox') commentbox: CommentBoxComponent;
+  
   @ViewChild('header') header: ElementRef;
   @ViewChildren(FormattedTimeComponent) workingTimeInputList!: QueryList<FormattedTimeComponent>;
   @ViewChildren('projectComboList') projectComboList!: QueryList<ComboBoxComponent>;
@@ -44,6 +42,8 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
 
   daysOfMonth: CalendarDayDetails[] = [];
   isDataChanged: Boolean;
+  isSavable: Boolean;
+
 
 
   private chosenPeriod: Date;
@@ -64,21 +64,23 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
   subtaskList: Array<BasicElement>;
   isComboReady: boolean;
 
-  editingCommentRef: any;
   editingComment: { dayNumber: number, dataIndex: number }
+  openCommentBoxRef: any;
+  isCommentEditing: Boolean;
+  isCommentPreview: Boolean;
+  isCommentInFocus: Boolean;
+  isCommentEditingFromIcon: Boolean;
+  commentValue: string;
+  isNewDisplayInTimeout: Boolean;
 
 
-  //TODO: háttér width fit content overflow-x scroll
-  //TODO:dropdown,comment x offset
+  
 
-  //TODO: ikonok helyett a szines ikonok
-  //TODO: mentés kepek helyett ikonok
   //TODO: toaster
-  //TODO: naptár + dolgozoi lista + projekt tabla ha van scrollwidth akkor a fehéren ne lógjon túl és scrollozni lehessen
-  //TODO: alul kiférjen a legnagyobb message
   
   
-  //TODO: képek css-ből legyenek (login, és nevbar)
+  
+  
 
   constructor(private spinner: SpinnerService, private scrollOffsetService: PageContentScrollOffsetService, private calendarService: CalendarService,
     private userService: UserService, private globalModalsService: GlobalModalsService, private comboBoxService: ComboBoxService,
@@ -88,6 +90,7 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
 
     this.backFunction = new EventEmitter();
     this.isDataChanged = false;
+    this.isSavable = false;
     this.isComboReady = false;
     this.getComboElements();
     this.chosenPeriod = new Date();
@@ -114,6 +117,14 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
         });
       }
     });
+
+    this.openCommentBoxRef = null;
+    this.isCommentEditing = false;
+    this.isCommentPreview = false;
+    this.isCommentInFocus = false;
+    this.isCommentEditingFromIcon = false;
+    this.commentValue = "";
+    this.isNewDisplayInTimeout = false;
   }
 
   ngOnInit(): void {
@@ -204,7 +215,7 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
     }
     this.updateCalendarViewData();
     this.scrollOffsetService.setOffsetY(0);
-    if (this.commentbox) { this.commentbox.hide(); }
+    this.closeCommentBox();
     this.spinner.hide();
   }
 
@@ -323,43 +334,98 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
     this.cdRef.detectChanges();
   }
 
+
+
+  
   async updateComment(value: string) {
     this.periodData[this.editingComment.dayNumber][this.editingComment.dataIndex].comment = value;
     await this.calcActualChangeState();
     this.cdRef.detectChanges();
   }
 
-  previewComment(e: any, dayNumber: number, dataIndex: number) {
-    if (this.commentbox && !this.commentbox.isEditing) {
+  commentBoxEventHandler(event: any) {
+    if (!this.isCommentEditing && this.isCommentPreview && this.isCommentInFocus && event.type === "mouseleave") {
+      this.closeCommentBox();
+      return;
+    }
+    this.isCommentInFocus = true;
+    if(event.type === "click" && this.isCommentPreview && this.isEditable){
+      this.switchPreviewToEdit();
+    }
+    this.cdRef.detectChanges();
+  }
+
+  previewComment(commentBoxRef: any, dayNumber: number, dataIndex: number) {
+    if(this.periodData[dayNumber][dataIndex].comment.length === 0) { return; }
+    if(this.isCommentPreview && this.openCommentBoxRef !== commentBoxRef) { 
+      this.closeCommentBox();
+    }
+    if(!this.isCommentEditing){
+      this.isCommentPreview = true;
+      this.commentValue = this.periodData[dayNumber][dataIndex].comment;
       this.editingComment = { dayNumber: dayNumber, dataIndex: dataIndex }
-      this.commentbox.preview(e.target, this.periodData[dayNumber][dataIndex].comment);
+      commentBoxRef.open();
+      document.body.querySelector("ngb-popover-window").addEventListener('mouseenter', this.commentBoxEventHandler.bind(this));
+      document.body.querySelector("ngb-popover-window").addEventListener('mouseleave', this.commentBoxEventHandler.bind(this));
+      document.body.querySelector("ngb-popover-window").addEventListener('click', this.commentBoxEventHandler.bind(this));
+      this.isNewDisplayInTimeout = true;
+      this.openCommentBoxRef = commentBoxRef;
     }
   }
 
-  editComment(e: any, dayNumber: number, dataIndex: number) {
+  closeCommentBox(){
+    this.commentValue = "";
+    this.isCommentPreview = false;
+    this.isCommentEditing = false;
+    this.isCommentEditingFromIcon = false;
+    this.isCommentInFocus = false;
+    this.isNewDisplayInTimeout = false;
+    this.openCommentBoxRef?.close();
+    this.openCommentBoxRef = null;
+  }
+
+  closePreviewComment() {
+    if(this.commentValue.length === 0) { return; }
+    this.isNewDisplayInTimeout = false;
+    setTimeout(() => {
+      if (this.isCommentPreview && !this.isCommentEditing && !this.isCommentInFocus && !this.isNewDisplayInTimeout) {
+        this.closeCommentBox();
+      }
+    }, 100);
+  }
+
+  editComment(commentBoxRef: any, dayNumber: number, dataIndex: number) {
     if (!this.isEditable) { return; }
-    if (this.commentbox && this.commentbox.isEditing && e.target === this.editingCommentRef) { 
-      this.commentbox.hide(); 
+    if(this.openCommentBoxRef !== commentBoxRef) { 
+      this.closeCommentBox();
+    }
+    if (this.isCommentEditing && commentBoxRef === this.openCommentBoxRef) { 
+      this.closeCommentBox();
       return; 
     }
-    if (this.commentbox) {
-      this.editingCommentRef = e.target;
-      this.editingComment = { dayNumber: dayNumber, dataIndex: dataIndex }
-      this.commentbox.edit(this.editingCommentRef, this.periodData[dayNumber][dataIndex].comment);
-    }
+    this.isCommentPreview = false;
+    this.isCommentEditing = true;
+    this.isCommentEditingFromIcon = true;
+    this.commentValue = this.periodData[dayNumber][dataIndex].comment;
+    this.editingComment = { dayNumber: dayNumber, dataIndex: dataIndex }
+    commentBoxRef.open();
+    this.openCommentBoxRef = commentBoxRef;
+    setTimeout(() => {
+      this.isCommentEditingFromIcon = false;
+    }, 500);
   }
 
-  hideComment() {
-    if (this.commentbox) {
-      this.commentbox.isNewDisplayInTimeout = false;
-      setTimeout(() => {
-        if (this.commentbox && this.commentbox.isPreview && !this.commentbox.isEditing && !this.commentbox.isCommentInFocus && !this.commentbox.isNewDisplayInTimeout) {
-          this.commentbox.hide();
-          this.editingComment = { dayNumber: -1, dataIndex: -1 }
-        }
-      }, 100);
-    }
+  switchPreviewToEdit() {
+    if (!this.isEditable) { return; }
+    this.isCommentPreview = false;
+    this.isCommentEditing = true;
+    this.isCommentEditingFromIcon = false;
   }
+
+  onScroll(){
+    this.closeCommentBox();
+  }
+
 
   //#endregion
 
@@ -370,6 +436,7 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
       setTimeout(() => {
         this.isDataChanged = !(_.isEqual(this.calendarOldData, this.removeEmptyRows(this.periodData)));
         this.globalModalsService.hasChanges = this.isDataChanged;
+        if(this.isDataChanged) { this.isSavable = this.isCalSavable(); }
         resolve(this.isDataChanged);
       }, 0);
     });
@@ -437,7 +504,7 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
   }
 
   async saveCalendar() {
-    if (!this.isCalSavable() || !(this.isDataChanged)) { return; }
+    if (!this.isSavable || !this.isDataChanged) { return; }
 
     if (!this.validateCalendar()) {
       if (!this.globalModalsService.isWarningModalOpen()) {
@@ -480,5 +547,12 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
   @HostListener('window:resize')
   onResize() {
     this.comboColWidth = (this.header.nativeElement.getBoundingClientRect().width - 445) * 0.25;
+  }
+
+  @HostListener('document:mousedown', ['$event.target'])
+  public onClick(target: any) {
+    if (this.openCommentBoxRef && !document.body.querySelector("ngb-popover-window").contains(target) && this.isCommentEditing && !this.isCommentEditingFromIcon) {
+      this.closeCommentBox();
+    }
   }
 }

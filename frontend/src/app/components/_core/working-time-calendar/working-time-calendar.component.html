@@ -3,9 +3,36 @@
                 (update)="updateComment($event);">
 </comment-box>
 
+<ng-template #commentTitle>
+    <h5>Megjegyzés</h5>
+</ng-template>
+<ng-template #commentContent>
+    <div>
+        <div class="p-2">
+            <textarea   #textarea
+                        autosize
+                        *ngIf="!isCommentPreview"
+                        class="comment-edit"
+                        [(ngModel)]="commentValue"
+                        (ngModelChange)="updateComment($event);">
+            </textarea>
+
+            <div    *ngIf="isCommentPreview"
+                    class="comment-edit preview">{{commentValue}}</div>
+        </div>
+        <div class="text-right">
+            <button *ngIf="!isCommentPreview"
+                    class="btn btn-secondary btn-sm w-50 mr-2 mb-2"
+                    (click)="closeCommentBox();">
+                        Bezárás
+            </button>
+        </div>
+    </div>
+</ng-template>
 
 
-<div class="calendar-container">
+
+<div class="calendar-container" (mousewheel)="onScroll();">
     <div class="calendar-slider p-2">
 
         <div class="calendar-slider-left">
@@ -37,9 +64,9 @@
                     aria-hidden="true"></i>
             </div>
            <div class="save-container">
-                <span class="save" 
-                    (click)="saveCalendar();"
-                    [ngClass]="isCalSavable() && isDataChanged ? 'save-valid' : 'save-disabled'"></span>
+               <span class="icon-wrapper" [ngClass]="{'savable' : isSavable && isDataChanged}">
+                    <mat-icon (click)="saveCalendar();" [svgIcon]="isSavable && isDataChanged ? 'save' : 'save-disabled'" class="save-icon"></mat-icon>
+               </span>
            </div>
         </div>
 
@@ -175,20 +202,20 @@
                         <table>
                             <tr *ngFor="let cellData of periodData[dayData.number]; index as dataRowIndex;">
                                 <td>
-                                    <div *ngIf="cellData.comment && cellData.length != 0">
-                                        <i  [ngClass]="isEditable ? 'cursor-pointer' : ''"
+                                    <i  #commentBox="ngbPopover"
+                                            container="body"
+                                            placement="left auto"
+                                            [popoverTitle]="commentTitle"
+                                            [ngbPopover]="commentContent"
+                                            [autoClose]="false"
+                                            triggers="manual"
                                             class="fa fa-comment" 
+                                            [ngStyle]="{'cursor': isEditable ? 'pointer' : 'default'}"
+                                            [ngClass]="cellData.comment.length > 0 ? 'fa fa-comment' : 'fa fa-comment-o'"
                                             aria-hidden="true"
-                                            (mouseenter)="previewComment($event, dayData.number, dataRowIndex);" 
-                                            (mouseleave)="hideComment();"
-                                            (click)="editComment($event, dayData.number, dataRowIndex);"></i>
-                                    </div>
-                                    <div *ngIf="!cellData.comment || cellData.length == 0">
-                                        <i  [ngClass]="isEditable ? 'cursor-pointer' : ''"
-                                            class="fa fa-comment-o" 
-                                            aria-hidden="true"
-                                            (click)="editComment($event, dayData.number, dataRowIndex);"></i>
-                                    </div>
+                                            (mouseenter)="previewComment(commentBox, dayData.number, dataRowIndex);"
+                                            (mouseleave)="closePreviewComment();"
+                                            (click)="editComment(commentBox, dayData.number, dataRowIndex);"></i>
                                 </td>
                             </tr>
                         </table>

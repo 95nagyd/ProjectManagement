@@ -8,6 +8,14 @@
     align-self: center;
 }
 
+.logo{
+  background-size: 258.5px 130px;
+  width: 258.5px;
+  height: 130px;
+  background-image: url('../../../assets/img/companyLogo.png');
+
+}
+
 button:disabled {
   cursor: not-allowed;
   pointer-events: all !important;

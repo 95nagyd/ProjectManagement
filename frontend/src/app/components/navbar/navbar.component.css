@@ -44,3 +44,10 @@ hr.nav-dropdown-end {
 .fit-content {
   min-width: fit-content !important;
 }
+
+.logo{
+  background-size: 99.42px 50px;
+  width: 99.42px;
+  height: 50px;
+  background-image: url('../../../assets/img/companyLogo.png');
+}

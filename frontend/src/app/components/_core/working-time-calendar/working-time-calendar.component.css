@@ -2,6 +2,7 @@
     width: 100%; 
     min-width: 1125px;
     margin: auto; 
+    margin-bottom: 150px;
     border: 2px solid rgb(63, 63, 63); 
     border-radius: 12px; 
     display: flex; 
@@ -101,23 +102,23 @@
 
 .save-container{
     width: 50%;
-    display: block;
-    margin-top: -11px;
+    display: flex;
+    justify-content: flex-end;
 }
 
-.save {
-    background-size: 55px 55px;
-    background-position: center;
-    height: 55px; 
-    width: 55px;
-    display: block;
-    float: right;
-    cursor: pointer;
+.save-icon {
+    transform: scale(2.2);
+    margin-right: 19px;
 }
 
-.save-valid{
-    background-image: url("../../../../assets/img/save/normal.png"); 
+.icon-wrapper {
+    margin-top: -10px;
+    cursor: not-allowed;
+}
+
+.savable {
     animation: shake 0.82s cubic-bezier(.36, .07, .19, .97) both infinite;
+    cursor: pointer;
 }
 
 @keyframes shake {
@@ -127,19 +128,7 @@
     40%, 60% {
       transform: translate3d(0, -2px, 0);
     }
-  }
-
-.save-valid:active {
-    background-image: url('../../../../assets/img/save/active.png');
 }
-
-.save-disabled {
-    background-image: url('../../../../assets/img/save/disabled.png');
-    cursor: not-allowed;
-}
-
-
-
 
 
 .header {
@@ -375,6 +364,25 @@ table table tr:not(:first-child) {
     text-shadow: 0px 0px 0px rgb(0, 0, 0);
 }
 
+.comment-edit {
+    width: 100%; 
+    min-height: 48px!important; 
+    max-height: 200px!important; 
+    height: auto;
+    overflow-y: auto !important;
+    overflow-x: hidden;
+    resize: vertical;
+    white-space: break-spaces;
+    overflow-wrap: break-word;
+    background-color: white;
+    cursor: text;
+}
 
-
-
+.preview {
+    border: 1px solid rgb(119, 119, 119);
+    background-color: rgb(240, 240, 240);
+    padding-left: 2px;
+    padding-top: 2px;
+    margin-bottom: 5px;
+    resize: none;
+}
