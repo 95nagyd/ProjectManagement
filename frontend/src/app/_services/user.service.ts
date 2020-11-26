@@ -27,7 +27,7 @@ export class UserService {
   }
 
   getFullName(user: User): string {
-    return ((user.title ? user.title + '. ' : '') +
+    return ((user.title ? user.title + ' ' : '') +
       user.lastName + ' ' +
       (user.middleName ? user.middleName + ' ' : '') +
       user.firstName

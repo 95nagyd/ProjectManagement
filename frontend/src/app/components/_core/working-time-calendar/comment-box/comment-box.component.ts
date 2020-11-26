@@ -1,11 +1,12 @@
-import { Component, ElementRef, HostListener, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostListener, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { PageContentScrollOffsetService } from '@app/_services/page-content-scroll-offset.service';
 import { EventEmitter } from '@angular/core'
 
 @Component({
   selector: 'comment-box',
   templateUrl: './comment-box.component.html',
-  styleUrls: ['./comment-box.component.css']
+  styleUrls: ['./comment-box.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CommentBoxComponent implements OnInit {
 
@@ -25,7 +26,7 @@ export class CommentBoxComponent implements OnInit {
   value: string;
   mouseEventCounter: number;
 
-  constructor(private scrollOffsetService: PageContentScrollOffsetService) {
+  constructor(private scrollOffsetService: PageContentScrollOffsetService, private cdRef: ChangeDetectorRef) {
     this.update = new EventEmitter();
     this.isVisible = false;
     this.isPreview = false;
@@ -101,6 +102,7 @@ export class CommentBoxComponent implements OnInit {
       this.isEditing = false;
       this.isEditFromIcon = false;
       this.commentIcon = null;
+      this.cdRef.detectChanges();
       return;
     }
   }
@@ -115,11 +117,13 @@ export class CommentBoxComponent implements OnInit {
   autosize() {
     setTimeout(() => {
       if (this.textarea) {
+        this.cdRef.detectChanges();
         let textarea = this.textarea.nativeElement;
         if (!textarea.style.height) { textarea.style.height = "30px"; }
         if (textarea.scrollHeight < 30) { return; }
         textarea.style.height = "30px";
         textarea.style.height = textarea.scrollHeight + 3 + 'px';
+        this.cdRef.detectChanges();
       }
     }, 0);
   }

@@ -5,8 +5,8 @@
 
     <span   class="dropdown-control" 
             [ngClass]="{ 'invalid': hasError, 'dropdown-visible': isActive }" 
-            placement="top"
-            [ngbTooltip]="!this.isActive && isTooltipRequired() ? searchValue : ''" 
+            placement="bottom auto"
+            [ngbTooltip]="!this.isActive && isTooltipRequired ? searchValue : ''" 
             (click)="toggleDropdown($event);"
             (mouseup)="onMouseEvent(0);" 
             (mousedown)="onMouseEvent(1);" 
@@ -46,8 +46,8 @@
 
     <span *ngIf="hasValue" 
             class="dropdown-control disabled" 
-            placement="top"
-            [ngbTooltip]="isTooltipRequired() ? searchValue : ''">
+            placement="bottom auto"
+            [ngbTooltip]="isTooltipRequired ? searchValue : ''">
 
         <div #search class="input-search disabled" [ngStyle]="{'width': 'calc(calc(100%) - 20px)'}">
             {{getChosenName()}}

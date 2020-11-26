@@ -7,6 +7,7 @@ import { AuthenticationService } from '@app/_services/authentication.service';
 import { Subscription } from 'rxjs';
 import { GlobalModalsService } from '@app/_services/global-modals.service';
 import { InfoModalType } from '@app/_models/modals';
+import { UserRegexPatterns } from '@app/_models/user';
 
 @Component({
   selector: 'login',
@@ -25,16 +26,14 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.submitted = false;
   }
 
-  //TODO: username, password regex hibaüzenetekkel (regex a usermodalrol)
-
   ngOnInit(): void {
     this.globalModalsService.closeAllModal();
     if (this.authenticationService.isLoggedIn()) {
       this.router.navigate(['']);
     }
     this.loginForm = this.formBuilder.group({
-      username: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(20)]],
-      password: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(20)]]
+      username: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(20), Validators.pattern(UserRegexPatterns['username'])]],
+      password: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(20), Validators.pattern(UserRegexPatterns['password'])]]
     });
 
     this.formValueChangeSubscription = this.loginForm.valueChanges.subscribe(() => {

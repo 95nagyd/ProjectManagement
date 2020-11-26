@@ -1,13 +1,13 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { BasicElement } from '@app/_models/basic-data';
 import { ComboBoxService } from '@app/_services/combo-box.service';
 import { PageContentScrollOffsetService } from '@app/_services/page-content-scroll-offset.service';
-import { ComboBoxComponent } from '../combo-box.component';
 
 @Component({
   selector: 'combo-box-dropdown',
   templateUrl: './combo-box-dropdown.component.html',
-  styleUrls: ['./combo-box-dropdown.component.css']
+  styleUrls: ['./combo-box-dropdown.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ComboBoxDropdownComponent implements OnInit {
 
@@ -19,7 +19,7 @@ export class ComboBoxDropdownComponent implements OnInit {
 
 
 
-  constructor(private comboBoxService: ComboBoxService, private scrollOffsetService: PageContentScrollOffsetService) {
+  constructor(private comboBoxService: ComboBoxService, private scrollOffsetService: PageContentScrollOffsetService, private cdRef: ChangeDetectorRef) {
     this.comboBoxService.registerDropdown(this);
 
 
@@ -31,6 +31,10 @@ export class ComboBoxDropdownComponent implements OnInit {
   }
 
   ngOnInit(): void {
+  }
+
+  detectChanges(){
+    this.cdRef.detectChanges();
   }
 
   isExactMatch() {
@@ -46,6 +50,7 @@ export class ComboBoxDropdownComponent implements OnInit {
     // megjelenítéskor a teljes elemlista látszik
     this.choices = comboRef.searchResult;
     this.setPosition();
+    this.cdRef.detectChanges();
   }
 
   setPosition() {
@@ -66,10 +71,21 @@ export class ComboBoxDropdownComponent implements OnInit {
   hide() {
     this.isVisible = false;
     this.isClickOutside = false;
+    this.cdRef.detectChanges();
   }
 
-  onClickInOutEvent(isOut: Boolean) { this.isClickOutside = isOut; }
+  updateFields(choices: Array<BasicElement>, chosenName?: string){
+    this.choices = choices;
+    if (chosenName) { this.chosenName = chosenName; }
+    this.cdRef.detectChanges();
+  }
 
-  choose(choiceIndex: number) { this.comboBoxService.getComboRef().updateValue(choiceIndex); }
+  onClickInOutEvent(isOut: Boolean) { 
+    this.isClickOutside = isOut; 
+  }
+
+  choose(choiceIndex: number) { 
+    this.comboBoxService.getComboRef().updateValue(choiceIndex); 
+  }
 
 }

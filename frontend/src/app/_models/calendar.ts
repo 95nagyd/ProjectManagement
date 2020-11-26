@@ -29,3 +29,7 @@ export class CalendarRowData {
     this.comment = data.comment || '';
   }
 }
+
+export const MonthNames = ['január', 'február', 'március', 'április', 'május', 'június', 'július', 'augusztus', 'szeptember', 'október', 'november', 'december'];
+
+export const DayNames = ['vasárnap', 'hétfő', 'kedd', 'szerda', 'csütörtök', 'péntek', 'szombat'];

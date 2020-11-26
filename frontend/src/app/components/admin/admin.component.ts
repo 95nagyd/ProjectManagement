@@ -2,7 +2,7 @@ import { Component, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { take } from 'rxjs/operators';
 
 import { SpinnerService } from '@app/_services/spinner.service'
-import { BasicElement, BasicDataType } from '@app/_models/basic-data';
+import { BasicElement, BasicDataType, TabNames } from '@app/_models/basic-data';
 import { ChipComponent } from '../_core/chip/chip.component';
 import { BasicDataService } from '@app/_services/basic-data.service';
 import { GlobalModalsService } from '@app/_services/global-modals.service';
@@ -18,8 +18,6 @@ export class AdminComponent implements OnInit {
   chipList: Array<BasicElement>;
   @ViewChildren(ChipComponent) chipRefList!: QueryList<ChipComponent>;
   isAddVisible: boolean;
-
-  //TODO: lentre irodjon ki kivalasztott a szövege az elso sorba
 
   constructor(private spinner: SpinnerService, private basicDataService: BasicDataService, private globalModalsService: GlobalModalsService) {
 
@@ -58,6 +56,14 @@ export class AdminComponent implements OnInit {
 
   public get basicDataTab(): typeof BasicDataType {
     return BasicDataType;
+  }
+
+  public get tabNames(): typeof TabNames {
+    return TabNames;
+  }
+
+  tabName(type: BasicDataType) {
+    return (TabNames)[type];
   }
 
 

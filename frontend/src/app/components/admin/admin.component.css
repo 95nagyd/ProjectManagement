@@ -2,47 +2,39 @@
 .tab-switch-container{
     display: flex;
     flex-direction: row;
-    margin-left: 10px;
     align-items: flex-end;
     height: 66px;
-    min-width: 477px;
+    min-width: 345px;
 }
 
 
 .active-icon {
     display: flex;
     transform: scale(2.3);
-    margin-left: 27px;
-    margin-right: 27px;
 }
 
 .icon {
     display: flex;
     transform: scale(1.7);
     margin-bottom: 4px;
-    margin-left: 11.5px;
     transition: all 0.1s ease-in-out;
 }
 
 
-.tab-switch-container div{
-    white-space: nowrap;
-}
 
 .tab {
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: center;
     background-color: rgb(146, 146, 146);
     padding-top: 4px;
-    padding-left: 3px; 
-    padding-right: 3px; 
     border: 1px solid rgb(55, 55, 55);
     border-bottom: none;
     cursor: pointer;
     height: 53px;
     width: 55px;
-    transition: all 0.4s, height 0s ease;
+    transition: all 0.4s ease;
 }
 
 
@@ -59,23 +51,31 @@
     cursor: default;
     height: 100%;;
     padding-top: 0px;
+    width: 72px;
     border-top-left-radius: 10px !important;
     border-top-right-radius: 10px !important;
-    padding-right: 10px;
-    font-size: 26px;
-    font-weight: 600;
-    width: fit-content;
 }
 
+.tab-name{
+    width: fit-content;
+    padding-left: 20px;
+    padding-right: 20px;
+    border-bottom: 2px solid black;
+    border-right: 2px solid black;
+    font-size: 32px;
+    background-color: rgb(116 135 148);
+    border-bottom-right-radius: 10px;
+}
 
 .chip-container{
     min-height: 200px;
-    min-width: 500px;
+    min-width: 345px;
     height: calc(100vh - 205px); 
     overflow: auto; 
     border-radius: 10px;
     border: 1px solid rgb(55, 55, 55);
     background-color: rgb(192, 218, 237);
+    border-top-left-radius: 0px;
 }
 
 

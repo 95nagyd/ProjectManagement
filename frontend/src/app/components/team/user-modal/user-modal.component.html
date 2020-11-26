@@ -22,7 +22,7 @@
             </mat-error>
 
             <mat-error *ngIf="userFormControls.username.hasError('minlength') || userFormControls.username.hasError('maxlength')">
-                A felhasználónév 6-20 karakter között kell legyen!
+                A felhasználónév 6-20 karakter hosszú lehet!
             </mat-error>
 
             <mat-error *ngIf="userFormControls.username.hasError('notUnique')">
@@ -49,11 +49,11 @@
             </mat-error>
 
             <mat-error *ngIf="userFormControls.password.hasError('minlength') || userFormControls.password.hasError('maxlength')">
-                A jelszó 6-20 karakter között kell legyen!
+                A jelszó 6-20 karakter hosszú lehet!
             </mat-error>
 
             <mat-error *ngIf="userFormControls.password.hasError('pattern')">
-                A jelszó csak betűket, számokat és @$!%*#?&]+$ karaktereket tartalmazhat!
+                A jelszó csak betűket, számokat és @$!%*#?& karaktereket tartalmazhat!
             </mat-error>
 
             <mat-hint class="hint-right">{{password.value.length}} / 20</mat-hint>

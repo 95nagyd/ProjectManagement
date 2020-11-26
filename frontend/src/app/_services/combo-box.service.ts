@@ -32,8 +32,7 @@ export class ComboBoxService {
   }
 
   updateDropdown(choices: Array<BasicElement>, chosenName?: string) {
-    this.comboBoxDropdown.choices = choices;
-    if (chosenName) this.comboBoxDropdown.chosenName = chosenName;
+    this.comboBoxDropdown.updateFields(choices, chosenName);
   }
 
   getComboRef() {

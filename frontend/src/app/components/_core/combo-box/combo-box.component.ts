@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, HostListener, Input, NgZone, OnChanges, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, Input, OnChanges, OnInit, Output, ViewChild } from '@angular/core';
 import { ComboBoxService } from '@app/_services/combo-box.service';
 import { EventEmitter } from '@angular/core'
 import { ChangeDetectionStrategy } from '@angular/compiler/src/core';
@@ -12,17 +12,18 @@ import { BasicElement } from '@app/_models/basic-data';
 })
 export class ComboBoxComponent implements OnInit, OnChanges {
 
-  @ViewChild('search') search: ElementRef;
   @Input() isDisabled: Boolean;
   @Input() chosenId: string;
   @Input() choices: Array<BasicElement>;
   @Input() comboWidth: number;
   @Input() isRequired: Boolean;
   @Output() update: EventEmitter<string>;
+  @ViewChild('search') search: ElementRef;
 
   hasError: Boolean;
   hasValue: Boolean;
   isActive: Boolean;
+  isTooltipRequired: Boolean;
 
   arrowIndex: number;
   mouseEventCounter: number;
@@ -37,10 +38,12 @@ export class ComboBoxComponent implements OnInit, OnChanges {
     this.hasError = false;
     this.hasValue = false;
     this.isActive = false;
+    this.isTooltipRequired = false;
     this.searchResult = new Array<BasicElement>();
     this.update = new EventEmitter();
     this.mouseEventCounter = 0;
   }
+
 
   ngOnInit(): void {
     this.hasValue = !(!this.chosenId || this.chosenId.length === 0);
@@ -48,6 +51,13 @@ export class ComboBoxComponent implements OnInit, OnChanges {
     //kezdetben a szúrés értéke (a megjelenített név) a mentett id-hez tartozó név vagy üres string
     this.searchValue = this.getChosenName();
   }
+
+  ngAfterViewInit(): void {
+    setTimeout(() => {
+      this.calcIsTooltipRequired();
+    }, 0);
+  }
+
 
   ngOnChanges() {
     if (this.chosenId && !this.getChosenName()) {
@@ -58,6 +68,7 @@ export class ComboBoxComponent implements OnInit, OnChanges {
       }, 0);
     }
   }
+
 
   getChosenName() {
     return this.choices?.find(choice => choice._id === this.chosenId)?.name || '';
@@ -90,12 +101,13 @@ export class ComboBoxComponent implements OnInit, OnChanges {
 
   closeComboBox() {
     this.isActive = false;
+    this.cdRef.detectChanges();
     // szűrés lista kiürítése
     this.searchResult = [];
     this.arrowIndex = 0;
     this.hasError = !this.isValueValid();
     this.search?.nativeElement?.blur();
-
+    this.calcIsTooltipRequired();
   }
 
 
@@ -189,13 +201,17 @@ export class ComboBoxComponent implements OnInit, OnChanges {
     this.comboBoxService.updateDropdown(this.searchResult, this.searchResult[0]?.name || '');
   }
 
-  isTooltipRequired() {
-    if (!this.search) { return false; }
-    return this.search.nativeElement.offsetWidth < this.search.nativeElement.scrollWidth;
+  calcIsTooltipRequired() {
+    setTimeout(() => {
+      const tooltipBefore = this.isTooltipRequired;
+      this.isTooltipRequired = this.search && this.search.nativeElement.offsetWidth < this.search.nativeElement.scrollWidth;
+      if(this.isTooltipRequired != tooltipBefore) { this.cdRef.detectChanges(); }
+    }, 0);
   }
 
   @HostListener('window:resize')
   onResize() {
+    this.calcIsTooltipRequired();
     this.comboBoxService.hideDropdown();
     this.closeComboBox();
   }

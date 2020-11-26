@@ -20,8 +20,9 @@
                                 [ngClass]="{ 'is-invalid': submitted && formControls.username.errors }"
                                 placeholder="Felhasználónév"/>
                         <div *ngIf="formControls.username.errors" class="invalid-feedback">
-                            <div *ngIf="submitted && formControls.username.hasError('required')">A felhasználónév kitöltése kötelező.</div>
+                            <div *ngIf="submitted && formControls.username.hasError('required')">A felhasználónév kitöltése kötelező!</div>
                             <div *ngIf="formControls.username.hasError('minlength') || formControls.username.hasError('maxlength')">A felhasználónév 6-20 karakter hosszú lehet!</div>
+                            <div *ngIf="formControls.username.hasError('pattern')">A felhasználónév csak ékezet nélküli betűket és számokat tartalmazhat!</div>
                         </div>
                     </div>
                 </div>
@@ -40,8 +41,9 @@
                                 [ngClass]="{ 'is-invalid': submitted && formControls.password.errors }"
                                 placeholder="Jelszó" />
                         <div *ngIf="formControls.password.errors" class="invalid-feedback">
-                            <div *ngIf="submitted && formControls.password.hasError('required')">A jelszó kitöltése kötelező.</div>
+                            <div *ngIf="submitted && formControls.password.hasError('required')">A jelszó kitöltése kötelező!</div>
                             <div *ngIf="formControls.password.hasError('minlength') || formControls.password.hasError('maxlength')">A jelszó 6-20 karakter hosszú lehet!</div>
+                            <div *ngIf="formControls.password.hasError('pattern')">A jelszó csak betűket, számokat és @$!%*#?& karaktereket tartalmazhat!</div>
                         </div>
                     </div>
                 </div>

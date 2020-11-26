@@ -1,6 +1,6 @@
 import { Component, ElementRef, EventEmitter, NgZone, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { Role } from '@app/_models/role';
-import { User } from '@app/_models/user';
+import { User, UserRegexPatterns } from '@app/_models/user';
 import { SpinnerService } from '@app/_services/spinner.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -26,7 +26,6 @@ export class UserModalComponent implements OnInit, OnDestroy {
   openUserModalRef: any;
   isPassVisible: Boolean;
   role: Role;
-  patterns: Record<string, RegExp>;
 
   constructor(private modalService: NgbModal, private globalModalsService: GlobalModalsService, private spinner: SpinnerService, private formBuilder: FormBuilder,
     private userService: UserService) {
@@ -35,26 +34,17 @@ export class UserModalComponent implements OnInit, OnDestroy {
     this.isPassVisible = false;
     this.role = Role.USER;
 
-    this.patterns = {
-      'username': new RegExp('^[a-zA-Z0-9]*$'),
-      'password': new RegExp('^[a-zA-Z0-9áéíóöőúüűÁÉÍÓÖŐUÚÜŰ@$!%*#?&]*$'),
-      'title': new RegExp('^[a-zA-ZáéíóöőúüűÁÉÍÓÖŐUÚÜŰ .-]*$'),
-      'lastname': new RegExp('^[a-zA-ZáéíóöőúüűÁÉÍÓÖŐUÚÜŰ .-]*$'),
-      'middlename': new RegExp('^[a-zA-ZáéíóöőúüűÁÉÍÓÖŐUÚÜŰ .-]*$'),
-      'firstname': new RegExp('^[a-zA-ZáéíóöőúüűÁÉÍÓÖŐUÚÜŰ .-]*$'),
-      'telephone': new RegExp('^(?=.{14,15}$)\\+36 (\\d{2}) (\\d{3}) (\\d{3,4})$'),
-      'email': new RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$')
-    };
+    
     this.validations = {
-      'username': [Validators.required, Validators.minLength(6), Validators.maxLength(20), Validators.pattern(this.patterns['username'])],
-      'password-edit': [Validators.minLength(6), Validators.maxLength(20), Validators.pattern(this.patterns['password'])],
-      'password': [Validators.required, Validators.minLength(6), Validators.maxLength(20), Validators.pattern(this.patterns['password'])],
-      'title': [Validators.maxLength(20), Validators.pattern(this.patterns['title'])],
-      'lastname': [Validators.required, Validators.maxLength(20), Validators.pattern(this.patterns['lastname'])],
-      'middlename': [Validators.maxLength(15), Validators.pattern(this.patterns['middlename'])],
-      'firstname': [Validators.required, Validators.maxLength(15), Validators.pattern(this.patterns['firstname'])],
-      'telephone': [Validators.pattern(this.patterns['telephone'])],
-      'email': [Validators.pattern(this.patterns['email'])]
+      'username': [Validators.required, Validators.minLength(6), Validators.maxLength(20), Validators.pattern(UserRegexPatterns['username'])],
+      'password-edit': [Validators.minLength(6), Validators.maxLength(20), Validators.pattern(UserRegexPatterns['password'])],
+      'password': [Validators.required, Validators.minLength(6), Validators.maxLength(20), Validators.pattern(UserRegexPatterns['password'])],
+      'title': [Validators.maxLength(20), Validators.pattern(UserRegexPatterns['title'])],
+      'lastname': [Validators.required, Validators.maxLength(20), Validators.pattern(UserRegexPatterns['lastname'])],
+      'middlename': [Validators.maxLength(15), Validators.pattern(UserRegexPatterns['middlename'])],
+      'firstname': [Validators.required, Validators.maxLength(15), Validators.pattern(UserRegexPatterns['firstname'])],
+      'telephone': [Validators.pattern(UserRegexPatterns['telephone'])],
+      'email': [Validators.pattern(UserRegexPatterns['email'])]
     }
   }
 
@@ -154,7 +144,7 @@ export class UserModalComponent implements OnInit, OnDestroy {
   onKeyPress(event: any, controlName?: string) {
     if (event.key === 'Enter') event.target.blur();
 
-    if (controlName && !this.patterns[controlName].test(event.key)) { event.preventDefault(); }
+    if (controlName && !UserRegexPatterns[controlName].test(event.key)) { event.preventDefault(); }
 
   }
 

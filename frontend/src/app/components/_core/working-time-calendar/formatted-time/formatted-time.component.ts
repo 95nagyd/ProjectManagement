@@ -1,10 +1,11 @@
-import { Component, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit, Output } from '@angular/core';
 import { EventEmitter } from '@angular/core'
 
 @Component({
   selector: 'formatted-time',
   templateUrl: './formatted-time.component.html',
-  styleUrls: ['./formatted-time.component.css']
+  styleUrls: ['./formatted-time.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FormattedTimeComponent implements OnInit {
   @Input() value: number;

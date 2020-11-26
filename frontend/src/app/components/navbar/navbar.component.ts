@@ -32,12 +32,12 @@ export class NavbarComponent implements OnInit {
 
 
   constructor(private authenticationService: AuthenticationService) {
-    this.isNavbarCollapsed = this.isExpandable()
+    this.currentUser = this.authenticationService.getCurrentUser();
+    this.isNavbarCollapsed = this.isExpandable();
     this.isAnimationDisabled = false;
   }
 
   ngOnInit(): void {
-    this.currentUser = this.authenticationService.getCurrentUser();
   }
 
   logout() {
@@ -46,7 +46,10 @@ export class NavbarComponent implements OnInit {
 
   isAdmin() { return this.currentUser && this.currentUser.role === Role.ADMIN; }
 
-  isExpandable() { return window.innerWidth < 1200; }
+  isExpandable() {
+    const breakPoint = this.isAdmin() ? 992 : 768;
+    return window.innerWidth < breakPoint;
+  }
 
   toggleNavbar() { this.isNavbarCollapsed = !this.isNavbarCollapsed; }
 

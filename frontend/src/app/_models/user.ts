@@ -31,3 +31,14 @@ export class User {
         this.email = data.email || '';
     }
 }
+
+export const UserRegexPatterns: Record<string, RegExp> = {
+    'username': new RegExp('^[a-zA-Z0-9]*$'),
+    'password': new RegExp('^[a-zA-Z0-9áéíóöőúüűÁÉÍÓÖŐUÚÜŰ@$!%*#?&]*$'),
+    'title': new RegExp('^[a-zA-ZáéíóöőúüűÁÉÍÓÖŐUÚÜŰ .-]*$'),
+    'lastname': new RegExp('^[a-zA-ZáéíóöőúüűÁÉÍÓÖŐUÚÜŰ .-]*$'),
+    'middlename': new RegExp('^[a-zA-ZáéíóöőúüűÁÉÍÓÖŐUÚÜŰ .-]*$'),
+    'firstname': new RegExp('^[a-zA-ZáéíóöőúüűÁÉÍÓÖŐUÚÜŰ .-]*$'),
+    'telephone': new RegExp('^(?=.{14,15}$)\\+36 (\\d{2}) (\\d{3}) (\\d{3,4})$'),
+    'email': new RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$')
+};

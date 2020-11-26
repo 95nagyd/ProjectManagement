@@ -23,3 +23,10 @@ export enum BasicDataType {
     STRUCTURAL_ELEMENT = 'structuralElements',
     SUBTASK = 'subtasks'
 }
+
+export enum TabNames {
+    'projects' = 'Projektek',
+    'designPhases' = 'Tervfázisok',
+    'structuralElements' = 'Szerkezeti elemek',
+    'subtasks' = 'Részfeladatok',
+}

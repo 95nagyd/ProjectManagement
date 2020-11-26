@@ -2,22 +2,23 @@
                 #commentbox 
                 (update)="updateComment($event);">
 </comment-box>
-    
+
+
 
 <div class="calendar-container">
     <div class="calendar-slider p-2">
 
         <div class="calendar-slider-left">
             <div class="w-75 text-left d-flex flex-row">
-                <div *ngIf="user" class="d-flex flex-row">
+                <div *ngIf="user" class="d-flex flex-row align-items-center">
 
                     <i class="fa fa-reply d-flex flex-column justify-content-center cursor-pointer arrow" aria-hidden="true" (click)="back();"></i>
-                    <span class="d-flex flex-column justify-content-center h-100 ml-3 name">
+                    <div class="ml-3 name">
                         {{userFullName}}
-                    </span>
+                    </div>
                 </div>
             </div>
-            <div class="w-25">
+            <div class="w-25 ml-auto">
                 <i  *ngIf="isPreviousChangeAvailable"
                     class="fa fa-arrow-left pr-2 cursor-pointer arrow" 
                     (click)="changeMonth('previous')"
@@ -75,16 +76,15 @@
                 <tr *ngFor="let dayData of daysOfMonth; last as isLast;" 
                     class="row-color">
                     <!-- Dátum cella -->
-                    <td class="date-cell date-cell-w"
-                        [ngClass]="isLast ? 'last-tr-left' : ''">
+                    <td class="date-cell date-cell-w" [ngClass]="{'today-first today' : isActualMonth && (dayData.number+1) === actualDayNumber}">
                         <div class="day"
-                             [ngClass]="{ 'last-tr-left': isLast, 'sunday': dayData.name === 'vasárnap', 'saturday': dayData.name === 'szombat' }">
+                             [ngClass]="{ 'sunday': dayData.name === 'vasárnap', 'saturday': dayData.name === 'szombat' }">
                             <div class="day-number">{{dayData.number+1 | twoDigitNumber}}.</div>
                             <div class="day-name">{{dayData.name}}</div>
                         </div>
                     </td>
                     <!-- Munkaidő cella -->
-                    <td class="working-time-cell-w">
+                    <td class="working-time-cell-w" [ngClass]="{'today' : isActualMonth && (dayData.number+1) === actualDayNumber}">
                         <table>
                             <tr *ngFor="let cellData of periodData[dayData.number]; index as dataRowIndex;">
                                 <td>
@@ -99,7 +99,7 @@
                         </table>
                     </td>
                     <!-- Projekt cella -->
-                    <td>
+                    <td [ngClass]="{'today' : isActualMonth && (dayData.number+1) === actualDayNumber}">
                         <table>
                             <tr *ngFor="let cellData of periodData[dayData.number]; index as dataRowIndex;">
                                 <td>
@@ -117,7 +117,7 @@
                         </table>
                     </td>
                     <!-- Tervfázis cella -->
-                    <td>
+                    <td [ngClass]="{'today' : isActualMonth && (dayData.number+1) === actualDayNumber}">
                         <table>
                             <tr *ngFor="let cellData of periodData[dayData.number]; index as dataRowIndex;">
                                 <td>
@@ -135,7 +135,7 @@
                         </table>
                     </td>
                     <!-- Szerkezeti elem cella -->
-                    <td >
+                    <td [ngClass]="{'today' : isActualMonth && (dayData.number+1) === actualDayNumber}">
                         <table>
                             <tr *ngFor="let cellData of periodData[dayData.number]; index as dataRowIndex;">
                                 <td>
@@ -153,7 +153,7 @@
                         </table>
                     </td>
                     <!-- Részfeladat cella -->
-                    <td >
+                    <td [ngClass]="{'today' : isActualMonth && (dayData.number+1) === actualDayNumber}">
                         <table>
                             <tr *ngFor="let cellData of periodData[dayData.number]; index as dataRowIndex;">
                                 <td>
@@ -171,7 +171,7 @@
                         </table>
                     </td>
                     <!-- Megjegyzés cella -->
-                    <td class="comment-cell-w">
+                    <td class="comment-cell-w" [ngClass]="{'today' : isActualMonth && (dayData.number+1) === actualDayNumber}">
                         <table>
                             <tr *ngFor="let cellData of periodData[dayData.number]; index as dataRowIndex;">
                                 <td>
@@ -194,8 +194,7 @@
                         </table>
                     </td>
                     <!-- Szerkesztés cella -->
-                    <td class="modify-cell modify-cell-w"
-                        [ngClass]="isLast ? 'last-tr-right' : ''">
+                    <td class="modify-cell modify-cell-w" [ngClass]="{'today-last today' : isActualMonth && (dayData.number+1) === actualDayNumber}">
                         <table>
                             <tr *ngFor="let cellData of periodData[dayData.number]; index as dataRowIndex; last as isLastRow; count as rowCount;">
                                 <td>
@@ -218,7 +217,12 @@
                 </tr>
             </tbody>
         </table>
+        <div class="summary">
+            <div class="date-cell-w text-center">Havi munkaidő:</div>
+            <div class="working-time-cell-w text-center">
+                <span class="summary-value">{{displayedSummary}}</span>
+            </div>
+        </div>
     </div>
 </div>
-
 

@@ -1,6 +1,7 @@
 .user-details {
   cursor: default;
   font-size: 12px;
+  min-width: 80px;
 }
 
 .user-name {
@@ -9,6 +10,8 @@
     max-height: 36px;
     overflow-x: auto;
     overflow-wrap: break-word;
+    max-width: 190px;
+    margin-left: auto;
 }
 
 .time-left {

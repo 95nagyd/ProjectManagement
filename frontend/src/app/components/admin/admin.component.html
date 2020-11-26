@@ -1,38 +1,29 @@
 <div class="tab-switch-container">
-    <div (click)="switchToTab(basicDataTab.PROJECT)" class="tab" [ngClass]="{'active-tab': selectedTab === basicDataTab.PROJECT}" [ngbTooltip]="selectedTab !== basicDataTab.PROJECT ? 'Projektek' : ''">
+    <div (click)="switchToTab(basicDataTab.PROJECT)" class="tab" [ngClass]="{'active-tab': selectedTab === basicDataTab.PROJECT}" [ngbTooltip]="selectedTab !== basicDataTab.PROJECT ? tabName(basicDataTab.PROJECT) : ''">
         <span>
             <mat-icon svgIcon="project"  placement="top" [ngClass]="selectedTab === basicDataTab.PROJECT ? 'active-icon' : 'icon'"></mat-icon>
         </span>
-        <span *ngIf="selectedTab === basicDataTab.PROJECT" class="mr-1">
-            Projektek
-        </span>
     </div>
-    <div (click)="switchToTab(basicDataTab.DESIGN_PHASE)" class="tab" [ngClass]="{'active-tab': selectedTab === basicDataTab.DESIGN_PHASE}" [ngbTooltip]="selectedTab !== basicDataTab.DESIGN_PHASE ? 'Tervfázisok' : ''">
+    <div (click)="switchToTab(basicDataTab.DESIGN_PHASE)" class="tab" [ngClass]="{'active-tab': selectedTab === basicDataTab.DESIGN_PHASE}" [ngbTooltip]="selectedTab !== basicDataTab.DESIGN_PHASE ? tabName(basicDataTab.DESIGN_PHASE) : ''">
         <span>
             <mat-icon svgIcon="design-phase" placement="top" [ngClass]="selectedTab === basicDataTab.DESIGN_PHASE ? 'active-icon' : 'icon'"></mat-icon>
         </span>
-        <span *ngIf="selectedTab === basicDataTab.DESIGN_PHASE" class="mr-1">
-            Tervfázisok
-        </span>
     </div>
-    <div (click)="switchToTab(basicDataTab.STRUCTURAL_ELEMENT)" class="tab" [ngClass]="{'active-tab': selectedTab === basicDataTab.STRUCTURAL_ELEMENT}" [ngbTooltip]="selectedTab !== basicDataTab.STRUCTURAL_ELEMENT ? 'Szerkezeti elemek' : ''">
+    <div (click)="switchToTab(basicDataTab.STRUCTURAL_ELEMENT)" class="tab" [ngClass]="{'active-tab': selectedTab === basicDataTab.STRUCTURAL_ELEMENT}" [ngbTooltip]="selectedTab !== basicDataTab.STRUCTURAL_ELEMENT ? tabName(basicDataTab.STRUCTURAL_ELEMENT) : ''">
         <span>
             <mat-icon svgIcon="structural-element" placement="top" [ngClass]="selectedTab === basicDataTab.STRUCTURAL_ELEMENT ? 'active-icon' : 'icon'"></mat-icon>
         </span>
-        <span *ngIf="selectedTab === basicDataTab.STRUCTURAL_ELEMENT" class="mr-1">
-            Szerkezeti elemek
-        </span>
     </div>
-    <div (click)="switchToTab(basicDataTab.SUBTASK)" class="tab" [ngClass]="{'active-tab': selectedTab === basicDataTab.SUBTASK}" [ngbTooltip]="selectedTab !== basicDataTab.SUBTASK ? 'Részfeladatok' : ''">
+    <div (click)="switchToTab(basicDataTab.SUBTASK)" class="tab" [ngClass]="{'active-tab': selectedTab === basicDataTab.SUBTASK}" [ngbTooltip]="selectedTab !== basicDataTab.SUBTASK ? tabName(basicDataTab.SUBTASK) : ''">
         <span>
             <mat-icon svgIcon="subtask" placement="top" [ngClass]="selectedTab === basicDataTab.SUBTASK ? 'active-icon' : 'icon'"></mat-icon>
-        </span>
-        <span *ngIf="selectedTab === basicDataTab.SUBTASK" class="mr-1">
-            Részfeladatok
         </span>
     </div>
 </div>
 <div class="chip-container">
+    <div class="tab-name">
+        {{tabName(selectedTab)}}
+    </div>
     <div class="p-3 d-flex flex-row align-content-start flex-wrap">
         <div class="d-inline-block" *ngFor="let chip of chipList;">
             <chip   [chipData]="chip"
