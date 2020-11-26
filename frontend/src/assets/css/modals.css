@@ -1,3 +1,7 @@
+.modal-open .modal {
+  overflow-x: auto !important;
+}
+
 .modal-holder{
   animation-name: open;
   animation-duration: 0.3s;
@@ -8,7 +12,9 @@
 }
 
 .modal-dialog{
-  margin: auto;
+  margin: auto !important;
+  max-width: 80% !important;
+  min-width: 200px !important;
 }
 
 .modal-title i {
@@ -100,6 +106,7 @@
 /*--- User modal ---*/
 .user-modal .modal-dialog {
   width: 350px;
+  min-width: 350px !important;
 }
 
 .user-modal .modal-header {
