@@ -19,7 +19,6 @@ app.options('*', cors());
 
 app.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
-    //res.setHeader('Access-Control-Allow-Origin', 'http://192.168.1.119');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
     next();
@@ -41,7 +40,6 @@ app.get('/users', verifyToken, (req, res) => {
 });
 
 app.post('/saveUser', verifyToken, (req, res) => {
-    console.log(req.body.user)
     if(req.body.user._id === '-1'){
         userService.addUser(req.body.user).then(() => {
             return res.status(201).send();
@@ -103,7 +101,6 @@ app.get('/basicData/all', verifyToken, (req, res) => {
     basicDataService.getBasicData().then((projects) => {
         return res.status(200).json(projects);
     }, (error) => {
-        console.log(error)
         return res.status(400).json({ message: error });
     });
 });

@@ -21,7 +21,6 @@ async function deleteBasicElementByType(basicElementId, type) {
     return await new Promise((resolve, reject) => {
         MongoClient.connect(process.env.URL, { useUnifiedTopology: true }, (err, client) => {
             if (err) {
-                console.log('DB Connection Error: ' + err);
                 return reject(err);
             } else {
                 var db = client.db(process.env.DBNAME);
@@ -269,7 +268,6 @@ async function getBasicData() {
     return await new Promise((resolve, reject) => {
         MongoClient.connect(process.env.URL, { useUnifiedTopology: true }, (err, client) => {
             if (err) {
-                console.log('DB Connection Error: ' + err);
                 return reject(err);
             } else {
                 var db = client.db(process.env.DBNAME);

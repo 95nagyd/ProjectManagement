@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, NgZone, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { Role } from '@app/_models/role';
 import { User, UserRegexPatterns } from '@app/_models/user';
 import { SpinnerService } from '@app/_services/spinner.service';
@@ -8,6 +8,7 @@ import { UserService } from '@app/_services/user.service';
 import { GlobalModalsService } from '@app/_services/global-modals.service';
 import { ConfirmModalType } from '@app/_models/modals';
 import { take } from 'rxjs/operators';
+import { ToasterService } from '@app/_services/toaster.service';
 
 
 @Component({
@@ -28,7 +29,7 @@ export class UserModalComponent implements OnInit, OnDestroy {
   role: Role;
 
   constructor(private modalService: NgbModal, private globalModalsService: GlobalModalsService, private spinner: SpinnerService, private formBuilder: FormBuilder,
-    private userService: UserService) {
+    private userService: UserService, private toasterService: ToasterService) {
     this.spinner.show();
     this.onClose = new EventEmitter();
     this.isPassVisible = false;
@@ -114,7 +115,7 @@ export class UserModalComponent implements OnInit, OnDestroy {
     userToSave.email = this.userFormControls.email.value.trim();
 
     this.userService.saveUser(userToSave).pipe(take(1)).subscribe(() => {
-      //TODO: sikeres mentés toaster
+      this.toasterService.saveSuccess();
       this.onClose.emit();
       this.openUserModalRef.close();
       this.spinner.hide();

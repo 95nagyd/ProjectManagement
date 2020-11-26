@@ -13,7 +13,6 @@ class MongoService {
         return new Promise((resolve, reject) => {
             MongoClient.connect(this.url, { useUnifiedTopology: true }, (err, client) => {
                 if (err) {
-                    console.log('DB Connection Error: ' + err);
                     return reject(err);
                 } else {
                     var db = client.db(this.dbName);
@@ -34,7 +33,6 @@ class MongoService {
         return new Promise((resolve, reject) => {
             MongoClient.connect(this.url, { useUnifiedTopology: true }, (err, client) => {
                 if (err) {
-                    console.log('DB Connection Error: ' + err);
                     return reject(err);
                 } else {
                     var db = client.db(this.dbName);
@@ -62,7 +60,6 @@ class MongoService {
         return new Promise((resolve, reject) => {
             MongoClient.connect(this.url, { useUnifiedTopology: true }, (err, client) => {
                 if (err) {
-                    console.log('DB Connection Error: ' + err);
                     return reject(err);
                 } else {
                     var db = client.db(this.dbName);
@@ -83,7 +80,6 @@ class MongoService {
         return new Promise((resolve, reject) => {
             MongoClient.connect(this.url, { useUnifiedTopology: true }, (err, client) => {
                 if (err) {
-                    console.log('DB Connection Error: ' + err);
                     return reject(err);
                 } else {
                     var db = client.db(this.dbName);
@@ -106,7 +102,6 @@ class MongoService {
         return new Promise((resolve, reject) => {
             MongoClient.connect(this.url, { useUnifiedTopology: true }, (err, client) => {
                 if (err) {
-                    console.log('DB Connection Error: ' + err);
                     return reject(err);
                 } else {
                     var db = client.db(this.dbName);

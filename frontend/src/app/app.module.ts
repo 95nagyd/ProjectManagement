@@ -33,6 +33,7 @@ import { GlobalModalsComponent } from './components/_core/global-modals/global-m
 import { ChipComponent } from './components/_core/chip/chip.component';
 import { MatIconModule } from '@angular/material/icon';
 import { AutosizeModule } from 'ngx-autosize';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @NgModule({
   declarations: [
@@ -68,7 +69,8 @@ import { AutosizeModule } from 'ngx-autosize';
     MatFormFieldModule,
     MatRadioModule,
     MatIconModule,
-    AutosizeModule
+    AutosizeModule,
+    MatSnackBarModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   providers: [

@@ -6,6 +6,7 @@ import { BasicElement, BasicDataType, TabNames } from '@app/_models/basic-data';
 import { ChipComponent } from '../_core/chip/chip.component';
 import { BasicDataService } from '@app/_services/basic-data.service';
 import { GlobalModalsService } from '@app/_services/global-modals.service';
+import { ToasterService } from '@app/_services/toaster.service';
 
 @Component({
   selector: 'admin',
@@ -19,7 +20,8 @@ export class AdminComponent implements OnInit {
   @ViewChildren(ChipComponent) chipRefList!: QueryList<ChipComponent>;
   isAddVisible: boolean;
 
-  constructor(private spinner: SpinnerService, private basicDataService: BasicDataService, private globalModalsService: GlobalModalsService) {
+  constructor(private spinner: SpinnerService, private basicDataService: BasicDataService, private globalModalsService: GlobalModalsService, 
+    private toasterService: ToasterService) {
 
     this.spinner.show();
 
@@ -79,8 +81,8 @@ export class AdminComponent implements OnInit {
       this.spinner.show();
       delete chipData.tempId;
       this.basicDataService.saveBasicElement(chipData, this.selectedTab).pipe(take(1)).subscribe(() => {
+        this.toasterService.saveSuccess();
         this.getCurrentList();
-        //TODO: sikeres mentés toaster
         this.spinner.hide();
       }, (error) => {
         this.spinner.forceHide();
@@ -153,7 +155,7 @@ export class AdminComponent implements OnInit {
     }
     this.spinner.show();
     this.basicDataService.deleteBasicElement(deleteChip._id, this.selectedTab).pipe(take(1)).subscribe(() => {
-      //TODO: siker toaster
+      this.toasterService.saveSuccess();
       this.getCurrentList();
       this.spinner.hide();
     }, (error) => {

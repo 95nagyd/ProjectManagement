@@ -14,7 +14,6 @@ async function saveCurrentUserWorkingTimeByGivenPeriod(userId, period, periodDat
     return await new Promise((resolve, reject) => {
         MongoClient.connect(process.env.URL, { useUnifiedTopology: true }, (err, client) => {
             if (err) {
-                console.log('DB Connection Error: ' + err);
                 return reject(err);
             } else {
                 if (_.isEmpty(periodData)) {

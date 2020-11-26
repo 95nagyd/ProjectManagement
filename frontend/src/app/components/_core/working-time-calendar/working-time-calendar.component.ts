@@ -14,6 +14,7 @@ import { ConfirmModalType } from '@app/_models/modals';
 import { BasicDataService } from '@app/_services/basic-data.service';
 import { BasicElement } from '@app/_models/basic-data';
 import { take } from 'rxjs/operators';
+import { ToasterService } from '@app/_services/toaster.service';
 
 @Component({
   selector: 'working-time-calendar',
@@ -74,17 +75,11 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
   isNewDisplayInTimeout: Boolean;
 
 
-  
-
-  //TODO: toaster
-  
-  
-  
-  
+  //TODO: projekt, tervf töröl, warnng modal, munkaido torol, projekt tervf kijelol, mentés nincs
 
   constructor(private spinner: SpinnerService, private scrollOffsetService: PageContentScrollOffsetService, private calendarService: CalendarService,
     private userService: UserService, private globalModalsService: GlobalModalsService, private comboBoxService: ComboBoxService,
-    private basicDataService: BasicDataService, private cdRef: ChangeDetectorRef) {
+    private basicDataService: BasicDataService, private cdRef: ChangeDetectorRef, private toasterService: ToasterService) {
 
     this.spinner.show();
 
@@ -436,11 +431,10 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
       setTimeout(() => {
         this.isDataChanged = !(_.isEqual(this.calendarOldData, this.removeEmptyRows(this.periodData)));
         this.globalModalsService.hasChanges = this.isDataChanged;
-        if(this.isDataChanged) { this.isSavable = this.isCalSavable(); }
+        this.isSavable = this.isCalSavable();
         resolve(this.isDataChanged);
       }, 0);
     });
-
   }
 
   removeEmptyRows(data: CalendarData) {
@@ -510,6 +504,7 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
       if (!this.globalModalsService.isWarningModalOpen()) {
         this.globalModalsService.openWarningModal('Mentés előtt kérem javítsa a hibás mezőket.').then(() => {
           this.getComboElements();
+          this.calcActualChangeState();
           this.globalModalsService.closeWarningModal();
         });
       }
@@ -519,7 +514,7 @@ export class WorkingTimeCalendarComponent implements OnInit, OnDestroy {
     this.spinner.show();
     let saveData = this.removeEmptyRows(this.periodData);
     this.calendarService.saveWorkingTime(this.chosenPeriod.getTime(), saveData).pipe(take(1)).subscribe((data) => {
-      //TODO: toaster mentés
+      this.toasterService.saveSuccess();
       this.getComboElements();
       this.updateCalendarViewData();
       this.spinner.hide();

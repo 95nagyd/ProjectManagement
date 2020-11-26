@@ -179,7 +179,7 @@ export class ComboBoxComponent implements OnInit, OnChanges {
       event.preventDefault();
     }
 
-    // dropdown frissítése a szűrt listára, és a megjelölendő névre
+    //dropdown frissítése a szűrt listára, és a megjelölendő névre
     this.comboBoxService.updateDropdown(this.searchResult, this.searchResult[this.arrowIndex]?.name || '');
   }
 
@@ -196,7 +196,7 @@ export class ComboBoxComponent implements OnInit, OnChanges {
       //ha a szűrő üres, akkor a teljes lista látszik
       this.searchResult = this.choices;
     }
-    // dropdown frissítése a szűrt listára, és a megjelölendő névre
+    //dropdown frissítése a szűrt listára, és a megjelölendő névre
     this.comboBoxService.updateDropdown(this.searchResult, this.searchResult[0]?.name || '');
   }
 

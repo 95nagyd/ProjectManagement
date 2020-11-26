@@ -12,6 +12,7 @@ html, body {
     height: calc(100% - 0.5rem);
 }
 
+
 ngb-popover-window{
     width: 270px !important;
     box-shadow: 5px 10px 18px #7a7a7a;
@@ -33,4 +34,18 @@ ngb-popover-window .popover-body {
     border-bottom: 1px solid rgb(73, 73, 73); 
     border-left: 1px solid rgb(73, 73, 73); 
     border-right: 1px solid rgb(73, 73, 73);
+}
+
+.green-snackbar {
+    background: rgb(18, 172, 75) !important;
+    color: white !important;
+}
+
+
+.cdk-overlay-container {
+    z-index: 10000 !important;
+}
+
+ngx-spinner div {
+    z-index: 9999 !important;
 }
