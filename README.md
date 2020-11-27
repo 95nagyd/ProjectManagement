@@ -1,8 +1,8 @@
 ## Backend
 `cd backend`
 `npm install`
+`npm run authServer`
 `npm run server`
-`npm run auth`
 
 ## Frontend
 `cd frontend`

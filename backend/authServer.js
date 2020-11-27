@@ -26,7 +26,6 @@ app.post('/token', (req, res) => {
     const refreshToken = req.body.refreshToken;
     if (!refreshToken || !jwt.decode(refreshToken).username) return res.status(401).json({ message: "Azonosítási hiba.\nFolytatáshoz jelentkezzen be újra." });
     const username = jwt.decode(refreshToken).username;
-    const role = jwt.decode(refreshToken).role;
     return userService.getUsers({ username: username }).then(async (users) => {
         if (users.length !== 1) return res.status(401).json({ message: "Azonosítási hiba.\nFolytatáshoz jelentkezzen be újra." });
         const refreshSecret = process.env.REFRESH_TOKEN_SECRET + users[0].password + users[0].role;
