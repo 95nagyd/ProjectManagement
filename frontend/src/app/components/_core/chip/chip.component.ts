@@ -30,7 +30,6 @@ export class ChipComponent implements OnInit {
   isNew: boolean;
   isEmpty: boolean;
   isAlreadyExist: boolean;
-  isInUse: boolean;
 
   constructor(private globalModalsService: GlobalModalsService) {
     this.save = new EventEmitter();
@@ -38,7 +37,6 @@ export class ChipComponent implements OnInit {
     this.isEditing = false;
     this.isEmpty = false;
     this.isAlreadyExist = false;
-    this.isInUse = false;
   }
 
   ngOnInit(): void {
