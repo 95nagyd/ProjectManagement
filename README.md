@@ -1,4 +1,4 @@
-## Backend
+## Database
 `cd database`
 `_DeployDatabase.bat`
 
