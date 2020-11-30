@@ -98,8 +98,8 @@ app.get('/firstPeriod', verifyToken, (req, res) => {
 });
 
 app.get('/basicData/all', verifyToken, (req, res) => {
-    basicDataService.getBasicData().then((projects) => {
-        return res.status(200).json(projects);
+    basicDataService.getBasicData().then((allBasicData) => {
+        return res.status(200).json(allBasicData);
     }, (error) => {
         return res.status(400).json({ message: error });
     });
