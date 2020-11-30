@@ -27,6 +27,6 @@ export const InfoModalData = {
   },
   'firstuser': {
     title: 'Első felhasználó',
-    content: 'Az első felhasználó automatikusan hozzáadsra került.'
+    content: 'Az első felhasználó automatikusan hozzáadásra került.'
   }
 }
